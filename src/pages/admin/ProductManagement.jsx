@@ -431,6 +431,15 @@ const ProductManagement = () => {
             return;
         }
 
+        // Check file type
+        const isPDF = file.type === 'application/pdf';
+        const isImage = file.type.startsWith('image/');
+
+        if (!isPDF && !isImage) {
+            alert("이미지 또는 PDF 파일만 업로드 가능합니다.");
+            return;
+        }
+
         setIsScanning(true);
         try {
             // Helper function to convert file to generative part
@@ -448,36 +457,132 @@ const ProductManagement = () => {
             const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
             const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-            const prompt = `
+            const prompt = isPDF ? `
+                Analyze this product catalog PDF and extract ALL product information.
+                If there are multiple products, extract them all as an array.
+                
+                Available Categories: zebra, roller, cellular, motor, wood, vertical, horizontal, swatch-zebra, swatch-roller.
+                
+                For EACH product, extract:
+                - title: product name (string)
+                - basePrice: numeric price in USD (if multiple prices, use the base/lowest)
+                - description: detailed feature/specs summary (string)
+                - category: one of the specified categories (string)
+                - colors: array of color options [{name: string, hex: string (estimate if not shown), component_id: string (create unique ID like "FAB_COLORNAME")}]
+                - sizeRatio: price per square foot if mentioned (number, default 0)
+                - minWidth: minimum width in inches (number, default 20)
+                - maxWidth: maximum width in inches (number, default 120)
+                - minHeight: minimum height in inches (number, default 10)
+                - maxHeight: maximum height in inches (number, default 144)
+                - showMotor: whether motor option is available (boolean, default true)
+                - showColor: whether color selection is available (boolean, default true)
+                
+                Return a JSON object with this structure:
+                {
+                    "products": [
+                        { /* product 1 data */ },
+                        { /* product 2 data */ },
+                        ...
+                    ]
+                }
+                
+                If only ONE product is found, still return it in the "products" array.
+                Return ONLY the JSON, no markdown formatting.
+            ` : `
                 Analyze this catalog image and extract product information. 
                 Return the information as a JSON object.
                 
-                Categories: zebra, roller, cellular, motor.
+                Available Categories: zebra, roller, cellular, motor, wood, vertical, horizontal, swatch-zebra, swatch-roller.
                 
                 Fields:
-                - title: product name
-                - basePrice: numeric price (if multiple, use the lowest or a base)
-                - description: feature/specs summary
-                - category: one of the specified categories
-                - colors: list of colors shown or mentioned {name, hex (if visible/guessable), component_id (create unique ID based on color name)}
+                - title: product name (string)
+                - basePrice: numeric price in USD (if multiple, use the lowest or a base)
+                - description: feature/specs summary (string)
+                - category: one of the specified categories (string)
+                - colors: list of colors shown or mentioned [{name: string, hex: string (if visible/guessable), component_id: string (create unique ID like "FAB_COLORNAME")}]
+                - sizeRatio: price per square foot if mentioned (number, default 0)
+                - minWidth: minimum width in inches (number, default 20)
+                - maxWidth: maximum width in inches (number, default 120)
+                - minHeight: minimum height in inches (number, default 10)
+                - maxHeight: maximum height in inches (number, default 144)
+                - showMotor: whether motor option is available (boolean, default true)
+                - showColor: whether color selection is available (boolean, default true)
                 
-                Return ONLY the JSON.
+                Return ONLY the JSON, no markdown formatting.
             `;
 
-            const imagePart = await fileToGenerativePart(file);
-            const result = await model.generateContent([prompt, imagePart]);
+            const filePart = await fileToGenerativePart(file);
+            const result = await model.generateContent([prompt, filePart]);
             const response = await result.response;
             const jsonText = response.text().replace(/```json|```/g, "").trim();
             const extractedData = JSON.parse(jsonText);
 
-            setNewProduct(prev => ({ ...prev, ...extractedData }));
+            // Handle PDF with multiple products
+            if (isPDF && extractedData.products && Array.isArray(extractedData.products)) {
+                if (extractedData.products.length === 0) {
+                    alert("PDF에서 제품 정보를 찾을 수 없습니다.");
+                    return;
+                }
+
+                // If multiple products found, ask user which one to add or add all
+                if (extractedData.products.length > 1) {
+                    const confirmAll = window.confirm(
+                        `PDF에서 ${extractedData.products.length}개의 제품을 찾았습니다.\n\n` +
+                        `모두 등록하시겠습니까?\n\n` +
+                        `"확인" = 모두 등록\n` +
+                        `"취소" = 첫 번째 제품만 폼에 로드`
+                    );
+
+                    if (confirmAll) {
+                        // Add all products directly to Firebase
+                        let successCount = 0;
+                        for (const productData of extractedData.products) {
+                            try {
+                                const fullProductData = {
+                                    ...productData,
+                                    basePrice: Number(productData.basePrice) || 0,
+                                    sizeRatio: parseFloat(productData.sizeRatio) || 0,
+                                    minWidth: Number(productData.minWidth) || 20,
+                                    maxWidth: Number(productData.maxWidth) || 120,
+                                    minHeight: Number(productData.minHeight) || 10,
+                                    maxHeight: Number(productData.maxHeight) || 144,
+                                    showMotor: productData.showMotor !== undefined ? productData.showMotor : true,
+                                    showColor: productData.showColor !== undefined ? productData.showColor : true,
+                                    colors: productData.colors || [],
+                                    configGroups: productData.configGroups || [],
+                                    createdAt: new Date().toISOString(),
+                                    updatedAt: new Date().toISOString()
+                                };
+                                await addDoc(collection(db, "products"), fullProductData);
+                                successCount++;
+                            } catch (err) {
+                                console.error("Error adding product:", err);
+                            }
+                        }
+                        alert(`${successCount}개의 제품이 성공적으로 등록되었습니다!`);
+                        fetchProducts();
+                        setShowAIModal(false);
+                        return;
+                    } else {
+                        // Load first product into form
+                        setNewProduct(prev => ({ ...prev, ...extractedData.products[0] }));
+                    }
+                } else {
+                    // Only one product found
+                    setNewProduct(prev => ({ ...prev, ...extractedData.products[0] }));
+                }
+            } else {
+                // Single image product
+                setNewProduct(prev => ({ ...prev, ...extractedData }));
+            }
+
             setShowForm(true);
             setShowAIModal(false);
-            alert("이미지 분석이 완료되었습니다! 추출된 정보를 확인해주세요.");
+            alert(`${isPDF ? 'PDF' : '이미지'} 분석이 완료되었습니다! 추출된 정보를 확인해주세요.`);
             
         } catch (error) {
             console.error("AI Scan Error:", error);
-            alert("이미지 분석에 실패했습니다. (Gemini API 오류)");
+            alert(`${isPDF ? 'PDF' : '이미지'} 분석에 실패했습니다.\n\n오류: ${error.message}\n\nGemini API 키와 파일 형식을 확인해주세요.`);
         } finally {
             setIsScanning(false);
             e.target.value = null;

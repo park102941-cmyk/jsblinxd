@@ -71,17 +71,18 @@ function doPost(e) {
         lock.waitLock(10000); // Wait for other processes
 
         var ss = SpreadsheetApp.getActiveSpreadsheet();
-        var sheet = ss.getSheetByName("Sheet1") || ss.getSheets()[0];
         var data = JSON.parse(e.postData.contents);
 
         // --- ACTION HANDLER ---
-        // If action is 'sync_products', update the Products sheet and return early
+        // Handle specific actions first
+        
+        // 1. SYNC PRODUCTS ACTION
         if (data.action === 'sync_products') {
             var result = syncProducts(ss, data.products);
             return ContentService.createTextOutput(JSON.stringify(result)).setMimeType(ContentService.MimeType.JSON);
         }
 
-        // --- NEW: SEND TO FACTORY ACTION ---
+        // 2. SEND TO FACTORY ACTION
         if (data.action === 'send_to_factory') {
             var orderData = data.order;
             var targetSs = SpreadsheetApp.openById(CONFIG.PURCHASE_SHEET_ID);
@@ -113,13 +114,16 @@ function doPost(e) {
         }
 
         // --- DEFAULT ORDER PROCESSING ---
+        // If no specific action, treat as regular order creation
+        var sheet = ss.getSheetByName("Sheet1") || ss.getSheets()[0];
+        
         // Create Headers if empty
         if (sheet.getLastRow() === 0) {
             sheet.appendRow(["주문일", "주문번호", "Side Mark", "고객명", "상품명", "Color", "W (in)", "H (in)", "Mount", "Motor/Cord", "수량", "상태", "송장번호", "판매가", "Email", "Address"]);
         }
 
         var items = data.items || [];
-        var consumedAssets = data.consumedAssets || []; // New: Assets to deduce
+        var consumedAssets = data.consumedAssets || []; // Assets to deduce
         var timestamp = new Date().toLocaleDateString();
 
         // 1. Append Order Rows
