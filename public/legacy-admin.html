@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSBLIND Legacy Admin Panel</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f7;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        header {
+            background-color: #1d1d1f;
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+        }
+        nav {
+            display: flex;
+            gap: 20px;
+        }
+        nav button {
+            background: none;
+            border: none;
+            color: #86868b;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            padding: 10px 0;
+            transition: color 0.2s;
+        }
+        nav button.active {
+            color: white;
+            border-bottom: 2px solid #0071e3;
+        }
+        nav button:hover {
+            color: white;
+        }
+        main {
+            flex: 1;
+            padding: 20px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        .iframe-container {
+            flex: 1;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            overflow: hidden;
+            border: 1px solid #d2d2d7;
+        }
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        .auth-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: #f5f5f7;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .auth-card {
+            background: white;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            text-align: center;
+            width: 350px;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 20px 0;
+            border: 1px solid #d2d2d7;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 1rem;
+        }
+        .btn-submit {
+            background: #0071e3;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div id="authOverlay" class="auth-overlay">
+        <div class="auth-card">
+            <h2 style="margin-top: 0;">Admin Login</h2>
+            <p style="color: #666; font-size: 0.9rem;">Please enter password to access legacy panel.</p>
+            <input type="password" id="password" placeholder="Password" autofocus>
+            <button class="btn-submit" onclick="checkAuth()">Enter</button>
+            <p id="error" style="color: #d32f2f; font-size: 0.8rem; margin-top: 15px; display: none;">Incorrect Password</p>
+        </div>
+    </div>
+
+    <header>
+        <div class="logo">JSBLIND ADMIN (LEGACY)</div>
+        <nav>
+            <button class="active" onclick="switchTab('orders', this)">Orders / Factory</button>
+            <button onclick="switchTab('products', this)">Product Database</button>
+            <button onclick="switchTab('returns', this)">Returns / Refunds</button>
+            <button onclick="switchTab('referral', this)">Referral Status</button>
+            <a href="/" style="color: #0071e3; text-decoration: none; font-size: 0.9rem; display: flex; align-items: center; margin-left: 20px;">Back to Site</a>
+        </nav>
+    </header>
+
+    <main>
+        <div class="iframe-container">
+            <iframe id="adminFrame" src="about:blank"></iframe>
+        </div>
+    </main>
+
+    <script>
+        const SHEETS = {
+            orders: 'https://docs.google.com/spreadsheets/d/1O0RSagEwk8MlxN-Yslcw8F_N5cHzaoz7GJGwWVRfiT0/edit?gid=1966987767',
+            products: 'https://docs.google.com/spreadsheets/d/1O0RSagEwk8MlxN-Yslcw8F_N5cHzaoz7GJGwWVRfiT0/edit?gid=0',
+            returns: 'https://docs.google.com/spreadsheets/d/1O0RSagEwk8MlxN-Yslcw8F_N5cHzaoz7GJGwWVRfiT0/edit?gid=1534081045',
+            referral: 'https://docs.google.com/spreadsheets/d/1O0RSagEwk8MlxN-Yslcw8F_N5cHzaoz7GJGwWVRfiT0/edit?gid=324567890' // Dummy GID, placeholder for referral
+        };
+
+        function checkAuth() {
+            const pass = document.getElementById('password').value;
+            if (pass === '123456') {
+                document.getElementById('authOverlay').style.display = 'none';
+                switchTab('orders', document.querySelector('nav button.active'));
+            } else {
+                document.getElementById('error').style.display = 'block';
+            }
+        }
+
+        document.getElementById('password').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') checkAuth();
+        });
+
+        function switchTab(type, el) {
+            const frame = document.getElementById('adminFrame');
+            frame.src = SHEETS[type];
+            
+            document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+            el.classList.add('active');
+        }
+    </script>
+</body>
+</html>

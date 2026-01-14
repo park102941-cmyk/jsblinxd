@@ -1,0 +1,21 @@
+{
+  "name": "JSBlind - Custom Smart Blinds",
+  "short_name": "JSBlind",
+  "description": "Premium Custom Smart Blinds and Shades with ZSHINE Technology",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0071e3",
+  "icons": [
+    {
+      "src": "/logo.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/logo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
