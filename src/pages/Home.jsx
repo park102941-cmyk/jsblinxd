@@ -5,6 +5,8 @@ import ProductCard from '../components/ProductCard';
 import { useAuth } from '../context/AuthContext';
 import { Link } from 'react-router-dom';
 import { Truck, ShieldCheck, Ruler, ThumbsUp, Instagram, Cpu, Smartphone, Rss, Sun, ChevronRight, Star, ShieldAlert, Sparkles, Menu } from 'lucide-react';
+import ScrollReveal from '../components/ScrollReveal';
+import LoadingSpinner from '../components/LoadingSpinner';
 
 const Home = () => {
     const { currentUser } = useAuth();
@@ -111,11 +113,7 @@ const Home = () => {
         return Icon ? <Icon size={24} /> : null;
     };
 
-    if (loading) return (
-        <div style={{ padding: '100px', textAlign: 'center' }}>
-            <div className="loader"></div>
-        </div>
-    );
+    if (loading) return <LoadingSpinner fullScreen text="Loading..." />;
 
     return (
         <div className="home-container">
@@ -144,7 +142,7 @@ const Home = () => {
                     background: 'linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.1))'
                 }}></div>
                 
-                <div className="container" style={{ position: 'relative', textAlign: 'center', maxWidth: '800px' }}>
+                <div className="container animate-fade-in-up" style={{ position: 'relative', textAlign: 'center', maxWidth: '800px' }}>
                     <h1 style={{ 
                         fontSize: 'clamp(3rem, 8vw, 5rem)', 
                         fontWeight: '800', 
@@ -159,10 +157,10 @@ const Home = () => {
                         {homeData.hero.subtitle}
                     </p>
                     <div style={{ display: 'flex', gap: '20px', justifyContent: 'center' }}>
-                        <Link to="/products" className="btn-primary" style={{ padding: '15px 35px', borderRadius: '30px' }}>
+                        <Link to="/products" className="btn-primary hover-lift" style={{ padding: '15px 35px', borderRadius: '30px' }}>
                             Shop Now
                         </Link>
-                        <Link to="/swatches" className="btn-secondary" style={{ padding: '15px 35px', borderRadius: '30px', backgroundColor: 'rgba(255,255,255,0.1)', backdropFilter: 'blur(10px)', color: 'white', border: '1px solid rgba(255,255,255,0.3)' }}>
+                        <Link to="/swatches" className="btn-secondary hover-lift" style={{ padding: '15px 35px', borderRadius: '30px', backgroundColor: 'rgba(255,255,255,0.1)', backdropFilter: 'blur(10px)', color: 'white', border: '1px solid rgba(255,255,255,0.3)' }}>
                             Free Swatches
                         </Link>
                     </div>
@@ -186,32 +184,36 @@ const Home = () => {
 
             {/* Collections Grid */}
             <section className="container" style={{ padding: '100px 20px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '40px' }}>
-                    <h2 style={{ fontSize: '2.5rem', fontWeight: '700', margin: 0 }}>The Collection</h2>
-                    <Link to="/products" style={{ color: 'var(--primary-green)', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '5px' }}>
-                        View All <ChevronRight size={18} />
-                    </Link>
-                </div>
+                <ScrollReveal animation="fade">
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '40px' }}>
+                        <h2 style={{ fontSize: '2.5rem', fontWeight: '700', margin: 0 }}>The Collection</h2>
+                        <Link to="/products" style={{ color: 'var(--primary-green)', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                            View All <ChevronRight size={18} />
+                        </Link>
+                    </div>
+                </ScrollReveal>
                 
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '30px' }}>
                     {homeData.categories.map((cat, i) => (
-                        <Link to={cat.link} key={i} style={{ position: 'relative', height: '500px', borderRadius: '20px', overflow: 'hidden', display: 'block' }}>
-                            <img src={cat.img} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt={cat.title} />
-                            <div style={{
-                                position: 'absolute',
-                                bottom: 0,
-                                left: 0,
-                                right: 0,
-                                padding: '40px',
-                                background: 'linear-gradient(transparent, rgba(0,0,0,0.6))',
-                                color: 'white'
-                            }}>
-                                <h3 style={{ fontSize: '1.8rem', fontWeight: '700', marginBottom: '10px' }}>{cat.title}</h3>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '5px', fontWeight: '600' }}>
-                                    Explore <ChevronRight size={16} />
+                        <ScrollReveal key={i} animation="scale" delay={i * 100}>
+                            <Link to={cat.link} className="hover-lift" style={{ position: 'relative', height: '500px', borderRadius: '20px', overflow: 'hidden', display: 'block' }}>
+                                <img src={cat.img} style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.5s ease' }} alt={cat.title} />
+                                <div style={{
+                                    position: 'absolute',
+                                    bottom: 0,
+                                    left: 0,
+                                    right: 0,
+                                    padding: '40px',
+                                    background: 'linear-gradient(transparent, rgba(0,0,0,0.6))',
+                                    color: 'white'
+                                }}>
+                                    <h3 style={{ fontSize: '1.8rem', fontWeight: '700', marginBottom: '10px' }}>{cat.title}</h3>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '5px', fontWeight: '600' }}>
+                                        Explore <ChevronRight size={16} />
+                                    </div>
                                 </div>
-                            </div>
-                        </Link>
+                            </Link>
+                        </ScrollReveal>
                     ))}
                 </div>
             </section>
@@ -219,42 +221,49 @@ const Home = () => {
             {/* Smart Technology Feature */}
             <section style={{ backgroundColor: '#fcfcfd', color: 'var(--text-main)', overflow: 'hidden', borderTop: '1px solid #eee', borderBottom: '1px solid #eee' }}>
                 <div className="container" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', alignItems: 'center' }}>
-                    <div style={{ padding: '100px 60px' }}>
-                        <span style={{ color: 'var(--primary-green)', fontWeight: '700', letterSpacing: '2px', fontSize: '0.9rem' }}>{homeData.techHighlight.tag}</span>
-                        <h2 style={{ fontSize: '3rem', fontWeight: '800', margin: '20px 0', lineHeight: '1.1', color: '#1d1d1f' }}>{homeData.techHighlight.title}</h2>
-                        <p style={{ fontSize: '1.1rem', color: '#666', marginBottom: '40px', lineHeight: '1.6' }}>{homeData.techHighlight.description}</p>
-                        
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '30px' }}>
-                            {homeData.techHighlight.features.map((f, i) => (
-                                <div key={i}>
-                                    <div style={{ color: 'var(--primary-green)', marginBottom: '15px' }}>{renderIcon(f.icon)}</div>
-                                    <h4 style={{ margin: '0 0 5px', fontSize: '1rem', fontWeight: '700', color: '#1d1d1f' }}>{f.title}</h4>
-                                    <p style={{ margin: 0, fontSize: '0.85rem', color: '#666' }}>{f.desc}</p>
-                                </div>
-                            ))}
+                    <ScrollReveal animation="left">
+                        <div style={{ padding: '100px 60px' }}>
+                            <span style={{ color: 'var(--primary-green)', fontWeight: '700', letterSpacing: '2px', fontSize: '0.9rem' }}>{homeData.techHighlight.tag}</span>
+                            <h2 style={{ fontSize: '3rem', fontWeight: '800', margin: '20px 0', lineHeight: '1.1', color: '#1d1d1f' }}>{homeData.techHighlight.title}</h2>
+                            <p style={{ fontSize: '1.1rem', color: '#666', marginBottom: '40px', lineHeight: '1.6' }}>{homeData.techHighlight.description}</p>
+                            
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '30px' }}>
+                                {homeData.techHighlight.features.map((f, i) => (
+                                    <div key={i}>
+                                        <div style={{ color: 'var(--primary-green)', marginBottom: '15px' }}>{renderIcon(f.icon)}</div>
+                                        <h4 style={{ margin: '0 0 5px', fontSize: '1rem', fontWeight: '700', color: '#1d1d1f' }}>{f.title}</h4>
+                                        <p style={{ margin: 0, fontSize: '0.85rem', color: '#666' }}>{f.desc}</p>
+                                    </div>
+                                ))}
+                            </div>
                         </div>
-                    </div>
-                    <div style={{ height: '700px', backgroundColor: '#f5f5f7' }}>
-                        <img src={homeData.techHighlight.imageUrl} style={{ width: '100%', height: '100%', objectFit: 'cover', mixBlendMode: 'multiply' }} alt="Smart Tech" />
-                    </div>
+                    </ScrollReveal>
+                    <ScrollReveal animation="right">
+                        <div style={{ height: '700px', backgroundColor: '#f5f5f7' }}>
+                            <img src={homeData.techHighlight.imageUrl} style={{ width: '100%', height: '100%', objectFit: 'cover', mixBlendMode: 'multiply' }} alt="Smart Tech" />
+                        </div>
+                    </ScrollReveal>
                 </div>
             </section>
 
             {/* Best Sellers */}
             <section className="container" style={{ padding: '100px 20px' }}>
-                <h2 style={{ fontSize: '2.5rem', fontWeight: '700', marginBottom: '50px', textAlign: 'center' }}>Most Popular</h2>
+                <ScrollReveal animation="fade">
+                    <h2 style={{ fontSize: '2.5rem', fontWeight: '700', marginBottom: '50px', textAlign: 'center' }}>Most Popular</h2>
+                </ScrollReveal>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '40px' }}>
-                    {bestSellers.map(product => (
-                        <ProductCard 
-                            key={product.id}
-                            id={product.id}
-                            title={product.title}
-                            price={product.basePrice}
-                            image={product.imageUrl}
-                            badge={product.badge}
-                            reviews={product.reviews || 0}
-                            colors={product.colors && Array.isArray(product.colors) ? product.colors.map(c => typeof c === 'string' ? c : c.hex) : []}
-                        />
+                    {bestSellers.map((product, index) => (
+                        <ScrollReveal key={product.id} animation="scale" delay={index * 100}>
+                            <ProductCard 
+                                id={product.id}
+                                title={product.title}
+                                price={product.basePrice}
+                                image={product.imageUrl}
+                                badge={product.badge}
+                                reviews={product.reviews || 0}
+                                colors={product.colors && Array.isArray(product.colors) ? product.colors.map(c => typeof c === 'string' ? c : c.hex) : []}
+                            />
+                        </ScrollReveal>
                     ))}
                 </div>
             </section>

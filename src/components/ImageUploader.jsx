@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Upload, Loader2, CheckCircle, AlertCircle, X } from 'lucide-react';
 
 const CLOUDINARY_CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
@@ -10,6 +10,14 @@ const CloudinaryImageUploader = ({ onUploadComplete, currentImageUrl = '', label
   const [error, setError] = useState('');
   const [preview, setPreview] = useState(currentImageUrl);
   const [uploadProgress, setUploadProgress] = useState(0);
+
+  // Update preview and uploadedUrl when currentImageUrl changes (for edit mode)
+  useEffect(() => {
+    if (currentImageUrl) {
+      setPreview(currentImageUrl);
+      setUploadedUrl(currentImageUrl);
+    }
+  }, [currentImageUrl]);
 
   const handleFileChange = async (e) => {
     const file = e.target.files[0];

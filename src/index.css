@@ -167,3 +167,389 @@ button {
 @media (max-width: 640px) {
   .grid-3 { grid-template-columns: 1fr; }
 }
+
+/* ========================================
+   ANIMATION KEYFRAMES
+   ======================================== */
+
+/* Fade Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Scale Animations */
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes scaleUp {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.05);
+  }
+}
+
+/* Bounce Animation */
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-10px);
+  }
+  60% {
+    transform: translateY(-5px);
+  }
+}
+
+/* Pulse Animation */
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Shake Animation */
+@keyframes shake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  10%, 30%, 50%, 70%, 90% {
+    transform: translateX(-5px);
+  }
+  20%, 40%, 60%, 80% {
+    transform: translateX(5px);
+  }
+}
+
+/* Slide Animations */
+@keyframes slideInUp {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideInDown {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Rotate Animation */
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Shimmer/Loading Animation */
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+/* Glow Animation */
+@keyframes glow {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(107, 116, 103, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(107, 116, 103, 0.6);
+  }
+}
+
+/* ========================================
+   ANIMATION UTILITY CLASSES
+   ======================================== */
+
+/* Fade Animations */
+.animate-fade-in {
+  animation: fadeIn 0.6s ease-out;
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.8s ease-out;
+}
+
+.animate-fade-in-down {
+  animation: fadeInDown 0.8s ease-out;
+}
+
+.animate-fade-in-left {
+  animation: fadeInLeft 0.8s ease-out;
+}
+
+.animate-fade-in-right {
+  animation: fadeInRight 0.8s ease-out;
+}
+
+/* Scale Animations */
+.animate-scale-in {
+  animation: scaleIn 0.5s ease-out;
+}
+
+.animate-bounce {
+  animation: bounce 1s ease-in-out;
+}
+
+.animate-pulse {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.animate-shake {
+  animation: shake 0.5s ease-in-out;
+}
+
+/* Slide Animations */
+.animate-slide-in-up {
+  animation: slideInUp 0.6s ease-out;
+}
+
+.animate-slide-in-down {
+  animation: slideInDown 0.6s ease-out;
+}
+
+/* Rotate Animation */
+.animate-rotate {
+  animation: rotate 1s linear infinite;
+}
+
+/* Shimmer Animation */
+.animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    #f0f0f0 0%,
+    #e0e0e0 50%,
+    #f0f0f0 100%
+  );
+  background-size: 1000px 100%;
+  animation: shimmer 2s infinite;
+}
+
+/* Glow Animation */
+.animate-glow {
+  animation: glow 2s ease-in-out infinite;
+}
+
+/* ========================================
+   SCROLL REVEAL ANIMATIONS
+   ======================================== */
+
+.scroll-reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+}
+
+.scroll-reveal.revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.scroll-reveal-left {
+  opacity: 0;
+  transform: translateX(-30px);
+  transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+}
+
+.scroll-reveal-left.revealed {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.scroll-reveal-right {
+  opacity: 0;
+  transform: translateX(30px);
+  transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+}
+
+.scroll-reveal-right.revealed {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.scroll-reveal-scale {
+  opacity: 0;
+  transform: scale(0.9);
+  transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+}
+
+.scroll-reveal-scale.revealed {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Stagger animation delays for multiple elements */
+.scroll-reveal:nth-child(1) { transition-delay: 0.1s; }
+.scroll-reveal:nth-child(2) { transition-delay: 0.2s; }
+.scroll-reveal:nth-child(3) { transition-delay: 0.3s; }
+.scroll-reveal:nth-child(4) { transition-delay: 0.4s; }
+.scroll-reveal:nth-child(5) { transition-delay: 0.5s; }
+.scroll-reveal:nth-child(6) { transition-delay: 0.6s; }
+
+/* ========================================
+   HOVER EFFECTS
+   ======================================== */
+
+.hover-lift {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+.hover-scale {
+  transition: transform 0.3s ease;
+}
+
+.hover-scale:hover {
+  transform: scale(1.05);
+}
+
+.hover-glow {
+  transition: box-shadow 0.3s ease;
+}
+
+.hover-glow:hover {
+  box-shadow: 0 0 20px rgba(107, 116, 103, 0.4);
+}
+
+.hover-brightness {
+  transition: filter 0.3s ease;
+}
+
+.hover-brightness:hover {
+  filter: brightness(1.1);
+}
+
+/* ========================================
+   PAGE TRANSITION
+   ======================================== */
+
+.page-transition-enter {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.page-transition-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.4s ease-out, transform 0.4s ease-out;
+}
+
+.page-transition-exit {
+  opacity: 1;
+}
+
+.page-transition-exit-active {
+  opacity: 0;
+  transition: opacity 0.3s ease-in;
+}
+
+/* ========================================
+   LOADING SPINNER
+   ======================================== */
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid rgba(107, 116, 103, 0.1);
+  border-top-color: var(--primary-green);
+  border-radius: 50%;
+  animation: rotate 1s linear infinite;
+}
+
+.spinner-small {
+  width: 20px;
+  height: 20px;
+  border-width: 2px;
+}
+
+.spinner-large {
+  width: 60px;
+  height: 60px;
+  border-width: 6px;
+}

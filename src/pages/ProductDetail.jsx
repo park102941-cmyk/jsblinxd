@@ -247,7 +247,11 @@ const ProductDetail = () => {
         );
     }
 
-    const images = product.images && product.images.length > 0 ? product.images : ["https://via.placeholder.com/600x600/f5f5f5/333?text=No+Image"];
+    const images = product.images && product.images.length > 0 
+        ? product.images 
+        : product.imageUrl 
+            ? [product.imageUrl] 
+            : ["https://via.placeholder.com/600x600/f5f5f5/333?text=No+Image"];
 
     return (
         <div className="container" style={{ padding: '40px 20px', maxWidth: '1200px', margin: '0 auto' }}>

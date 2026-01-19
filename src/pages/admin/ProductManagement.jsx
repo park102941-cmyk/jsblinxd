@@ -32,7 +32,13 @@ const ProductManagement = () => {
         minWidth: 20, maxWidth: 100,
         minHeight: 10, maxHeight: 120,
         showMotor: true,
-        showColor: true
+        showColor: true,
+        // Motor-specific fields
+        motorType: '', // e.g., 'Zigbee', 'WiFi', 'RF', 'Hardwired'
+        torque: '', // Torque in Nm (Newton meters)
+        voltage: '', // e.g., '12V DC', '110V AC'
+        batteryType: '', // e.g., 'Rechargeable Li-ion', 'AA batteries', 'N/A'
+        compatibleBlinds: '' // e.g., 'Roller, Zebra, Cellular'
     };
     const [newProduct, setNewProduct] = useState(initialFormState);
 

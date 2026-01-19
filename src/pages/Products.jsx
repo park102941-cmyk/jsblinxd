@@ -24,9 +24,13 @@ const Products = () => {
                 }));
 
                 if (categoryFilter) {
-                    fetchedProducts = fetchedProducts.filter(p =>
-                        p.category?.toLowerCase() === categoryFilter.toLowerCase()
-                    );
+                    fetchedProducts = fetchedProducts.filter(p => {
+                        const productCategory = p.category?.toLowerCase() || '';
+                        const filter = categoryFilter.toLowerCase();
+                        // Support both exact match and partial match
+                        // e.g., "zebra" matches "Zebra Shades"
+                        return productCategory === filter || productCategory.includes(filter);
+                    });
                 }
 
                 setProducts(fetchedProducts);

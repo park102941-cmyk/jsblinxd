@@ -5,6 +5,7 @@ import { AuthProvider } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
 import Header from './components/Header';
 import Footer from './components/Footer';
+import PageTransition from './components/PageTransition';
 import Home from './pages/Home';
 import ProductDetail from './pages/ProductDetail';
 import Swatches from './pages/Swatches';
@@ -31,6 +32,7 @@ import AdminRoute from './components/AdminRoute';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import ProductManagement from './pages/admin/ProductManagement';
 import OrderManagement from './pages/admin/OrderManagement';
+import EnhancedOrderManagement from './pages/admin/EnhancedOrderManagement';
 import ReturnManagement from './pages/admin/ReturnManagement';
 import CouponManagement from './pages/admin/CouponManagement';
 import HomeManagement from './pages/admin/HomeManagement';
@@ -42,6 +44,8 @@ import NotificationCenter from './pages/admin/NotificationCenter';
 import AIAssistant from './pages/admin/AIAssistant';
 import CustomerManagement from './pages/admin/CustomerManagement';
 import CategoryManagement from './pages/admin/CategoryManagement';
+import ZshineProductImporter from './pages/admin/ZshineProductImporter';
+import ProductImporter from './pages/admin/ProductImporter';
 
 import { db } from './lib/firebase';
 import { doc, getDoc } from 'firebase/firestore';
@@ -126,49 +130,54 @@ function App() {
             {/* <AnnouncementPopup /> */}
             <Header />
             <main style={{ flex: 1, background: '#f5f5f7' }}>
-              <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/swatches" element={<Swatches />} />
-                <Route path="/products" element={<Products />} />
-                <Route path="/custom-blinds" element={<Navigate to="/products" replace />} /> {/* Redirect old route */}
-                <Route path="/support" element={<Support />} />
-                <Route path="/about-us" element={<AboutUs />} />
-                <Route path="/track-order" element={<TrackOrder />} />
-                <Route path="/search" element={<SearchPage />} />
-                <Route path="/help" element={<Help />} />
-                <Route path="/help/how-to-measure" element={<HowToMeasure />} />
-                <Route path="/help/how-to-install" element={<HowToInstall />} />
-                <Route path="/help/how-to-choose" element={<HowToChoose />} />
-                <Route path="/help/smart-motors" element={<SmartMotors />} />
+              <PageTransition>
+                <Routes>
+                  <Route path="/" element={<Home />} />
+                  <Route path="/swatches" element={<Swatches />} />
+                  <Route path="/products" element={<Products />} />
+                  <Route path="/custom-blinds" element={<Navigate to="/products" replace />} /> {/* Redirect old route */}
+                  <Route path="/support" element={<Support />} />
+                  <Route path="/about-us" element={<AboutUs />} />
+                  <Route path="/track-order" element={<TrackOrder />} />
+                  <Route path="/search" element={<SearchPage />} />
+                  <Route path="/help" element={<Help />} />
+                  <Route path="/help/how-to-measure" element={<HowToMeasure />} />
+                  <Route path="/help/how-to-install" element={<HowToInstall />} />
+                  <Route path="/help/how-to-choose" element={<HowToChoose />} />
+                  <Route path="/help/smart-motors" element={<SmartMotors />} />
 
 
-                <Route path="/product/:id" element={<ProductDetail />} />
-                <Route path="/cart" element={<Cart />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/account" element={<MyAccount />} />
-                <Route path="/checkout" element={<Checkout />} />
+                  <Route path="/product/:id" element={<ProductDetail />} />
+                  <Route path="/cart" element={<Cart />} />
+                  <Route path="/login" element={<Login />} />
+                  <Route path="/account" element={<MyAccount />} />
+                  <Route path="/checkout" element={<Checkout />} />
 
-                {/* Admin Routes */}
-                <Route path="/admin" element={
-                  <AdminRoute>
-                    <AdminDashboard />
-                  </AdminRoute>
-                }>
-                  <Route index element={<DashboardHome />} />
-                  <Route path="analytics" element={<Analytics />} />
-                  <Route path="inventory" element={<InventoryManagement />} />
-                  <Route path="notifications" element={<NotificationCenter />} />
-                  <Route path="ai-assistant" element={<AIAssistant />} />
-                  <Route path="customers" element={<CustomerManagement />} />
-                  <Route path="products" element={<ProductManagement />} />
-                  <Route path="orders" element={<OrderManagement />} />
-                  <Route path="returns" element={<ReturnManagement />} />
-                  <Route path="coupons" element={<CouponManagement />} />
-                   <Route path="home-edit" element={<HomeManagement />} />
-                  <Route path="categories" element={<CategoryManagement />} />
-                  <Route path="content" element={<ContentManagement />} />
-                </Route>
-              </Routes>
+                  {/* Admin Routes */}
+                  <Route path="/admin" element={
+                    <AdminRoute>
+                      <AdminDashboard />
+                    </AdminRoute>
+                  }>
+                    <Route index element={<DashboardHome />} />
+                    <Route path="analytics" element={<Analytics />} />
+                    <Route path="inventory" element={<InventoryManagement />} />
+                    <Route path="notifications" element={<NotificationCenter />} />
+                    <Route path="ai-assistant" element={<AIAssistant />} />
+                    <Route path="customers" element={<CustomerManagement />} />
+                    <Route path="products" element={<ProductManagement />} />
+                    <Route path="zshine-importer" element={<ZshineProductImporter />} />
+                    <Route path="product-importer" element={<ProductImporter />} />
+                    <Route path="orders" element={<OrderManagement />} />
+                    <Route path="enhanced-orders" element={<EnhancedOrderManagement />} />
+                    <Route path="returns" element={<ReturnManagement />} />
+                    <Route path="coupons" element={<CouponManagement />} />
+                     <Route path="home-edit" element={<HomeManagement />} />
+                    <Route path="categories" element={<CategoryManagement />} />
+                    <Route path="content" element={<ContentManagement />} />
+                  </Route>
+                </Routes>
+              </PageTransition>
             </main>
             <Footer />
           </div>

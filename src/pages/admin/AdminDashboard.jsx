@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, Outlet } from 'react-router-dom';
-import { PieChart, Users, Package, ShoppingBag, Layout, FileText, ArrowLeftRight, Sheet, ExternalLink, BarChart3, PackageSearch, Bell, Sparkles, UserCog, List } from 'lucide-react';
+import { PieChart, Users, Package, ShoppingBag, Layout, FileText, ArrowLeftRight, Sheet, ExternalLink, BarChart3, PackageSearch, Bell, Sparkles, UserCog, List, Upload } from 'lucide-react';
 
 const AdminDashboard = () => {
     return (
@@ -66,6 +66,16 @@ const AdminDashboard = () => {
                             </Link>
                         </li>
                         <li style={{ marginBottom: '10px' }}>
+                            <Link to="/admin/zshine-importer" style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px', color: 'var(--secondary-color)', borderRadius: '4px', background: '#fff3e0' }}>
+                                <Package size={18} /> ZSHINE 제품 가져오기 🆕
+                            </Link>
+                        </li>
+                        <li style={{ marginBottom: '10px' }}>
+                            <Link to="/admin/product-importer" style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px', color: 'var(--secondary-color)', borderRadius: '4px', background: '#e3f2fd' }}>
+                                <Upload size={18} /> 제품 가져오기 ⚡
+                            </Link>
+                        </li>
+                        <li style={{ marginBottom: '10px' }}>
                             <Link to="/admin/categories" style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px', color: 'var(--secondary-color)', borderRadius: '4px' }}>
                                 <List size={18} /> Categories
                             </Link>
@@ -73,6 +83,11 @@ const AdminDashboard = () => {
                         <li style={{ marginBottom: '10px' }}>
                             <Link to="/admin/orders" style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px', color: 'var(--secondary-color)', borderRadius: '4px' }}>
                                 <ShoppingBag size={18} /> Orders
+                            </Link>
+                        </li>
+                        <li style={{ marginBottom: '10px' }}>
+                            <Link to="/admin/enhanced-orders" style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px', color: 'var(--secondary-color)', borderRadius: '4px', background: '#e8f5e9' }}>
+                                <Package size={18} /> 통합 주문 관리 ⭐
                             </Link>
                         </li>
                         <li style={{ marginBottom: '10px' }}>
