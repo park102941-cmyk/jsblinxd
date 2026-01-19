@@ -4,6 +4,8 @@ import { collection, addDoc, getDocs, doc, deleteDoc, updateDoc } from 'firebase
 import { Plus, X, Image as ImageIcon, ExternalLink, Sparkles, Loader2, Trash2, Pencil } from 'lucide-react';
 import { GOOGLE_SCRIPT_URL, GEMINI_API_KEY } from '../../lib/config';
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import ImageUploader from '../../components/ImageUploader';
+import HTMLEditor from '../../components/HTMLEditor';
 
 
 const ProductManagement = () => {
@@ -748,13 +750,19 @@ const ProductManagement = () => {
                         </div>
 
                         <div style={{ gridColumn: '1 / -1' }}>
-                            <label style={{ display: 'block', marginBottom: '8px', fontWeight: '500' }}>Image URL</label>
-                            <input type="url" name="imageUrl" value={newProduct.imageUrl} onChange={handleInputChange} placeholder="https://..." style={{ width: '100%', padding: '12px', border: '1px solid #ddd', borderRadius: '6px' }} />
+                            <ImageUploader 
+                                currentImageUrl={newProduct.imageUrl}
+                                onUploadComplete={(url) => setNewProduct(prev => ({ ...prev, imageUrl: url }))}
+                                label="Product Image"
+                            />
                         </div>
 
                         <div style={{ gridColumn: '1 / -1' }}>
-                            <label style={{ display: 'block', marginBottom: '8px', fontWeight: '500' }}>Description</label>
-                            <textarea name="description" value={newProduct.description} onChange={handleInputChange} style={{ width: '100%', padding: '12px', border: '1px solid #ddd', borderRadius: '6px', minHeight: '100px' }}></textarea>
+                            <HTMLEditor 
+                                value={newProduct.description}
+                                onChange={(e) => setNewProduct(prev => ({ ...prev, description: e.target.value }))}
+                                label="Product Description (HTML)"
+                            />
                         </div>
 
                         {/* Custom Options Module: Colors & Inventory */}
