@@ -1,24 +1,34 @@
-const CACHE_NAME = 'jsblind-v1';
-const ASSETS_TO_CACHE = [
-  '/',
-  '/index.html',
-  '/manifest.json',
-  '/logo.png',
-  '/assets/index.css' // Note: This might change with each build, but Vite handles static assets
-];
+// Service Worker - Self-unregistering to fix caching issues
+// This will unregister itself and delete all caches
 
 self.addEventListener('install', (event) => {
+  // Skip waiting so this SW activates immediately
+  self.skipWaiting();
+});
+
+self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(ASSETS_TO_CACHE);
+    // Delete ALL caches including old jsblind-v1
+    caches.keys().then((cacheNames) => {
+      return Promise.all(
+        cacheNames.map((cacheName) => {
+          console.log('Deleting cache:', cacheName);
+          return caches.delete(cacheName);
+        })
+      );
+    }).then(() => {
+      // Unregister this service worker
+      return self.registration.unregister();
+    }).then(() => {
+      // Force all clients to reload with fresh content
+      return self.clients.matchAll();
+    }).then((clients) => {
+      clients.forEach(client => client.navigate(client.url));
     })
   );
 });
 
+// Pass all fetch requests directly to network (no caching)
 self.addEventListener('fetch', (event) => {
-  event.respondWith(
-    caches.match(event.request).then((response) => {
-      return response || fetch(event.request);
-    })
-  );
+  event.respondWith(fetch(event.request));
 });
