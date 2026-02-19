@@ -7,25 +7,25 @@ import { useLocation } from 'react-router-dom';
  */
 const PageTransition = ({ children }) => {
   const location = useLocation();
-  const [displayLocation, setDisplayLocation] = useState(location);
+  const [displayLocation, setDisplayLocation] = useState(location.pathname);
   const [transitionStage, setTransitionStage] = useState('fadeIn');
 
   useEffect(() => {
-    if (location !== displayLocation) {
+    if (location.pathname !== displayLocation) {
       setTransitionStage('fadeOut');
     }
-  }, [location, displayLocation]);
+  }, [location.pathname, displayLocation]);
 
   useEffect(() => {
     if (transitionStage === 'fadeOut') {
       const timer = setTimeout(() => {
-        setDisplayLocation(location);
+        setDisplayLocation(location.pathname);
         setTransitionStage('fadeIn');
         window.scrollTo(0, 0); // Scroll to top on page change
       }, 300);
       return () => clearTimeout(timer);
     }
-  }, [transitionStage, location]);
+  }, [transitionStage, location.pathname]);
 
   return (
     <div

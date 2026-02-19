@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 
 import { AuthProvider } from './context/AuthContext';
@@ -6,46 +6,46 @@ import { CartProvider } from './context/CartContext';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import PageTransition from './components/PageTransition';
-import Home from './pages/Home';
-import ProductDetail from './pages/ProductDetail';
-import Swatches from './pages/Swatches';
-import Products from './pages/Products';
-import Support from './pages/Support';
-import AboutUs from './pages/AboutUs';
-import TrackOrder from './pages/TrackOrder';
-import SearchPage from './pages/Search';
-import Help from './pages/Help';
-import HowToMeasure from './pages/help/HowToMeasure';
-import HowToInstall from './pages/help/HowToInstall';
-import HowToChoose from './pages/help/HowToChoose';
-import SmartMotors from './pages/help/SmartMotors';
-
-
-
-import Cart from './pages/Cart';
-import Login from './pages/Login';
-import MyAccount from './pages/MyAccount';
-import Checkout from './pages/Checkout';
-
-// Admin imports
+import LoadingSpinner from './components/LoadingSpinner';
 import AdminRoute from './components/AdminRoute';
-import AdminDashboard from './pages/admin/AdminDashboard';
-import ProductManagement from './pages/admin/ProductManagement';
-import OrderManagement from './pages/admin/OrderManagement';
-import EnhancedOrderManagement from './pages/admin/EnhancedOrderManagement';
-import ReturnManagement from './pages/admin/ReturnManagement';
-import CouponManagement from './pages/admin/CouponManagement';
-import HomeManagement from './pages/admin/HomeManagement';
-import DashboardHome from './pages/admin/DashboardHome';
-import ContentManagement from './pages/admin/ContentManagement';
-import Analytics from './pages/admin/Analytics';
-import InventoryManagement from './pages/admin/InventoryManagement';
-import NotificationCenter from './pages/admin/NotificationCenter';
-import AIAssistant from './pages/admin/AIAssistant';
-import CustomerManagement from './pages/admin/CustomerManagement';
-import CategoryManagement from './pages/admin/CategoryManagement';
-import ZshineProductImporter from './pages/admin/ZshineProductImporter';
-import ProductImporter from './pages/admin/ProductImporter';
+
+// Lazy load all pages for code splitting (reduces initial bundle size)
+const Home = lazy(() => import('./pages/Home'));
+const ProductDetail = lazy(() => import('./pages/ProductDetail'));
+const Swatches = lazy(() => import('./pages/Swatches'));
+const Products = lazy(() => import('./pages/Products'));
+const Support = lazy(() => import('./pages/Support'));
+const AboutUs = lazy(() => import('./pages/AboutUs'));
+const TrackOrder = lazy(() => import('./pages/TrackOrder'));
+const SearchPage = lazy(() => import('./pages/Search'));
+const Help = lazy(() => import('./pages/Help'));
+const HowToMeasure = lazy(() => import('./pages/help/HowToMeasure'));
+const HowToInstall = lazy(() => import('./pages/help/HowToInstall'));
+const HowToChoose = lazy(() => import('./pages/help/HowToChoose'));
+const SmartMotors = lazy(() => import('./pages/help/SmartMotors'));
+const Cart = lazy(() => import('./pages/Cart'));
+const Login = lazy(() => import('./pages/Login'));
+const MyAccount = lazy(() => import('./pages/MyAccount'));
+const Checkout = lazy(() => import('./pages/Checkout'));
+
+// Admin pages (lazy loaded - only admins need these)
+const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'));
+const ProductManagement = lazy(() => import('./pages/admin/ProductManagement'));
+const OrderManagement = lazy(() => import('./pages/admin/OrderManagement'));
+const EnhancedOrderManagement = lazy(() => import('./pages/admin/EnhancedOrderManagement'));
+const ReturnManagement = lazy(() => import('./pages/admin/ReturnManagement'));
+const CouponManagement = lazy(() => import('./pages/admin/CouponManagement'));
+const HomeManagement = lazy(() => import('./pages/admin/HomeManagement'));
+const DashboardHome = lazy(() => import('./pages/admin/DashboardHome'));
+const ContentManagement = lazy(() => import('./pages/admin/ContentManagement'));
+const Analytics = lazy(() => import('./pages/admin/Analytics'));
+const InventoryManagement = lazy(() => import('./pages/admin/InventoryManagement'));
+const NotificationCenter = lazy(() => import('./pages/admin/NotificationCenter'));
+const AIAssistant = lazy(() => import('./pages/admin/AIAssistant'));
+const CustomerManagement = lazy(() => import('./pages/admin/CustomerManagement'));
+const CategoryManagement = lazy(() => import('./pages/admin/CategoryManagement'));
+const ZshineProductImporter = lazy(() => import('./pages/admin/ZshineProductImporter'));
+const ProductImporter = lazy(() => import('./pages/admin/ProductImporter'));
 
 import { db } from './lib/firebase';
 import { doc, getDoc } from 'firebase/firestore';
@@ -130,54 +130,54 @@ function App() {
             {/* <AnnouncementPopup /> */}
             <Header />
             <main style={{ flex: 1, background: '#f5f5f7' }}>
-              <PageTransition>
-                <Routes>
-                  <Route path="/" element={<Home />} />
-                  <Route path="/swatches" element={<Swatches />} />
-                  <Route path="/products" element={<Products />} />
-                  <Route path="/custom-blinds" element={<Navigate to="/products" replace />} /> {/* Redirect old route */}
-                  <Route path="/support" element={<Support />} />
-                  <Route path="/about-us" element={<AboutUs />} />
-                  <Route path="/track-order" element={<TrackOrder />} />
-                  <Route path="/search" element={<SearchPage />} />
-                  <Route path="/help" element={<Help />} />
-                  <Route path="/help/how-to-measure" element={<HowToMeasure />} />
-                  <Route path="/help/how-to-install" element={<HowToInstall />} />
-                  <Route path="/help/how-to-choose" element={<HowToChoose />} />
-                  <Route path="/help/smart-motors" element={<SmartMotors />} />
+              <Suspense fallback={<LoadingSpinner fullScreen text="Loading..." />}>
+                <PageTransition>
+                  <Routes>
+                    <Route path="/" element={<Home />} />
+                    <Route path="/swatches" element={<Swatches />} />
+                    <Route path="/products" element={<Products />} />
+                    <Route path="/custom-blinds" element={<Navigate to="/products" replace />} />
+                    <Route path="/support" element={<Support />} />
+                    <Route path="/about-us" element={<AboutUs />} />
+                    <Route path="/track-order" element={<TrackOrder />} />
+                    <Route path="/search" element={<SearchPage />} />
+                    <Route path="/help" element={<Help />} />
+                    <Route path="/help/how-to-measure" element={<HowToMeasure />} />
+                    <Route path="/help/how-to-install" element={<HowToInstall />} />
+                    <Route path="/help/how-to-choose" element={<HowToChoose />} />
+                    <Route path="/help/smart-motors" element={<SmartMotors />} />
+                    <Route path="/product/:id" element={<ProductDetail />} />
+                    <Route path="/cart" element={<Cart />} />
+                    <Route path="/login" element={<Login />} />
+                    <Route path="/account" element={<MyAccount />} />
+                    <Route path="/checkout" element={<Checkout />} />
 
-
-                  <Route path="/product/:id" element={<ProductDetail />} />
-                  <Route path="/cart" element={<Cart />} />
-                  <Route path="/login" element={<Login />} />
-                  <Route path="/account" element={<MyAccount />} />
-                  <Route path="/checkout" element={<Checkout />} />
-
-                  {/* Admin Routes */}
-                  <Route path="/admin" element={
-                    <AdminRoute>
-                      <AdminDashboard />
-                    </AdminRoute>
-                  }>
-                    <Route index element={<DashboardHome />} />
-                    <Route path="analytics" element={<Analytics />} />
-                    <Route path="inventory" element={<InventoryManagement />} />
-                    <Route path="notifications" element={<NotificationCenter />} />
-                    <Route path="ai-assistant" element={<AIAssistant />} />
-                    <Route path="customers" element={<CustomerManagement />} />
-                    <Route path="products" element={<ProductManagement />} />
-                    <Route path="zshine-importer" element={<ZshineProductImporter />} />
-                    <Route path="product-importer" element={<ProductImporter />} />
-                    <Route path="orders" element={<OrderManagement />} />
-                    <Route path="enhanced-orders" element={<EnhancedOrderManagement />} />
-                    <Route path="returns" element={<ReturnManagement />} />
-                    <Route path="coupons" element={<CouponManagement />} />
-                     <Route path="home-edit" element={<HomeManagement />} />
-                    <Route path="categories" element={<CategoryManagement />} />
-                    <Route path="content" element={<ContentManagement />} />
-                  </Route>
-                </Routes>
-              </PageTransition>
+                    {/* Admin Routes */}
+                    <Route path="/admin" element={
+                      <AdminRoute>
+                        <AdminDashboard />
+                      </AdminRoute>
+                    }>
+                      <Route index element={<DashboardHome />} />
+                      <Route path="analytics" element={<Analytics />} />
+                      <Route path="inventory" element={<InventoryManagement />} />
+                      <Route path="notifications" element={<NotificationCenter />} />
+                      <Route path="ai-assistant" element={<AIAssistant />} />
+                      <Route path="customers" element={<CustomerManagement />} />
+                      <Route path="products" element={<ProductManagement />} />
+                      <Route path="zshine-importer" element={<ZshineProductImporter />} />
+                      <Route path="product-importer" element={<ProductImporter />} />
+                      <Route path="orders" element={<OrderManagement />} />
+                      <Route path="enhanced-orders" element={<EnhancedOrderManagement />} />
+                      <Route path="returns" element={<ReturnManagement />} />
+                      <Route path="coupons" element={<CouponManagement />} />
+                      <Route path="home-edit" element={<HomeManagement />} />
+                      <Route path="categories" element={<CategoryManagement />} />
+                      <Route path="content" element={<ContentManagement />} />
+                    </Route>
+                  </Routes>
+                </PageTransition>
+              </Suspense>
             </main>
             <Footer />
           </div>
