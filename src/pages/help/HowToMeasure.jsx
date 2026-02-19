@@ -29,7 +29,35 @@ const HowToMeasure = () => {
             </div>
 
             {/* Content */}
-            <div className="container" style={{ padding: '60px 20px', maxWidth: '900px', margin: '0 auto' }}>
+            <div className="container" style={{ padding: '60px 20px', maxWidth: '1000px', margin: '0 auto' }}>
+                
+                {/* Visual Guide Image */}
+                <div style={{ marginBottom: '60px', textAlign: 'center' }}>
+                    <div style={{ 
+                        background: 'white', 
+                        padding: '10px', 
+                        borderRadius: '16px', 
+                        boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
+                        overflow: 'hidden',
+                        display: 'inline-block',
+                        maxWidth: '100%'
+                    }}>
+                        <img 
+                            src="/images/how-to-measure-guide.jpg" 
+                            alt="How to Measure for Blinds and Shades Guide" 
+                            style={{ 
+                                width: '100%', 
+                                height: 'auto', 
+                                borderRadius: '8px',
+                                display: 'block'
+                            }} 
+                        />
+                    </div>
+                    <p style={{ marginTop: '16px', color: '#666', fontSize: '0.9rem', fontStyle: 'italic' }}>
+                        * Detailed visual guide for Inside and Outside mount measurements.
+                    </p>
+                </div>
+
                 {/* Inside vs Outside Mount */}
                 <div style={{ marginBottom: '60px' }}>
                     <h2 style={{ fontSize: '2rem', fontWeight: 'bold', marginBottom: '30px', color: '#1d1d1f' }}>

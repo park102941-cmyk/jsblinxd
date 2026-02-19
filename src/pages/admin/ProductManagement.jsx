@@ -26,6 +26,7 @@ const ProductManagement = () => {
         basePrice: 0,
         description: '',
         imageUrl: '',
+        images: [], // Multiple product images
         colors: [], // Array of objects: { name, image, hex, component_id }
         configGroups: [], // Dynamic option groups: { name, type, options: [{name, price, desc}] }
         sizeRatio: 0,
@@ -264,6 +265,7 @@ const ProductManagement = () => {
             basePrice: product.basePrice || 0,
             description: product.description || '',
             imageUrl: product.imageUrl || '',
+            images: product.images || [],
             colors: formattedColors,
             configGroups: product.configGroups || [],
             sizeRatio: product.sizeRatio || 0,
@@ -755,12 +757,61 @@ const ProductManagement = () => {
                             </div>
                         </div>
 
-                        <div style={{ gridColumn: '1 / -1' }}>
+                        <div style={{ gridColumn: '1 / -1', background: '#f8f9fa', padding: '20px', borderRadius: '8px', border: '1px solid #eee' }}>
+                            <label style={{ display: 'block', marginBottom: '15px', fontWeight: '600', color: '#555' }}>Product Images (Multiple)</label>
+                            
+                            {/* Current Images List */}
+                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '15px', marginBottom: '20px' }}>
+                                {newProduct.images && newProduct.images.map((url, index) => (
+                                    <div key={index} style={{ position: 'relative', width: '120px', height: '120px', borderRadius: '8px', overflow: 'hidden', border: '1px solid #ddd', background: '#fff' }}>
+                                        <img src={url} alt={`Product ${index}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                const newImages = [...newProduct.images];
+                                                newImages.splice(index, 1);
+                                                setNewProduct(prev => ({ ...prev, images: newImages }));
+                                            }}
+                                            style={{
+                                                position: 'absolute', top: '5px', right: '5px', background: 'rgba(255,0,0,0.8)', color: 'white',
+                                                border: 'none', borderRadius: '50%', width: '24px', height: '24px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center'
+                                            }}
+                                        >
+                                            <X size={14} />
+                                        </button>
+                                        {index === 0 && (
+                                            <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: 'rgba(0,0,0,0.6)', color: 'white', fontSize: '10px', textAlign: 'center', padding: '2px' }}>
+                                                Main Preview
+                                            </div>
+                                        )}
+                                    </div>
+                                ))}
+                                
+                                {(!newProduct.images || newProduct.images.length === 0) && (
+                                    <div style={{ width: '100%', padding: '20px', textAlign: 'center', color: '#888', border: '1px dashed #ccc', borderRadius: '8px' }}>
+                                        No images added yet. The first image will be the main preview.
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Add New Image */}
                             <ImageUploader 
-                                currentImageUrl={newProduct.imageUrl}
-                                onUploadComplete={(url) => setNewProduct(prev => ({ ...prev, imageUrl: url }))}
-                                label="Product Image"
+                                onUploadComplete={(url) => {
+                                    if (url) {
+                                        setNewProduct(prev => ({ 
+                                            ...prev, 
+                                            images: [...(prev.images || []), url],
+                                            // Auto-set the first image as the main imageUrl if it's empty
+                                            imageUrl: prev.imageUrl || url 
+                                        }));
+                                    }
+                                }}
+                                label="Add New Product Image"
                             />
+                            
+                            <div style={{ marginTop: '10px', fontSize: '0.85rem', color: '#666' }}>
+                                <p>Tip: You can add multiple images. The first image in the list above will be used as the primary thumbnail in search results.</p>
+                            </div>
                         </div>
 
                         <div style={{ gridColumn: '1 / -1' }}>
