@@ -1,0 +1,18 @@
+# HTML files - no cache so users always get latest
+/*.html
+  Cache-Control: no-cache, no-store, must-revalidate
+
+# JS and CSS assets have content hashes in filenames, cache aggressively
+/assets/*.js
+  Cache-Control: public, max-age=31536000, immutable
+
+/assets/*.css
+  Cache-Control: public, max-age=31536000, immutable
+
+# Images
+/images/*
+  Cache-Control: public, max-age=86400
+
+# Service worker - never cache
+/sw.js
+  Cache-Control: no-cache, no-store, must-revalidate
