@@ -5,6 +5,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { db } from '../lib/firebase';
 import { doc, getDoc, updateDoc, deleteDoc, arrayRemove, collection, query, where, getDocs } from 'firebase/firestore';
 import { updateProfile, deleteUser } from 'firebase/auth';
+import { getUserPoints } from '../lib/points';
 
 const statusConfig = {
     'Order Received':   { bg: '#e0f2fe', color: '#0369a1', dot: '#0ea5e9' },
@@ -27,6 +28,8 @@ const MyAccount = () => {
     const [newName, setNewName] = useState('');
     const [saving, setSaving] = useState(false);
     const [saveMsg, setSaveMsg] = useState('');
+    const [points, setPoints] = useState(0);
+    const [pointsHistory, setPointsHistory] = useState([]);
 
     useEffect(() => {
         if (!currentUser) { navigate('/login'); return; }
@@ -34,8 +37,11 @@ const MyAccount = () => {
             try {
                 const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
                 if (userDoc.exists()) {
-                    setUserData(userDoc.data());
-                    setNewName(userDoc.data().displayName || currentUser.displayName || '');
+                    const data = userDoc.data();
+                    setUserData(data);
+                    setNewName(data.displayName || currentUser.displayName || '');
+                    setPoints(data.points || 0);
+                    setPointsHistory(data.pointsHistory || []);
                 } else {
                     setNewName(currentUser.displayName || '');
                 }
@@ -146,10 +152,17 @@ const MyAccount = () => {
                             : initials}
                     </div>
                     <div style={{ flex: 1 }}>
-                        <h1 style={{ color: 'white', fontSize: '1.75rem', fontWeight: '700', margin: '0 0 4px' }}>
-                            Hello, {displayName.split(' ')[0]} 👋
-                        </h1>
-                        <p style={{ color: 'rgba(255,255,255,0.6)', margin: 0, fontSize: '0.95rem' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+                            <h1 style={{ color: 'white', fontSize: '1.75rem', fontWeight: '700', margin: 0 }}>
+                                Hello, {displayName.split(' ')[0]} 👋
+                            </h1>
+                            {/* Points badge */}
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '5px 12px', borderRadius: '20px', background: 'linear-gradient(135deg, #fbbf24, #f59e0b)', boxShadow: '0 2px 8px rgba(251,191,36,0.4)' }}>
+                                <span style={{ fontSize: '0.95rem' }}>⭐</span>
+                                <span style={{ fontSize: '0.875rem', fontWeight: '800', color: '#78350f' }}>{points.toFixed(1)} pts</span>
+                            </div>
+                        </div>
+                        <p style={{ color: 'rgba(255,255,255,0.6)', margin: '6px 0 0', fontSize: '0.95rem' }}>
                             {currentUser?.email}
                         </p>
                     </div>
@@ -171,7 +184,7 @@ const MyAccount = () => {
                 <div style={{ maxWidth: '960px', margin: '32px auto 0', display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px', position: 'relative' }}>
                     {[
                         { label: 'Total Orders', value: orders.length },
-                        { label: 'Favorites', value: userData?.favorites?.length || 0 },
+                        { label: 'My Points ⭐', value: `${points.toFixed(1)} pts` },
                         { label: 'Cart Items', value: cartItems.length },
                     ].map(stat => (
                         <div key={stat.label} style={{

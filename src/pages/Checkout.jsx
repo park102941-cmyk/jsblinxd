@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { db } from '../lib/firebase';
 import { collection, addDoc } from 'firebase/firestore';
 import { GOOGLE_SCRIPT_URL } from '../lib/config';
+import { getUserPoints, awardPoints, redeemPoints, calcPointsEarned, calcPointsDiscount, DISCOUNT_PER_POINT } from '../lib/points';
 
 const Checkout = () => {
     const { cartItems, calculateTotals, coupon, applyCoupon } = useCart();
@@ -12,6 +13,14 @@ const Checkout = () => {
     const navigate = useNavigate();
     const totals = calculateTotals();
     const [promoCode, setPromoCode] = useState('');
+
+    // Points state
+    const [userPoints, setUserPoints] = useState(0);
+    const [pointsToUse, setPointsToUse] = useState(0);
+    const [usePoints, setUsePoints] = useState(false);
+    const pointsDiscount = usePoints ? calcPointsDiscount(pointsToUse) : 0;
+    const finalTotal = Math.max(0, totals.total - pointsDiscount);
+    const pointsToEarn = calcPointsEarned(finalTotal);
 
     const [shippingInfo, setShippingInfo] = useState({
         name: '',
@@ -25,6 +34,12 @@ const Checkout = () => {
         memo: ''
     });
     const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        if (currentUser) {
+            getUserPoints(currentUser.uid).then(setUserPoints);
+        }
+    }, [currentUser]);
 
     const US_STATES = [
         "AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA",
@@ -85,10 +100,12 @@ const Checkout = () => {
                 userId: currentUser ? currentUser.uid : 'guest',
                 userInfo: { email: orderEmail },
                 items: cartItems,
-                shippingInfo, // contains email too now
-                totals,
+                shippingInfo,
+                totals: { ...totals, total: finalTotal, pointsDiscount, pointsUsed: pointsToUse },
                 couponUsed: coupon ? coupon.code : null,
-                status: 'pending', // pending -> paid -> preparing -> shipping -> delivered
+                pointsUsed: usePoints ? pointsToUse : 0,
+                pointsEarned: pointsToEarn,
+                status: 'pending',
                 createdAt: new Date().toISOString()
             };
 
@@ -119,12 +136,15 @@ const Checkout = () => {
                 console.error("Failed to sync inventory to Google Sheet", sheetError);
             }
 
-            alert('Order Placed Successfully! Your Order ID is ' + orderId);
-            // If logged in, go to account. If guest, maybe go to a success page? 
-            // For now, let's go to account page (which handles guest view gracefully or redirects) 
-            // - actually Account page might require auth. 
-            // Ideally we need an Order Confirmation page. But let's stick to /account for now or redirect to /track-order?
-            // Let's redirect to Track Order so they can see it immediately!
+            // Award / deduct points
+            if (currentUser && currentUser.uid !== 'guest') {
+                if (usePoints && pointsToUse > 0) {
+                    await redeemPoints(currentUser.uid, pointsToUse, orderId);
+                }
+                await awardPoints(currentUser.uid, finalTotal, orderId);
+            }
+
+            alert(`Order Placed! 🎉\nOrder ID: ${orderId}\n\nPoints earned: +${pointsToEarn} pts`);
             navigate(`/track-order?id=${orderId}&email=${encodeURIComponent(orderEmail)}`);
 
         } catch (error) {
@@ -275,6 +295,33 @@ const Checkout = () => {
                     </div>
 
                     <div style={{ borderTop: '1px solid #ddd', paddingTop: '20px' }}>
+                        {/* Points Redemption */}
+                        {currentUser && userPoints > 0 && (
+                            <div style={{ marginBottom: '20px', padding: '14px', background: 'linear-gradient(135deg, #fffbeb, #fef3c7)', borderRadius: '10px', border: '1.5px solid #fcd34d' }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                                    <span style={{ fontSize: '0.85rem', fontWeight: '700', color: '#92400e' }}>⭐ My Points</span>
+                                    <span style={{ fontSize: '1rem', fontWeight: '800', color: '#d97706' }}>{userPoints.toFixed(1)} pts</span>
+                                </div>
+                                <p style={{ fontSize: '0.78rem', color: '#78350f', margin: '0 0 10px' }}>1 pt = ${DISCOUNT_PER_POINT} off</p>
+                                <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', marginBottom: usePoints ? '10px' : 0 }}>
+                                    <input type="checkbox" checked={usePoints} onChange={e => { setUsePoints(e.target.checked); if (!e.target.checked) setPointsToUse(0); }} style={{ width: '16px', height: '16px', accentColor: '#d97706' }} />
+                                    <span style={{ fontSize: '0.875rem', fontWeight: '600', color: '#92400e' }}>Use points for discount</span>
+                                </label>
+                                {usePoints && (
+                                    <div>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
+                                            <input type="range" min="0" max={Math.min(userPoints, totals.total / DISCOUNT_PER_POINT)} step="0.1"
+                                                value={pointsToUse}
+                                                onChange={e => setPointsToUse(parseFloat(e.target.value))}
+                                                style={{ flex: 1, accentColor: '#d97706' }} />
+                                            <span style={{ fontSize: '0.85rem', fontWeight: '700', color: '#92400e', minWidth: '50px', textAlign: 'right' }}>{pointsToUse.toFixed(1)} pts</span>
+                                        </div>
+                                        <div style={{ fontSize: '0.8rem', color: '#16a34a', fontWeight: '600' }}>Discount: -${calcPointsDiscount(pointsToUse).toFixed(2)}</div>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+
                         {/* Promo Code Input */}
                         <div style={{ marginBottom: '20px' }}>
                             <label style={{ fontSize: '0.85rem', fontWeight: '600', display: 'block', marginBottom: '8px' }}>Promotion Code</label>
@@ -322,10 +369,22 @@ const Checkout = () => {
                                 <span>-${totals.couponDiscount.toLocaleString()}</span>
                             </div>
                         )}
+                        {pointsDiscount > 0 && (
+                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px', color: '#d97706', fontWeight: '500' }}>
+                                <span>⭐ Points Discount ({pointsToUse.toFixed(1)} pts)</span>
+                                <span>-${pointsDiscount.toFixed(2)}</span>
+                            </div>
+                        )}
                         <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '20px', borderTop: '2px solid #ddd', paddingTop: '20px', fontSize: '1.2rem', fontWeight: 'bold' }}>
                             <span>Total</span>
-                            <span>${totals.total.toLocaleString()}</span>
+                            <span>${finalTotal.toFixed(2)}</span>
                         </div>
+                        {currentUser && (
+                            <div style={{ marginTop: '8px', padding: '8px 12px', background: '#f0fdf4', borderRadius: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <span style={{ fontSize: '0.8rem', color: '#16a34a' }}>⭐ Points you'll earn</span>
+                                <span style={{ fontSize: '0.85rem', fontWeight: '700', color: '#16a34a' }}>+{pointsToEarn.toFixed(1)} pts</span>
+                            </div>
+                        )}
                     </div>
 
                     <button
