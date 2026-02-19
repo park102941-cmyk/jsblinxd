@@ -221,8 +221,17 @@ const Login = () => {
             await saveUserToFirestore(result.user, 'google');
             navigate('/account');
         } catch (err) {
-            if (err.code !== 'auth/popup-closed-by-user') {
-                setError('Google login failed. Please try again.');
+            console.error('Google login error:', err.code, err.message);
+            if (err.code === 'auth/popup-closed-by-user' || err.code === 'auth/cancelled-popup-request') {
+                // User closed popup, do nothing
+            } else if (err.code === 'auth/operation-not-allowed') {
+                setError('Google login is not enabled yet. Please contact support.');
+            } else if (err.code === 'auth/unauthorized-domain') {
+                setError('This domain is not authorized. Please contact support.');
+            } else if (err.code === 'auth/popup-blocked') {
+                setError('Popup was blocked. Please allow popups for this site and try again.');
+            } else {
+                setError(`Google login failed: ${err.code || err.message}`);
             }
         } finally {
             setSocialLoading('');
@@ -238,8 +247,17 @@ const Login = () => {
             await saveUserToFirestore(result.user, 'facebook');
             navigate('/account');
         } catch (err) {
-            if (err.code !== 'auth/popup-closed-by-user') {
-                setError('Facebook login failed. Please try again.');
+            console.error('Facebook login error:', err.code, err.message);
+            if (err.code === 'auth/popup-closed-by-user' || err.code === 'auth/cancelled-popup-request') {
+                // User closed popup, do nothing
+            } else if (err.code === 'auth/operation-not-allowed') {
+                setError('Facebook login is not enabled yet. Please contact support.');
+            } else if (err.code === 'auth/unauthorized-domain') {
+                setError('This domain is not authorized. Please contact support.');
+            } else if (err.code === 'auth/account-exists-with-different-credential') {
+                setError('An account already exists with this email using a different sign-in method.');
+            } else {
+                setError(`Facebook login failed: ${err.code || err.message}`);
             }
         } finally {
             setSocialLoading('');
