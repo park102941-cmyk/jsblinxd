@@ -7,6 +7,7 @@ import { Link } from 'react-router-dom';
 import { Truck, ShieldCheck, Ruler, ThumbsUp, Instagram, Cpu, Smartphone, Rss, Sun, ChevronRight, Star, ShieldAlert, Sparkles, Menu } from 'lucide-react';
 import ScrollReveal from '../components/ScrollReveal';
 import LoadingSpinner from '../components/LoadingSpinner';
+import aiAssets from '../lib/aiAssets';
 
 const Home = () => {
     const { currentUser } = useAuth();
@@ -17,13 +18,13 @@ const Home = () => {
         hero: {
             title: 'SMART SHADES\nFOR MODERN VIBE',
             subtitle: 'Experience the ultimate convenience with ZSHINE™ technology.',
-            imageUrl: '/images/aivision/roller_shade_white_1777429322768.png'
+            imageUrl: aiAssets.rollerHero
         },
         categories: [
-            { title: 'Roller Shades', img: '/images/aivision/roller_shade_white_1777429322768.png', link: '/products?category=Roller%20Shades' },
-            { title: 'Zebra Shades', img: '/images/aivision/zebra_shade_white_1777429360324.png', link: '/products?category=Zebra%20Shades' },
-            { title: 'Nex-Doors™', img: '/images/aivision/glass_doors_premium_1777429374604.png', link: '/products?category=Glass%20Doors' },
-            { title: 'Outdoor Tech', img: '/images/aivision/pergola_outdoor_tech_1777429388159.png', link: '/products?category=Outdoor%20Tech' },
+            { title: 'Roller Shades', img: aiAssets.rollerHero, link: '/products?category=Roller%20Shades' },
+            { title: 'Zebra Shades', img: aiAssets.zebraCat, link: '/products?category=Zebra%20Shades' },
+            { title: 'Nex-Doors™', img: aiAssets.glassDoors, link: '/products?category=Glass%20Doors' },
+            { title: 'Outdoor Tech', img: aiAssets.pergolaHero, link: '/products?category=Outdoor%20Tech' },
             { title: 'Smart Curtains', img: 'https://images.unsplash.com/photo-1558603668-6570496b66f8?w=600', link: '/products?category=Smart%20Curtains' },
             { title: 'Cellular Shades', img: 'https://images.unsplash.com/photo-1522771753062-5a49c1284524?w=600', link: '/products?category=Cellular%20Shades' }
         ],
@@ -32,7 +33,7 @@ const Home = () => {
             tag: 'ZSHINE™ CORE',
             title: 'Advanced Connectivity',
             description: 'Not just a motor. A ecosystem. Our ZSHINE™ logic enables multi-room synchronization and adaptive light scheduling based on local weather.',
-            imageUrl: '/images/aivision/pergola_outdoor_tech_1777429388159.png',
+            imageUrl: aiAssets.smartTech,
             features: [
                 { title: 'Matter Standard', desc: 'Universal compatibility.', icon: 'Rss' },
                 { title: 'Full App Control', desc: 'iOS and Android ready.', icon: 'Smartphone' }
