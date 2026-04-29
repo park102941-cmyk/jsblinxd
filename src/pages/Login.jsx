@@ -138,6 +138,41 @@ const Login = () => {
         }
     };
 
+    // Send welcome email using Firestore template
+    const sendWelcomeEmail = async (userName, userEmail) => {
+        try {
+            const templateSnap = await getDoc(doc(db, 'settings', 'emailTemplates'));
+            let subject = `${userName}님, JSBlind에 오신 것을 환영합니다! 🎉`;
+            let body = `안녕하세요, ${userName}님!\n\nJSBlind에 가입해 주셔서 진심으로 감사드립니다.\n\n저희 웹사이트를 방문하시어 다양한 블라인드 제품을 살펴보세요!\n\n감사합니다,\nJSBlind 팀 드림`;
+
+            if (templateSnap.exists() && templateSnap.data().welcome) {
+                const tpl = templateSnap.data().welcome;
+                subject = tpl.subject
+                    .replace(/\{\{name\}\}/g, userName)
+                    .replace(/\{\{email\}\}/g, userEmail);
+                body = tpl.body
+                    .replace(/\{\{name\}\}/g, userName)
+                    .replace(/\{\{email\}\}/g, userEmail);
+            }
+
+            if (GOOGLE_SCRIPT_URL) {
+                await fetch(GOOGLE_SCRIPT_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain' },
+                    body: JSON.stringify({
+                        action: 'sendWelcomeEmail',
+                        email: userEmail,
+                        subject,
+                        body,
+                        name: userName
+                    })
+                });
+            }
+        } catch (err) {
+            console.error('Welcome email error:', err);
+        }
+    };
+
     // STEP 2: Verify OTP and create account
     const handleVerifyOTP = async (e) => {
         e.preventDefault();
@@ -177,6 +212,9 @@ const Login = () => {
 
             // Delete OTP from Firestore
             await deleteDoc(doc(db, 'emailOTPs', email));
+
+            // Send welcome email using Firestore template
+            sendWelcomeEmail(name, email); // async, non-blocking
 
             navigate('/account');
         } catch (err) {

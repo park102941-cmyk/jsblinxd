@@ -46,7 +46,8 @@ const ProductManagement = () => {
     // Temporary state for adding a new color option
     const [tempColor, setTempColor] = useState({
         name: '',
-        image: '',
+        image: '', // Swatch image
+        fullImage: '', // Full product image for this color
         hex: '#000000',
         component_id: ''
     });
@@ -245,7 +246,7 @@ const ProductManagement = () => {
 
     const resetForm = () => {
         setNewProduct(initialFormState);
-        setTempColor({ name: '', image: '', hex: '#000000', component_id: '' });
+        setTempColor({ name: '', image: '', fullImage: '', hex: '#000000', component_id: '' });
         setTempConfig({ name: '', type: 'radio', options: [] });
         setTempOption({ name: '', price: 0, desc: '' });
         setIsEditing(false);
@@ -829,24 +830,43 @@ const ProductManagement = () => {
                             </h4>
 
                             {/* Color Input Area */}
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 50px auto', gap: '10px', alignItems: 'end', marginBottom: '15px', padding: '15px', background: '#fff', borderRadius: '8px', border: '1px solid #ddd' }}>
-                                <div>
-                                    <label style={{ fontSize: '0.8rem', color: '#666' }}>Color Name (e.g. Snow White)</label>
-                                    <input type="text" name="name" value={tempColor.name} onChange={handleTempColorChange} placeholder="Navi Blue" style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }} />
+                            <div style={{ background: '#fff', padding: '20px', borderRadius: '8px', border: '1px solid #ddd', marginBottom: '15px' }}>
+                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '20px', marginBottom: '20px' }}>
+                                    <div>
+                                        <label style={{ display: 'block', marginBottom: '8px', fontWeight: '500' }}>Color Name</label>
+                                        <input type="text" name="name" value={tempColor.name} onChange={handleTempColorChange} placeholder="e.g. Snow White" style={{ width: '100%', padding: '10px', border: '1px solid #ddd', borderRadius: '6px' }} />
+                                    </div>
+                                    <div>
+                                        <label style={{ display: 'block', marginBottom: '8px', fontWeight: '500' }}>Inventory ID (Component ID)</label>
+                                        <input type="text" name="component_id" value={tempColor.component_id} onChange={handleTempColorChange} placeholder="e.g. FAB_001" style={{ width: '100%', padding: '10px', border: '1px solid #ddd', borderRadius: '6px' }} />
+                                    </div>
                                 </div>
-                                <div>
-                                    <label style={{ fontSize: '0.8rem', color: '#666' }}>Texture/Image URL</label>
-                                    <input type="text" name="image" value={tempColor.image} onChange={handleTempColorChange} placeholder="https://..." style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }} />
+                                
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '20px' }}>
+                                    <div>
+                                        <ImageUploader 
+                                            label="Swatch Image (Small Texture)"
+                                            currentImageUrl={tempColor.image}
+                                            onUploadComplete={(url) => setTempColor(prev => ({ ...prev, image: url }))}
+                                        />
+                                        <div style={{ marginTop: '10px' }}>
+                                            <label style={{ fontSize: '0.8rem', color: '#666', marginRight: '10px' }}>Or select Hex Color:</label>
+                                            <input type="color" name="hex" value={tempColor.hex} onChange={handleTempColorChange} style={{ height: '30px', verticalAlign: 'middle' }} />
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <ImageUploader 
+                                            label="Full Product Preview Image (Large)"
+                                            currentImageUrl={tempColor.fullImage}
+                                            onUploadComplete={(url) => setTempColor(prev => ({ ...prev, fullImage: url }))}
+                                        />
+                                        <p style={{ fontSize: '0.75rem', color: '#888', marginTop: '10px' }}>This image will show on the main product view when this color is clicked.</p>
+                                    </div>
                                 </div>
-                                <div>
-                                    <label style={{ fontSize: '0.8rem', color: '#666' }}>Inventory Component ID</label>
-                                    <input type="text" name="component_id" value={tempColor.component_id} onChange={handleTempColorChange} placeholder="FAB_001" style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }} />
-                                </div>
-                                <div>
-                                    <label style={{ fontSize: '0.8rem', color: '#666' }}>Hex</label>
-                                    <input type="color" name="hex" value={tempColor.hex} onChange={handleTempColorChange} style={{ width: '100%', height: '35px', padding: '0', border: 'none', cursor: 'pointer' }} />
-                                </div>
-                                <button type="button" onClick={addColorOption} className="btn" style={{ background: '#333', color: 'white', padding: '0 15px', height: '35px', borderRadius: '4px' }}>Add</button>
+
+                                <button type="button" onClick={addColorOption} className="btn btn-primary" style={{ width: '100%', padding: '12px' }}>
+                                    Add Color to List
+                                </button>
                             </div>
 
                             {/* Batch Color Add */}
@@ -878,7 +898,10 @@ const ProductManagement = () => {
                                     <div key={i} style={{ position: 'relative', border: '1px solid #ddd', borderRadius: '6px', padding: '10px', background: 'white', display: 'flex', flexDirection: 'column', gap: '5px' }}>
                                         <div style={{ height: '80px', background: c.image ? `url(${c.image}) center/cover` : c.hex, borderRadius: '4px', border: '1px solid #eee' }}></div>
                                         <div style={{ fontWeight: '600', fontSize: '0.9rem' }}>{c.name}</div>
-                                        <div style={{ fontSize: '0.75rem', color: '#666' }}>ID: {c.component_id}</div>
+                                        <div style={{ fontSize: '0.7rem', color: '#666' }}>
+                                            ID: {c.component_id}
+                                            {c.fullImage && <div style={{ color: 'var(--primary-green)', marginTop: '2px' }}>✓ Full image linked</div>}
+                                        </div>
                                         <button
                                             type="button"
                                             onClick={() => removeColor(i)}

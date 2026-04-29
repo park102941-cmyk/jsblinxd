@@ -17,7 +17,7 @@ const rollerProducts = [
     maxHeight: 118,
     showMotor: false,
     showColor: true,
-    imageUrl: '/images/products/roller-blackout.jpg',
+    imageUrl: '/images/ai/roller_shade_white_1777429322768.png',
     description: 'Premium blackout roller shades that block 100% of light. Perfect for bedrooms, media rooms, and any space requiring complete darkness. Durable fabric with thermal insulation properties.',
     colors: [
       { name: 'Pure White', code: 'WHITE', hex: '#FFFFFF' },
@@ -61,7 +61,7 @@ const rollerProducts = [
     maxHeight: 118,
     showMotor: false,
     showColor: true,
-    imageUrl: '/images/products/roller-light-filtering.jpg',
+    imageUrl: '/images/ai/roller_shade_grey_1777429334824.png',
     description: 'Elegant light filtering roller shades that diffuse natural light while maintaining privacy. Perfect for living rooms, dining areas, and offices. Soft, translucent fabric creates a warm ambiance.',
     colors: [
       { name: 'White', code: 'WHITE', hex: '#FFFFFF' },
@@ -104,7 +104,7 @@ const rollerProducts = [
     maxHeight: 118,
     showMotor: true,
     showColor: true,
-    imageUrl: '/images/products/roller-motorized-blackout.jpg',
+    imageUrl: '/images/ai/roller_shade_black_1777429348345.png',
     description: 'Premium motorized blackout roller shades with smart home integration. Complete light control at your fingertips with remote or app operation. Perfect for modern homes seeking convenience and style.',
     colors: [
       { name: 'Pure White', code: 'WHITE', hex: '#FFFFFF' },

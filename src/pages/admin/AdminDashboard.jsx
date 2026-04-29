@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, Outlet } from 'react-router-dom';
-import { PieChart, Users, Package, ShoppingBag, Layout, FileText, ArrowLeftRight, Sheet, ExternalLink, BarChart3, PackageSearch, Bell, Sparkles, UserCog, List, Upload } from 'lucide-react';
+import { PieChart, Users, Package, ShoppingBag, Layout, FileText, ArrowLeftRight, Sheet, ExternalLink, BarChart3, PackageSearch, Bell, Sparkles, UserCog, List, Upload, Mail } from 'lucide-react';
 
 const AdminDashboard = () => {
     return (
@@ -48,6 +48,11 @@ const AdminDashboard = () => {
                         <li style={{ marginBottom: '10px' }}>
                             <Link to="/admin/customers" style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px', color: 'var(--secondary-color)', borderRadius: '4px' }}>
                                 <UserCog size={18} /> Customers
+                            </Link>
+                        </li>
+                        <li style={{ marginBottom: '10px' }}>
+                            <Link to="/admin/email-management" style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px', color: 'var(--secondary-color)', borderRadius: '4px', background: '#f0f4ff' }}>
+                                <Mail size={18} /> 이메일 관리 ✉️
                             </Link>
                         </li>
 

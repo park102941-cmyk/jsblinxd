@@ -7,6 +7,8 @@ import { doc, updateDoc, arrayUnion, getDoc, setDoc } from 'firebase/firestore';
 import { Star, MessageCircle, Heart, Share2, ChevronLeft, ChevronRight, Check, AlertCircle, ChevronDown, ChevronUp, Loader2, Sparkles, ShieldCheck, Truck, ShieldAlert, Cpu, Rss, Sun } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { orderEngine } from '../lib/orderEngine';
+import OrderingGuide from '../components/OrderingGuide';
+import AIColorVision from '../components/AIColorVision';
 
 
 const ProductDetail = () => {
@@ -47,6 +49,8 @@ const ProductDetail = () => {
     const [remoteOption, setRemoteOption] = useState('none');
     const [roomLabel, setRoomLabel] = useState('');
     const [selectedConfigs, setSelectedConfigs] = useState({}); // { groupID: optionID }
+    const [mainImageUrl, setMainImageUrl] = useState('');
+    const [isGuideOpen, setIsGuideOpen] = useState(false);
 
     useEffect(() => {
         const fetchProduct = async () => {
@@ -58,6 +62,17 @@ const ProductDetail = () => {
                     setProduct({ id: docSnap.id, ...data });
                     if (data.colors && data.colors.length > 0) {
                         setSelectedColor(data.colors[0]);
+                    }
+
+                    // Pre-calculate images array for effects
+                    const prodImages = data.images && data.images.length > 0 
+                        ? data.images 
+                        : data.imageUrl 
+                            ? [data.imageUrl] 
+                            : ["https://via.placeholder.com/600x600/f5f5f5/333?text=No+Image"];
+                    
+                    if (!mainImageUrl && prodImages.length > 0) {
+                        setMainImageUrl(prodImages[0]);
                     }
                     // Initialize custom configs
                     if (data.configGroups) {
@@ -81,6 +96,25 @@ const ProductDetail = () => {
         };
         fetchProduct();
     }, [id]);
+
+    const images = product?.images && product.images.length > 0 
+        ? product.images 
+        : product?.imageUrl 
+            ? [product.imageUrl] 
+            : ["https://via.placeholder.com/600x600/f5f5f5/333?text=No+Image"];
+
+    // Handle Image Switching logic
+    useEffect(() => {
+        if (product && images && images.length > 0) {
+            setMainImageUrl(images[currentImageIndex]);
+        }
+    }, [currentImageIndex, product, images]);
+
+    useEffect(() => {
+        if (selectedColor?.fullImage) {
+            setMainImageUrl(selectedColor.fullImage);
+        }
+    }, [selectedColor]);
 
     const [validationError, setValidationError] = useState('');
 
@@ -247,11 +281,6 @@ const ProductDetail = () => {
         );
     }
 
-    const images = product.images && product.images.length > 0 
-        ? product.images 
-        : product.imageUrl 
-            ? [product.imageUrl] 
-            : ["https://via.placeholder.com/600x600/f5f5f5/333?text=No+Image"];
 
     return (
         <div className="container" style={{ padding: '40px 20px', maxWidth: '1200px', margin: '0 auto' }}>
@@ -269,9 +298,9 @@ const ProductDetail = () => {
                         marginBottom: '20px'
                     }}>
                         <img
-                            src={images[currentImageIndex]}
+                            src={mainImageUrl || images[currentImageIndex]}
                             alt={product.title}
-                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                            style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'all 0.4s ease' }}
                         />
                         {/* Nav Arrows */}
                         <button
@@ -306,7 +335,27 @@ const ProductDetail = () => {
 
                 {/* Right: Configuration Panel */}
                 <div style={{ flex: '1 1 400px' }}>
-                    <h1 style={{ fontSize: '1.8rem', fontWeight: '700', marginBottom: '10px' }}>{product.title}</h1>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <h1 style={{ fontSize: '1.8rem', fontWeight: '700', marginBottom: '10px' }}>{product.title}</h1>
+                        <button 
+                            onClick={() => setIsGuideOpen(true)}
+                            style={{ 
+                                display: 'flex', 
+                                alignItems: 'center', 
+                                gap: '8px', 
+                                background: '#f0f9ff', 
+                                color: '#0369a1', 
+                                border: '1px solid #bae6fd', 
+                                padding: '6px 12px', 
+                                borderRadius: '20px', 
+                                fontSize: '0.8rem', 
+                                fontWeight: '600',
+                                cursor: 'pointer' 
+                            }}
+                        >
+                            <Info size={14} /> Buying Guide
+                        </button>
+                    </div>
                     <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: 'var(--secondary-olive)', marginBottom: '15px' }}>
                         ${calculatePrice()} <span style={{ fontSize: '1rem', color: '#666', fontWeight: '400' }}>USD</span>
                     </div>
@@ -334,6 +383,14 @@ const ProductDetail = () => {
                                 isOpen={activeSection === 'color'}
                                 onToggle={() => setActiveSection(activeSection === 'color' ? '' : 'color')}
                             >
+                                <AIColorVision 
+                                    product={product} 
+                                    currentColor={selectedColor} 
+                                    onColorSelect={(color) => {
+                                        setSelectedColor(color);
+                                        if (color.image) setMainImageUrl(color.image);
+                                    }} 
+                                />
                                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(80px, 1fr))', gap: '10px' }}>
                                     {product.colors && product.colors.map((c, i) => (
                                         <div
@@ -706,6 +763,8 @@ const ProductDetail = () => {
                     </div>
                 </div>
             </div>
+
+            <OrderingGuide isOpen={isGuideOpen} onClose={() => setIsGuideOpen(false)} />
         </div>
     );
 };
