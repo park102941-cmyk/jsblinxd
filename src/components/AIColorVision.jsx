@@ -7,21 +7,21 @@ const AIColorVision = ({ product, currentColor, onColorSelect }) => {
     const [aiVariation, setAiVariation] = useState(null);
     const [selectedPrompt, setSelectedPrompt] = useState('Modern Minimalist');
 
-    // Mock AI variations based on the generated images for the demo
+    // Mock AI variations using cache-busting public paths
     const mockAiVariations = {
         'Roller Shades': [
-            { id: 'v1', name: 'Cloud White', hex: '#FFFFFF', image: '/images/ai/roller_shade_white_1777429322768.png', style: 'Modern Minimalist' },
-            { id: 'v2', name: 'Urban Grey', hex: '#808080', image: '/images/ai/roller_shade_grey_1777429334824.png', style: 'Industrial Loft' },
-            { id: 'v3', name: 'Midnight Charcoal', hex: '#333333', image: '/images/ai/roller_shade_black_1777429348345.png', style: 'Sophisticated Dark' }
+            { id: 'v1', name: 'Cloud White', hex: '#FFFFFF', image: '/images/aivision/roller_shade_white_1777429322768.png', style: 'Modern Minimalist' },
+            { id: 'v2', name: 'Urban Grey', hex: '#808080', image: '/images/aivision/roller_shade_grey_1777429334824.png', style: 'Industrial Loft' },
+            { id: 'v3', name: 'Midnight Charcoal', hex: '#333333', image: '/images/aivision/roller_shade_black_1777429348345.png', style: 'Sophisticated Dark' }
         ],
         'Zebra Shades': [
-            { id: 'z1', name: 'Arctic Zebra', hex: '#FFFFFF', image: '/images/ai/zebra_shade_white_1777429360324.png', style: 'Elegant Bedroom' }
+            { id: 'z1', name: 'Arctic Zebra', hex: '#FFFFFF', image: '/images/aivision/zebra_shade_white_1777429360324.png', style: 'Elegant Bedroom' }
         ],
         'Glass Doors': [
-            { id: 'g1', name: 'Obsidian Frame', hex: '#000000', image: '/images/ai/glass_doors_premium_1777429374604.png', style: 'Luxury Patio' }
+            { id: 'g1', name: 'Obsidian Frame', hex: '#000000', image: '/images/aivision/glass_doors_premium_1777429374604.png', style: 'Luxury Patio' }
         ],
         'Outdoor Tech': [
-            { id: 'p1', name: 'Titanium Grey', hex: '#4A4A4A', image: '/images/ai/pergola_outdoor_tech_1777429388159.png', style: 'Evening Lounge' }
+            { id: 'p1', name: 'Titanium Grey', hex: '#4A4A4A', image: '/images/aivision/pergola_outdoor_tech_1777429388159.png', style: 'Evening Lounge' }
         ]
     };
 

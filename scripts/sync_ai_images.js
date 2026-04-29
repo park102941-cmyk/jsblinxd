@@ -17,28 +17,28 @@ const db = getFirestore(app);
 
 const productUpdates = {
     'zebra-manual-001': {
-        imageUrl: '/images/ai/zebra_shade_white_1777429360324.png',
-        images: ['/images/ai/zebra_shade_white_1777429360324.png']
+        imageUrl: '/images/aivision/zebra_shade_white_1777429360324.png',
+        images: ['/images/aivision/zebra_shade_white_1777429360324.png']
     },
     'zebra-motorized-001': {
-        imageUrl: '/images/ai/zebra_shade_white_1777429360324.png',
-        images: ['/images/ai/zebra_shade_white_1777429360324.png']
+        imageUrl: '/images/aivision/zebra_shade_white_1777429360324.png',
+        images: ['/images/aivision/zebra_shade_white_1777429360324.png']
     },
     'roller-blackout-001': {
-        imageUrl: '/images/ai/roller_shade_white_1777429322768.png',
+        imageUrl: '/images/aivision/roller_shade_white_1777429322768.png',
         images: [
-            '/images/ai/roller_shade_white_1777429322768.png',
-            '/images/ai/roller_shade_grey_1777429334824.png',
-            '/images/ai/roller_shade_black_1777429348345.png'
+            '/images/aivision/roller_shade_white_1777429322768.png',
+            '/images/aivision/roller_shade_grey_1777429334824.png',
+            '/images/aivision/roller_shade_black_1777429348345.png'
         ]
     },
     'roller-light-filtering-001': {
-        imageUrl: '/images/ai/roller_shade_grey_1777429334824.png',
-        images: ['/images/ai/roller_shade_grey_1777429334824.png']
+        imageUrl: '/images/aivision/roller_shade_grey_1777429334824.png',
+        images: ['/images/aivision/roller_shade_grey_1777429334824.png']
     },
     'roller-motorized-blackout-001': {
-        imageUrl: '/images/ai/roller_shade_black_1777429348345.png',
-        images: ['/images/ai/roller_shade_black_1777429348345.png']
+        imageUrl: '/images/aivision/roller_shade_black_1777429348345.png',
+        images: ['/images/aivision/roller_shade_black_1777429348345.png']
     }
 };
 
