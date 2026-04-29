@@ -158,11 +158,23 @@ const OrderingGuide = ({ isOpen, onClose }) => {
                                     { label: 'Full blackout (완전암막)', desc: '숙면이나 영상 시청 및 빛 완전 차단' }
                                 ]} />
 
-                                <OptionGroup title="② 구동 방식 (Control Systems)" items={[
+                                 <OptionGroup title="② 구동 방식 (Control Systems)" items={[
                                     { label: 'Bead Chain (비드 체인)', desc: '표준 수동 방식' },
                                     { label: 'Cordless (무선)', desc: '어린이/반려동물 안전, 손잡이 조절' },
                                     { label: 'Motorized (전동)', desc: 'APP 연동, 리모컨 제어, 충전식 또는 전원식' },
                                     { label: 'TDBU', desc: '허니콤 전용, 상하 양방향 개폐 시스템' }
+                                ]} />
+
+                                <OptionGroup title="③ 상단 밸런스 및 레일 디자인 (Valance & Rail)" items={[
+                                    { label: 'Valance (상단 박스)', desc: 'Square, Curve, Fabric Wrapped, Fabric Inserted' },
+                                    { label: 'Bottom Rail (하단 바)', desc: 'Type A(물방울형), Type B, Type C 등' },
+                                    { label: 'Side Track (사이드 가이드)', desc: '빛 샘 방지를 위한 L자형 또는 U자형 가이드' }
+                                ]} />
+
+                                <OptionGroup title="④ 설치 규격 (Size & Mounting)" items={[
+                                    { label: 'Width & Height', desc: 'mm 단위 정확한 실측값 필요' },
+                                    { label: 'Roll Direction', desc: 'Forward Roll(앞으로), Reverse Roll(뒤로)' },
+                                    { label: 'Installation', desc: '천장 부착 또는 벽면 부착 확인' }
                                 ]} />
                             </div>
                         </div>
@@ -199,20 +211,6 @@ const OrderingGuide = ({ isOpen, onClose }) => {
                         </div>
                     )}
 
-                                <OptionGroup title="③ 상단 밸런스 및 레일 디자인 (Valance & Rail)" items={[
-                                    { label: 'Valance (상단 박스)', desc: 'Square, Curve, Fabric Wrapped, Fabric Inserted' },
-                                    { label: 'Bottom Rail (하단 바)', desc: 'Type A(물방울형), Type B, Type C 등' },
-                                    { label: 'Side Track (사이드 가이드)', desc: '빛 샘 방지를 위한 L자형 또는 U자형 가이드' }
-                                ]} />
-
-                                <OptionGroup title="④ 설치 규격 (Size & Mounting)" items={[
-                                    { label: 'Width & Height', desc: 'mm 단위 정확한 실측값 필요' },
-                                    { label: 'Roll Direction', desc: 'Forward Roll(앞으로), Reverse Roll(뒤로)' },
-                                    { label: 'Installation', desc: '천장 부착 또는 벽면 부착 확인' }
-                                ]} />
-                            </div>
-                        </div>
-                    )}
 
                     {activeTab === 'tips' && (
                         <div style={{ animation: 'fadeIn 0.3s ease' }}>
