@@ -13,7 +13,12 @@ export const jdxProducts = [
     maxHeight: 120,
     showMotor: true,
     showColor: true,
-    imageUrl: '/images/products/jdx-zebra-coit.png',
+    imageUrl: '/images/products/jdx-zebra-coit-1.png',
+    images: [
+      '/images/products/jdx-zebra-coit-1.png',
+      '/images/products/jdx-zebra-coit-2.png',
+      '/images/products/jdx-zebra-coit-3.png'
+    ],
     description: 'Premium light filtering zebra shades from JDX COIT collection. Features antibacterial fabric and high UV protection.',
     colors: [
       { name: 'White', code: 'WHITE', hex: '#FFFFFF' },
@@ -34,7 +39,12 @@ export const jdxProducts = [
     subCategory: 'Light Filtering',
     basePrice: 95.00,
     sizeRatio: 0.17,
-    imageUrl: '/images/products/jdx-zebra-coit.png',
+    imageUrl: '/images/products/jdx-zebra-las-colinas-1.png',
+    images: [
+      '/images/products/jdx-zebra-las-colinas-1.png',
+      '/images/products/jdx-zebra-las-colinas-2.png',
+      'https://images.unsplash.com/photo-1513694203530-ad3d99967451?auto=format&fit=crop&q=80&w=800'
+    ],
     description: 'Elegant textured zebra shades from the Las Colinas collection. Perfect for modern interiors.',
     colors: [
       { name: 'Mushroom', code: 'MUSHROOM', hex: '#E1D9D1' },
@@ -55,7 +65,12 @@ export const jdxProducts = [
     subCategory: 'Light Filtering',
     basePrice: 90.00,
     sizeRatio: 0.15,
-    imageUrl: '/images/products/jdx-zebra-coit.png',
+    imageUrl: '/images/products/jdx-zebra-legacy-1.png',
+    images: [
+      '/images/products/jdx-zebra-legacy-1.png',
+      '/images/products/jdx-zebra-legacy-2.png',
+      '/images/products/jdx-zebra-legacy-3.png'
+    ],
     colors: [
       { name: 'Ivory', code: 'IVORY', hex: '#FFFFF0' },
       { name: 'Mushroom', code: 'MUSHROOM', hex: '#E1D9D1' },
@@ -77,7 +92,12 @@ export const jdxProducts = [
     subCategory: 'Blackout',
     basePrice: 110.00,
     sizeRatio: 0.20,
-    imageUrl: '/images/products/jdx-roller-blackout.png',
+    imageUrl: '/images/products/jdx-zebra-apache-1.png',
+    images: [
+      '/images/products/jdx-zebra-apache-1.png',
+      '/images/products/jdx-zebra-apache-2.png',
+      '/images/products/jdx-zebra-apache-3.png'
+    ],
     description: 'High-performance blackout zebra shades from the Apache collection. Provides complete privacy and light control.',
     colors: [
       { name: 'Beige', code: 'BEIGE', hex: '#F5F5DC' },
@@ -98,7 +118,12 @@ export const jdxProducts = [
     subCategory: 'Blackout',
     basePrice: 115.00,
     sizeRatio: 0.22,
-    imageUrl: '/images/products/jdx-roller-blackout.png',
+    imageUrl: '/images/products/jdx-zebra-apache-1.png',
+    images: [
+      '/images/products/jdx-zebra-apache-1.png',
+      '/images/products/jdx-zebra-apache-2.png',
+      '/images/products/jdx-zebra-apache-3.png'
+    ],
     colors: [
       { name: 'Beige', code: 'BEIGE', hex: '#F5F5DC' },
       { name: 'Light Grey', code: 'L_GREY', hex: '#D3D3D3' },
@@ -120,7 +145,12 @@ export const jdxProducts = [
     subCategory: 'Light Filtering',
     basePrice: 75.00,
     sizeRatio: 0.12,
-    imageUrl: '/images/products/jdx-roller-light-filtering.png',
+    imageUrl: 'https://images.unsplash.com/photo-1513694203530-ad3d99967451?auto=format&fit=crop&q=80&w=800',
+    images: [
+      'https://images.unsplash.com/photo-1513694203530-ad3d99967451?auto=format&fit=crop&q=80&w=800',
+      'https://images.unsplash.com/photo-1533090161767-e6ffed986c88?auto=format&fit=crop&q=80&w=800',
+      'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&q=80&w=800'
+    ],
     colors: [
       { name: 'White', code: 'WHITE', hex: '#FFFFFF' },
       { name: 'Ivory', code: 'IVORY', hex: '#FFFFF0' },
@@ -140,7 +170,12 @@ export const jdxProducts = [
     subCategory: 'Sunscreen',
     basePrice: 85.00,
     sizeRatio: 0.14,
-    imageUrl: '/images/products/jdx-roller-light-filtering.png',
+    imageUrl: 'https://images.unsplash.com/photo-1533090161767-e6ffed986c88?auto=format&fit=crop&q=80&w=800',
+    images: [
+      'https://images.unsplash.com/photo-1533090161767-e6ffed986c88?auto=format&fit=crop&q=80&w=800',
+      'https://images.unsplash.com/photo-1513694203530-ad3d99967451?auto=format&fit=crop&q=80&w=800',
+      'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&q=80&w=800'
+    ],
     colors: [
       { name: 'White', code: 'WHITE', hex: '#FFFFFF' },
       { name: 'Ivory', code: 'IVORY', hex: '#FFFFF0' },
@@ -162,7 +197,12 @@ export const jdxProducts = [
     subCategory: 'Blackout',
     basePrice: 88.00,
     sizeRatio: 0.15,
-    imageUrl: '/images/products/jdx-roller-blackout.png',
+    imageUrl: '/images/products/jdx-roller-eldorado-1.png',
+    images: [
+      '/images/products/jdx-roller-eldorado-1.png',
+      '/images/products/jdx-roller-eldorado-2.png',
+      '/images/products/jdx-roller-eldorado-3.png'
+    ],
     colors: [
       { name: 'Ivory', code: 'IVORY', hex: '#FFFFF0' },
       { name: 'Beige', code: 'BEIGE', hex: '#F5F5DC' },
@@ -182,7 +222,12 @@ export const jdxProducts = [
     subCategory: 'Blackout',
     basePrice: 92.00,
     sizeRatio: 0.16,
-    imageUrl: '/images/products/jdx-roller-blackout.png',
+    imageUrl: '/images/products/jdx-roller-eldorado-1.png',
+    images: [
+      '/images/products/jdx-roller-eldorado-1.png',
+      '/images/products/jdx-roller-eldorado-2.png',
+      '/images/products/jdx-roller-eldorado-3.png'
+    ],
     colors: [
       { name: 'Sand', code: 'SAND', hex: '#C2B280' },
       { name: 'Light Grey', code: 'L_GREY', hex: '#D3D3D3' },
@@ -206,7 +251,12 @@ export const jdxProducts = [
     sizeRatio: 0.30,
     showMotor: true,
     showColor: true,
-    imageUrl: '/images/products/jdx-unislat-santorini.png',
+    imageUrl: '/images/products/jdx-unislat-santorini-1.png',
+    images: [
+      '/images/products/jdx-unislat-santorini-1.png',
+      '/images/products/jdx-unislat-santorini-2.png',
+      '/images/products/jdx-unislat-santorini-3.png'
+    ],
     description: 'Luxury smart curtain system from Unislat Living. The Santorini collection offers a perfect blend of elegance and technology.',
     colors: [
       { name: 'Blue & White', code: 'BLUE_WHITE', hex: '#0000FF' },
