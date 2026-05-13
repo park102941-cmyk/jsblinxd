@@ -153,7 +153,8 @@ const ProductDetail = () => {
         });
 
         // Add custom price and remote price to the total
-        return (result["Total Price"] + remotePrice + customPrice).toFixed(2);
+        const baseCalculatedPrice = result?.["Total Price"] || product.basePrice || 0;
+        return (Number(baseCalculatedPrice) + remotePrice + customPrice).toFixed(2);
     };
 
 

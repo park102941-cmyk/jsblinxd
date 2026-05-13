@@ -37,10 +37,12 @@ const Search = () => {
                 faqSnaps.forEach(doc => {
                     if (doc.id === 'faq') {
                         const faqs = doc.data().items || [];
-                        const matchedFaqs = faqs.filter(f =>
-                            f.question.toLowerCase().includes(query.toLowerCase()) ||
-                            f.answer.toLowerCase().includes(query.toLowerCase())
-                        );
+                        const matchedFaqs = faqs.filter(f => {
+                            const q = f.question || '';
+                            const a = f.answer || '';
+                            return q.toLowerCase().includes(query.toLowerCase()) ||
+                                   a.toLowerCase().includes(query.toLowerCase());
+                        });
                         if (matchedFaqs.length > 0) {
                             foundInfos.push({
                                 type: 'FAQ',
