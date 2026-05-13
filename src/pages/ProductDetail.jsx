@@ -304,7 +304,7 @@ const ProductDetail = () => {
                             style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'all 0.4s ease' }}
                             onError={(e) => {
                                 e.target.onerror = null; 
-                                e.target.src = "https://images.unsplash.com/photo-1513694203530-ad3d99967451?auto=format&fit=crop&q=80&w=800";
+                                e.target.src = "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&q=80&w=800";
                             }}
                         />
                         {/* Nav Arrows */}

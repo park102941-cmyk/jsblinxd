@@ -24,7 +24,8 @@ const Search = () => {
                 const filteredProducts = allProducts.filter(p => {
                     const titleMatch = (p.title || p.name || '').toLowerCase().includes(query.toLowerCase());
                     const categoryMatch = (p.category || '').toLowerCase().includes(query.toLowerCase());
-                    return titleMatch || categoryMatch;
+                    const descriptionMatch = (p.description || '').toLowerCase().includes(query.toLowerCase());
+                    return titleMatch || categoryMatch || descriptionMatch;
                 });
                 setProducts(filteredProducts);
 

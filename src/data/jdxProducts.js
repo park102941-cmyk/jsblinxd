@@ -13,7 +13,7 @@ export const jdxProducts = [
     maxHeight: 120,
     showMotor: true,
     showColor: true,
-    imageUrl: '/images/products/jdx-zebra-coit-1.png',
+    imageUrl: '/images/products/jdx-zebra-coit-2.png',
     images: [
       '/images/products/jdx-zebra-coit-1.png',
       '/images/products/jdx-zebra-coit-2.png',
@@ -39,7 +39,7 @@ export const jdxProducts = [
     subCategory: 'Light Filtering',
     basePrice: 95.00,
     sizeRatio: 0.17,
-    imageUrl: '/images/products/jdx-zebra-las-colinas-1.png',
+    imageUrl: '/images/products/jdx-zebra-las-colinas-2.png',
     images: [
       '/images/products/jdx-zebra-las-colinas-1.png',
       '/images/products/jdx-zebra-las-colinas-2.png',
@@ -65,7 +65,7 @@ export const jdxProducts = [
     subCategory: 'Light Filtering',
     basePrice: 90.00,
     sizeRatio: 0.15,
-    imageUrl: '/images/products/jdx-zebra-legacy-1.png',
+    imageUrl: '/images/products/jdx-zebra-legacy-2.png',
     images: [
       '/images/products/jdx-zebra-legacy-1.png',
       '/images/products/jdx-zebra-legacy-2.png',
@@ -92,7 +92,7 @@ export const jdxProducts = [
     subCategory: 'Blackout',
     basePrice: 110.00,
     sizeRatio: 0.20,
-    imageUrl: '/images/products/jdx-zebra-apache-1.png',
+    imageUrl: '/images/products/jdx-zebra-apache-2.png',
     images: [
       '/images/products/jdx-zebra-apache-1.png',
       '/images/products/jdx-zebra-apache-2.png',
@@ -118,7 +118,7 @@ export const jdxProducts = [
     subCategory: 'Blackout',
     basePrice: 115.00,
     sizeRatio: 0.22,
-    imageUrl: '/images/products/jdx-zebra-apache-1.png',
+    imageUrl: '/images/products/jdx-zebra-apache-2.png',
     images: [
       '/images/products/jdx-zebra-apache-1.png',
       '/images/products/jdx-zebra-apache-2.png',
@@ -197,7 +197,7 @@ export const jdxProducts = [
     subCategory: 'Blackout',
     basePrice: 88.00,
     sizeRatio: 0.15,
-    imageUrl: '/images/products/jdx-roller-eldorado-1.png',
+    imageUrl: '/images/products/jdx-roller-eldorado-2.png',
     images: [
       '/images/products/jdx-roller-eldorado-1.png',
       '/images/products/jdx-roller-eldorado-2.png',
@@ -222,7 +222,7 @@ export const jdxProducts = [
     subCategory: 'Blackout',
     basePrice: 92.00,
     sizeRatio: 0.16,
-    imageUrl: '/images/products/jdx-roller-eldorado-1.png',
+    imageUrl: '/images/products/jdx-roller-eldorado-2.png',
     images: [
       '/images/products/jdx-roller-eldorado-1.png',
       '/images/products/jdx-roller-eldorado-2.png',
@@ -251,7 +251,7 @@ export const jdxProducts = [
     sizeRatio: 0.30,
     showMotor: true,
     showColor: true,
-    imageUrl: '/images/products/jdx-unislat-santorini-1.png',
+    imageUrl: '/images/products/jdx-unislat-santorini-2.png',
     images: [
       '/images/products/jdx-unislat-santorini-1.png',
       '/images/products/jdx-unislat-santorini-2.png',
