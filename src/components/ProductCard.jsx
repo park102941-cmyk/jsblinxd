@@ -64,6 +64,10 @@ const ProductCard = ({ id, title, price, originalPrice, image, badge, reviews, c
                             }} 
                             onMouseOver={e => e.currentTarget.style.transform = 'scale(1.08)'}
                             onMouseOut={e => e.currentTarget.style.transform = 'scale(1)'}
+                            onError={(e) => {
+                                e.target.onerror = null; 
+                                e.target.src = "https://images.unsplash.com/photo-1513694203530-ad3d99967451?auto=format&fit=crop&q=80&w=800";
+                            }}
                         /> :
                         <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#ccc', fontSize: '0.9rem' }}>No Image</div>
                     }

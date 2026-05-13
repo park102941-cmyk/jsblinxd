@@ -302,6 +302,10 @@ const ProductDetail = () => {
                             src={mainImageUrl || images[currentImageIndex]}
                             alt={product.title}
                             style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'all 0.4s ease' }}
+                            onError={(e) => {
+                                e.target.onerror = null; 
+                                e.target.src = "https://images.unsplash.com/photo-1513694203530-ad3d99967451?auto=format&fit=crop&q=80&w=800";
+                            }}
                         />
                         {/* Nav Arrows */}
                         <button
@@ -328,6 +332,10 @@ const ProductDetail = () => {
                                 style={{
                                     width: '80px', height: '80px', objectFit: 'cover', borderRadius: '4px', cursor: 'pointer',
                                     border: currentImageIndex === idx ? '2px solid #333' : '1px solid #ddd'
+                                }}
+                                onError={(e) => {
+                                    e.target.onerror = null; 
+                                    e.target.src = "https://images.unsplash.com/photo-1513694203530-ad3d99967451?auto=format&fit=crop&q=80&w=800";
                                 }}
                             />
                         ))}
