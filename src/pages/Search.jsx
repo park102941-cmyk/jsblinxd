@@ -22,8 +22,8 @@ const Search = () => {
                 const allProducts = productSnaps.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
                 const filteredProducts = allProducts.filter(p =>
-                    p.title.toLowerCase().includes(query.toLowerCase()) ||
-                    p.category?.toLowerCase().includes(query.toLowerCase())
+                    (p.title?.toLowerCase().includes(query.toLowerCase()) || 
+                     p.category?.toLowerCase().includes(query.toLowerCase()))
                 );
                 setProducts(filteredProducts);
 

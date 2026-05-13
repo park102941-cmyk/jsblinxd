@@ -83,8 +83,8 @@ const Products = () => {
         <ProductCard
             key={product.id}
             id={product.id}
-            title={product.title}
-            price={product.basePrice}
+            title={product.title || 'Untitled Product'}
+            price={product.basePrice || 0}
             image={product.imageUrl}
             badge={product.badge || (product.category === 'motor' ? 'Smart' : null)}
             reviews={product.reviews || 0}
