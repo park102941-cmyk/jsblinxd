@@ -21,10 +21,11 @@ const Search = () => {
                 const productSnaps = await getDocs(productsRef);
                 const allProducts = productSnaps.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-                const filteredProducts = allProducts.filter(p =>
-                    (p.title?.toLowerCase().includes(query.toLowerCase()) || 
-                     p.category?.toLowerCase().includes(query.toLowerCase()))
-                );
+                const filteredProducts = allProducts.filter(p => {
+                    const titleMatch = (p.title || p.name || '').toLowerCase().includes(query.toLowerCase());
+                    const categoryMatch = (p.category || '').toLowerCase().includes(query.toLowerCase());
+                    return titleMatch || categoryMatch;
+                });
                 setProducts(filteredProducts);
 
                 // 2. Search Info (Static for now, could be dynamic if we fetch content pages)
