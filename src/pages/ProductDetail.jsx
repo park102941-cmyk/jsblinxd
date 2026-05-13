@@ -40,13 +40,14 @@ const ProductDetail = () => {
 
     // Selection States
     const [selectedColor, setSelectedColor] = useState(null);
-    const [width, setWidth] = useState('');
+    const [width, setWidth] = useState('24');
     const [widthFraction, setWidthFraction] = useState('0');
-    const [height, setHeight] = useState('');
+    const [height, setHeight] = useState('36');
     const [heightFraction, setHeightFraction] = useState('0');
     const [mountType, setMountType] = useState('inside');
-    const [motorOption, setMotorOption] = useState('manual');
-    const [remoteOption, setRemoteOption] = useState('none');
+    const [motorType, setMotorType] = useState('standard');
+    const [remoteType, setRemoteType] = useState('none');
+    const [solarPanel, setSolarPanel] = useState(false);
     const [roomLabel, setRoomLabel] = useState('');
     const [selectedConfigs, setSelectedConfigs] = useState({}); // { groupID: optionID }
     const [mainImageUrl, setMainImageUrl] = useState('');
@@ -149,12 +150,13 @@ const ProductDetail = () => {
             widthInch: w,
             heightInch: h,
             mountType: mountType,
-            motorPrice: motorPrice // This stays for the core engine logic
+            motorType: motorType,
+            remoteType: remoteType,
+            solarPanel: solarPanel
         });
 
-        // Add custom price and remote price to the total
-        const baseCalculatedPrice = result?.["Total Price"] || product.basePrice || 0;
-        return (Number(baseCalculatedPrice) + remotePrice + customPrice).toFixed(2);
+        const baseCalculatedPrice = result?.["Total Price"] || 0;
+        return (Number(baseCalculatedPrice) + customPrice).toFixed(2);
     };
 
 
@@ -182,7 +184,6 @@ const ProductDetail = () => {
 
             setValidationError('');
 
-            const motorPrice = motorOption === 'ble_motor' ? 148 : (motorOption === 'zigbee_motor' ? 155 : 0);
             const JSBlindData = orderEngine.calculateOrder({
                 name: currentUser?.displayName || "Customer",
                 location: roomLabel,
@@ -190,7 +191,9 @@ const ProductDetail = () => {
                 heightInch: h,
                 fabricCode: selectedColor?.component_id || selectedColor?.code || selectedColor?.name || "",
                 mountType: mountType,
-                motorPrice: motorPrice
+                motorType: motorType,
+                remoteType: remoteType,
+                solarPanel: solarPanel
             });
 
             // Resolve custom config details for cart display
@@ -500,7 +503,6 @@ const ProductDetail = () => {
                                     style={{ flex: 1, border: mountType === 'inside' ? '2px solid #333' : '1px solid #ddd', borderRadius: '6px', padding: '15px', cursor: 'pointer', textAlign: 'center', position: 'relative', background: mountType === 'inside' ? '#fcfcfc' : '#fff' }}
                                 >
                                     <div style={{ height: '80px', background: '#f5f5f5', marginBottom: '10px', borderRadius: '4px', display: 'flex', justifyContent: 'center', alignItems: 'center', overflow: 'hidden' }}>
-                                        {/* Simple SVG Diagram */}
                                         <svg width="60" height="60" viewBox="0 0 100 100">
                                             <rect x="10" y="10" width="80" height="80" fill="none" stroke="#ccc" strokeWidth="2" />
                                             <rect x="15" y="15" width="70" height="15" fill="#333" opacity="0.8" />
@@ -540,59 +542,49 @@ const ProductDetail = () => {
                                     How to measure your windows?
                                 </Link>
                             </div>
-                            {/* Width Row */}
-                            <div style={{ display: 'flex', gap: '10px', marginBottom: '15px' }}>
-                                <div style={{ flex: 2 }}>
-                                    <label style={{ fontSize: '0.8rem', fontWeight: 'bold', display: 'block', marginBottom: '5px' }}>Custom Width *</label>
-                                    <input
-                                        type="number"
-                                        value={width}
-                                        onChange={(e) => setWidth(e.target.value)}
-                                        placeholder="Inch"
-                                        style={{ width: '100%', padding: '10px', border: '1px solid #ddd', borderRadius: '4px' }}
-                                    />
+                            
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '20px' }}>
+                                <div>
+                                    <label style={{ fontSize: '0.8rem', fontWeight: 'bold', display: 'block', marginBottom: '8px' }}>WIDTH (INCH)</label>
+                                    <div style={{ display: 'flex', gap: '5px' }}>
+                                        <select 
+                                            value={width} 
+                                            onChange={(e) => setWidth(e.target.value)}
+                                            style={{ flex: 1, padding: '12px', border: '1px solid #ddd', borderRadius: '4px' }}
+                                        >
+                                            {Array.from({length: 96}, (_, i) => i + 15).map(v => (
+                                                <option key={v} value={v}>{v}</option>
+                                            ))}
+                                        </select>
+                                        <select 
+                                            value={widthFraction} 
+                                            onChange={(e) => setWidthFraction(e.target.value)}
+                                            style={{ width: '80px', padding: '12px', border: '1px solid #ddd', borderRadius: '4px' }}
+                                        >
+                                            {fractions.map(f => <option key={f.value} value={f.value}>{f.label.replace('"', '')}</option>)}
+                                        </select>
+                                    </div>
                                 </div>
-                                <div style={{ flex: 1 }}>
-                                    <label style={{ fontSize: '0.8rem', fontWeight: 'bold', display: 'block', marginBottom: '5px' }}>Width Fraction *</label>
-                                    <select
-                                        value={widthFraction}
-                                        onChange={(e) => setWidthFraction(e.target.value)}
-                                        style={{ width: '100%', padding: '10px', border: '1px solid #ddd', borderRadius: '4px' }}
-                                    >
-                                        {fractions.map(f => <option key={f.value} value={f.value}>{f.label}</option>)}
-                                    </select>
-                                </div>
-                            </div>
-
-                            {/* Height Row */}
-                            <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
-                                <div style={{ flex: 2 }}>
-                                    <label style={{ fontSize: '0.8rem', fontWeight: 'bold', display: 'block', marginBottom: '5px' }}>Custom Height *</label>
-                                    <input
-                                        type="number"
-                                        value={height}
-                                        onChange={(e) => setHeight(e.target.value)}
-                                        placeholder="Inch"
-                                        style={{ width: '100%', padding: '10px', border: '1px solid #ddd', borderRadius: '4px' }}
-                                    />
-                                </div>
-                                <div style={{ flex: 1 }}>
-                                    <label style={{ fontSize: '0.8rem', fontWeight: 'bold', display: 'block', marginBottom: '5px' }}>Height Fraction *</label>
-                                    <select
-                                        value={heightFraction}
-                                        onChange={(e) => setHeightFraction(e.target.value)}
-                                        style={{ width: '100%', padding: '10px', border: '1px solid #ddd', borderRadius: '4px' }}
-                                    >
-                                        {fractions.map(f => <option key={f.value} value={f.value}>{f.label}</option>)}
-                                    </select>
-                                </div>
-                            </div>
-
-                            {/* Reconfirmation */}
-                            <div style={{ marginBottom: '10px' }}>
-                                <label style={{ fontSize: '0.8rem', fontWeight: 'bold', display: 'block', marginBottom: '5px' }}>Reconfirmation</label>
-                                <div style={{ padding: '10px', background: '#f9f9f9', border: '1px solid #eee', borderRadius: '4px', color: '#555', fontSize: '0.9rem' }}>
-                                    {width ? `${width} ${fractions.find(f => f.value === widthFraction)?.label.replace('0"', '')}` : '-'} W x {height ? `${height} ${fractions.find(f => f.value === heightFraction)?.label.replace('0"', '')}` : '-'} H
+                                <div>
+                                    <label style={{ fontSize: '0.8rem', fontWeight: 'bold', display: 'block', marginBottom: '8px' }}>HEIGHT (INCH)</label>
+                                    <div style={{ display: 'flex', gap: '5px' }}>
+                                        <select 
+                                            value={height} 
+                                            onChange={(e) => setHeight(e.target.value)}
+                                            style={{ flex: 1, padding: '12px', border: '1px solid #ddd', borderRadius: '4px' }}
+                                        >
+                                            {Array.from({length: 106}, (_, i) => i + 15).map(v => (
+                                                <option key={v} value={v}>{v}</option>
+                                            ))}
+                                        </select>
+                                        <select 
+                                            value={heightFraction} 
+                                            onChange={(e) => setHeightFraction(e.target.value)}
+                                            style={{ width: '80px', padding: '12px', border: '1px solid #ddd', borderRadius: '4px' }}
+                                        >
+                                            {fractions.map(f => <option key={f.value} value={f.value}>{f.label.replace('"', '')}</option>)}
+                                        </select>
+                                    </div>
                                 </div>
                             </div>
 
@@ -605,138 +597,93 @@ const ProductDetail = () => {
                         </OptionSection>
 
 
-                        {/* 5. Motor / Control */}
-                        {(product.showMotor !== false) && (
-                            <>
-                                <OptionSection
-                                    title="Choose your motor"
-                                    isOpen={activeSection === 'motor'}
-                                    onToggle={() => setActiveSection(activeSection === 'motor' ? '' : 'motor')}
-                                >
-                                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))', gap: '10px' }}>
-                                        {/* Manual */}
-                                        <div
-                                            onClick={() => setMotorOption('manual')}
-                                            style={{
-                                                border: motorOption === 'manual' ? '2px solid #333' : '1px solid #ddd',
-                                                borderRadius: '6px',
-                                                padding: '12px',
-                                                cursor: 'pointer',
-                                                textAlign: 'center',
-                                                display: 'flex', flexDirection: 'column', alignItems: 'center',
-                                                background: motorOption === 'manual' ? '#fcfcfc' : '#fff'
-                                            }}
-                                        >
-                                            <div style={{ width: '32px', height: '32px', background: '#f5f5f5', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '8px' }}>
-                                                <ChevronDown size={18} />
-                                            </div>
-                                            <div style={{ fontSize: '0.85rem', fontWeight: '600' }}>Manual</div>
-                                            <div style={{ fontSize: '0.7rem', color: '#888' }}>Standard Chain</div>
-                                            <div style={{ fontSize: '0.85rem', fontWeight: '700', marginTop: '10px' }}>+$0.00</div>
-                                        </div>
-
-                                        {/* BLE Motor */}
-                                        <div
-                                            onClick={() => setMotorOption('ble_motor')}
-                                            style={{
-                                                border: motorOption === 'ble_motor' ? '2px solid #333' : '1px solid #ddd',
-                                                borderRadius: '6px',
-                                                padding: '12px',
-                                                cursor: 'pointer',
-                                                position: 'relative',
-                                                textAlign: 'center',
-                                                display: 'flex', flexDirection: 'column', alignItems: 'center',
-                                                background: motorOption === 'ble_motor' ? '#fcfcfc' : '#fff'
-                                            }}
-                                        >
-                                            <div style={{ width: '32px', height: '32px', background: 'var(--bg-soft)', color: 'var(--primary-green)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '8px' }}>
-                                                <Rss size={16} />
-                                            </div>
-                                            <div style={{ fontSize: '0.85rem', fontWeight: '600' }}>BLE Smart</div>
-                                            <div style={{ fontSize: '0.7rem', color: '#888' }}>Bluetooth 5.0</div>
-                                            <div style={{ fontSize: '0.85rem', fontWeight: '700', marginTop: '10px' }}>+$135.00</div>
-                                        </div>
-
-                                        {/* Zigbee Motor */}
-                                        <div
-                                            onClick={() => setMotorOption('zigbee_motor')}
-                                            style={{
-                                                border: motorOption === 'zigbee_motor' ? '2px solid #333' : '1px solid #ddd',
-                                                borderRadius: '6px',
-                                                padding: '12px',
-                                                cursor: 'pointer',
-                                                position: 'relative',
-                                                textAlign: 'center',
-                                                display: 'flex', flexDirection: 'column', alignItems: 'center',
-                                                background: motorOption === 'zigbee_motor' ? '#fcfcfc' : '#fff'
-                                            }}
-                                        >
-                                            <div style={{ width: '32px', height: '32px', background: '#f5f3ff', color: '#7c3aed', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '8px' }}>
-                                                <Cpu size={16} />
-                                            </div>
-                                            <div style={{ fontSize: '0.85rem', fontWeight: '600' }}>Matter/Zigbee</div>
-                                            <div style={{ fontSize: '0.7rem', color: '#888' }}>Universal Hub</div>
-                                            <div style={{ fontSize: '0.85rem', fontWeight: '700', marginTop: '10px' }}>+$155.00</div>
-                                        </div>
-                                    </div>
-
-                                    {/* Smart Home Compatibility Info (Allesin style) */}
-                                    <div style={{ marginTop: '15px', padding: '12px', background: '#f9f9f9', borderRadius: '6px', border: '1px solid #eee' }}>
-                                        <div style={{ fontSize: '0.75rem', color: '#666', fontWeight: '600', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '5px' }}>
-                                            <Check size={14} color="#16a34a" /> Works with:
-                                        </div>
-                                        <div style={{ display: 'flex', gap: '15px', color: '#888', flexWrap: 'wrap' }}>
-                                            <div style={{ fontSize: '0.7rem', display: 'flex', alignItems: 'center', gap: '4px' }}><Rss size={12} /> Alexa</div>
-                                            <div style={{ fontSize: '0.7rem', display: 'flex', alignItems: 'center', gap: '4px' }}><Rss size={12} /> Google Home</div>
-                                            <div style={{ fontSize: '0.7rem', display: 'flex', alignItems: 'center', gap: '4px' }}><Cpu size={12} /> Apple Home</div>
-                                            <div style={{ fontSize: '0.7rem', display: 'flex', alignItems: 'center', gap: '4px' }}><Sun size={12} /> Solar Ready</div>
-                                        </div>
-                                    </div>
-                                </OptionSection>
-
-                                {/* 6. Remote (Only if motor is selected) */}
-                                {motorOption !== 'manual' && (
-                                    <OptionSection
-                                        title="Remote Controller"
-                                        isOpen={activeSection === 'remote'}
-                                        onToggle={() => setActiveSection(activeSection === 'remote' ? '' : 'remote')}
+                        {/* 5. Motorization */}
+                        <OptionSection
+                            title="Motor Type"
+                            isOpen={activeSection === 'motor'}
+                            onToggle={() => setActiveSection(activeSection === 'motor' ? '' : 'motor')}
+                        >
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: '12px' }}>
+                                {[
+                                    { id: 'standard', name: 'Standard RF', icon: <Cpu size={20} />, desc: 'Remote controlled', price: 0 },
+                                    { id: 'zigbee', name: 'Zigbee 3.0', icon: <Rss size={20} />, desc: 'Hub required', price: 25 },
+                                    { id: 'alexa', name: 'Alexa Direct', icon: <Sparkles size={20} />, desc: 'No hub needed', price: 29 },
+                                    { id: 'matter', name: 'Matter / Thread', icon: <ShieldCheck size={20} />, desc: 'Future-proof', price: 94 }
+                                ].map(m => (
+                                    <div
+                                        key={m.id}
+                                        onClick={() => setMotorType(m.id)}
+                                        style={{
+                                            border: motorType === m.id ? '2px solid #333' : '1px solid #ddd',
+                                            borderRadius: '8px', padding: '15px', cursor: 'pointer', textAlign: 'center',
+                                            background: motorType === m.id ? '#fcfcfc' : '#fff', position: 'relative'
+                                        }}
                                     >
-                                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '10px' }}>
-                                            {/* None */}
-                                            <div
-                                                onClick={() => setRemoteOption('none')}
-                                                style={{
-                                                    border: remoteOption === 'none' ? '2px solid #333' : '1px solid #ddd',
-                                                    borderRadius: '6px',
-                                                    padding: '10px',
-                                                    textAlign: 'center',
-                                                    cursor: 'pointer'
-                                                }}
-                                            >
-                                                <div style={{ fontSize: '1.2rem', fontWeight: 'bold', marginBottom: '5px', padding: '20px 0' }}>NONE</div>
-                                                <div style={{ fontSize: '0.8rem' }}>No Remote</div>
-                                            </div>
-                                            {/* Basic Remote */}
-                                            <div
-                                                onClick={() => setRemoteOption('basic_remote')}
-                                                style={{
-                                                    border: remoteOption === 'basic_remote' ? '2px solid #333' : '1px solid #ddd',
-                                                    borderRadius: '6px',
-                                                    padding: '10px',
-                                                    textAlign: 'center',
-                                                    cursor: 'pointer'
-                                                }}
-                                            >
-                                                <div style={{ fontSize: '0.8rem', fontWeight: '500', marginBottom: '4px' }}>16-Channel [ZB16]</div>
-                                                <div style={{ fontSize: '0.8rem', fontWeight: 'bold' }}>+$19.00</div>
-                                            </div>
-                                        </div>
-                                    </OptionSection>
-                                )}
-                            </>
-                        )}
+                                        <div style={{ color: motorType === m.id ? 'var(--primary-green)' : '#666', marginBottom: '8px' }}>{m.icon}</div>
+                                        <div style={{ fontWeight: '700', fontSize: '0.85rem' }}>{m.name}</div>
+                                        <div style={{ fontSize: '0.7rem', color: '#888', marginTop: '4px' }}>{m.desc}</div>
+                                        <div style={{ fontSize: '0.85rem', fontWeight: '800', marginTop: '10px' }}>+${m.price}</div>
+                                        {motorType === m.id && <Check size={14} style={{ position: 'absolute', top: '8px', right: '8px' }} />}
+                                    </div>
+                                ))}
+                            </div>
+                        </OptionSection>
 
-                        {/* 7. Extra Options (Room Label) */}
+                        {/* 6. Remote Control */}
+                        <OptionSection
+                            title="Remote Control"
+                            isOpen={activeSection === 'remote'}
+                            onToggle={() => setActiveSection(activeSection === 'remote' ? '' : 'remote')}
+                        >
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))', gap: '10px' }}>
+                                {[
+                                    { id: 'none', name: 'No Remote', price: 0 },
+                                    { id: '1-channel', name: '1-Channel', price: 25 },
+                                    { id: '5-channel', name: '5-Channel', price: 35 },
+                                    { id: '15-channel', name: '15-Channel', price: 45 }
+                                ].map(r => (
+                                    <div
+                                        key={r.id}
+                                        onClick={() => setRemoteType(r.id)}
+                                        style={{
+                                            border: remoteType === r.id ? '2px solid #333' : '1px solid #ddd',
+                                            borderRadius: '6px', padding: '12px', cursor: 'pointer', textAlign: 'center',
+                                            background: remoteType === r.id ? '#fcfcfc' : '#fff'
+                                        }}
+                                    >
+                                        <div style={{ fontWeight: '600', fontSize: '0.85rem' }}>{r.name}</div>
+                                        <div style={{ fontSize: '0.85rem', fontWeight: '700', marginTop: '5px' }}>+${r.price}</div>
+                                    </div>
+                                ))}
+                            </div>
+                        </OptionSection>
+
+                        {/* 7. Add-ons */}
+                        <OptionSection
+                            title="Upgrades & Add-ons"
+                            isOpen={activeSection === 'addons'}
+                            onToggle={() => setActiveSection(activeSection === 'addons' ? '' : 'addons')}
+                        >
+                            <div 
+                                onClick={() => setSolarPanel(!solarPanel)}
+                                style={{ 
+                                    display: 'flex', alignItems: 'center', justifyContent: 'space-between', 
+                                    padding: '15px', border: solarPanel ? '2px solid #333' : '1px solid #eee', 
+                                    borderRadius: '8px', cursor: 'pointer', background: solarPanel ? '#fcfcfc' : '#fff'
+                                }}
+                            >
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                    <div style={{ background: '#fff9c4', color: '#fbc02d', padding: '8px', borderRadius: '50%' }}><Sun size={20} /></div>
+                                    <div>
+                                        <div style={{ fontWeight: '700', fontSize: '0.9rem' }}>Solar Panel Charger</div>
+                                        <div style={{ fontSize: '0.75rem', color: '#666' }}>Eco-friendly continuous charging</div>
+                                    </div>
+                                </div>
+                                <div style={{ fontWeight: '800' }}>+$49.00</div>
+                            </div>
+                        </OptionSection>
+
+                        {/* 8. Final Details */}
                         <OptionSection
                             title="Room Label"
                             isOpen={activeSection === 'room'}
@@ -753,24 +700,48 @@ const ProductDetail = () => {
 
                     </div>
 
-                    {/* Action Bar */}
-                    <div style={{ marginTop: '30px', display: 'flex', gap: '15px' }}>
-                        <button
-                            className="btn btn-secondary"
-                            style={{ padding: '15px 30px', display: 'flex', alignItems: 'center', gap: '10px' }}
-                            onClick={handleFavorite}
-                        >
-                            <Heart size={20} /> Favorite
-                        </button>
-                        <button
-                            className="btn btn-primary"
-                            style={{ flex: 1, padding: '15px', fontSize: '1.1rem' }}
-                            onClick={handleAddToCart}
-                        >
-                            Add to Cart - ${calculatePrice()}
-                        </button>
+                        <div style={{ marginTop: '40px', display: 'flex', gap: '15px', alignItems: 'center' }}>
+                            <div style={{ flex: 1 }}>
+                                <div style={{ fontSize: '0.85rem', color: '#666', marginBottom: '4px' }}>Estimated Total</div>
+                                <div style={{ fontSize: '2rem', fontWeight: '800', color: '#1d1d1f' }}>${calculatePrice()}</div>
+                            </div>
+                            <button
+                                onClick={handleAddToCart}
+                                className="btn btn-primary"
+                                style={{ flex: 2, padding: '20px', fontSize: '1.1rem', borderRadius: '8px' }}
+                            >
+                                Add to Cart
+                            </button>
+                        </div>
                     </div>
                 </div>
+            </div>
+
+            {/* Mobile Sticky Bar */}
+            <div style={{
+                position: 'fixed',
+                bottom: 0,
+                left: 0,
+                right: 0,
+                background: 'white',
+                padding: '15px 20px',
+                boxShadow: '0 -4px 12px rgba(0,0,0,0.1)',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                zIndex: 999,
+                borderTop: '1px solid #eee'
+            }} className="mobile-only">
+                <div>
+                    <div style={{ fontSize: '0.7rem', color: '#888' }}>Total Price</div>
+                    <div style={{ fontSize: '1.3rem', fontWeight: '800' }}>${calculatePrice()}</div>
+                </div>
+                <button 
+                    onClick={handleAddToCart}
+                    style={{ background: '#333', color: '#fff', border: 'none', padding: '12px 24px', borderRadius: '6px', fontWeight: '700' }}
+                >
+                    Add to Cart
+                </button>
             </div>
 
             <OrderingGuide isOpen={isGuideOpen} onClose={() => setIsGuideOpen(false)} />

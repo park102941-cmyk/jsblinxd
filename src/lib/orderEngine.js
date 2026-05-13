@@ -4,23 +4,18 @@
  */
 
 export class JSBlindOrderEngine {
-  constructor(pricePerSqInch = 0.07) {
-    this.pricePerSqInch = pricePerSqInch;
+  constructor() {
     this.inchToCm = 2.54;
+    // Smartwings-style pricing constants
+    this.BASE_PRICE = 189.99;
+    this.BASE_WIDTH = 23;
+    this.BASE_HEIGHT = 29;
+    this.WIDTH_SURCHARGE_PER_INCH = 2.22;
+    this.HEIGHT_SURCHARGE_PER_INCH = 1.71;
   }
 
   /**
-   * Calculates order details based on JSBlind V2.0 standards.
-   *
-   * @param {Object} params
-   * @param {string} params.name - Customer Name
-   * @param {string} params.location - Room/Label
-   * @param {number} params.widthInch - Width in inches
-   * @param {number} params.heightInch - Height in inches
-   * @param {string} params.fabricCode - Fabric code
-   * @param {string} params.mountType - 'inside' or 'outside'
-   * @param {number} params.motorPrice - Default 148 if motorized
-   * @returns {Object} Calculated order data
+   * Calculates order details based on Smartwings-style logic.
    */
   calculateOrder({
     name = "",
@@ -29,33 +24,51 @@ export class JSBlindOrderEngine {
     heightInch,
     fabricCode = "",
     mountType = "inside",
-    motorPrice = 0,
+    motorType = "standard", // standard, zigbee, alexa, matter
+    solarPanel = false,
+    remoteType = "none" // none, 1-channel, 5-channel, 15-channel
   }) {
-    // 1. Basic CM conversion
+    // 1. Basic CM conversion for manufacturing
     const widthCm = Number((widthInch * this.inchToCm).toFixed(4));
     const heightCm = Number((heightInch * this.inchToCm).toFixed(4));
 
-    // 2. JSBlind Standard Deductions (Deduction)
-    // Inside Mount: Width - 0.3cm for clearance
-    const finalWidthCm =
-      mountType === "inside" ? Number((widthCm - 0.3).toFixed(4)) : widthCm;
-
-    // Final Height: + 5.0cm for roll overlap and bottom allowance
+    // 2. JSBlind Standard Deductions
+    const finalWidthCm = mountType === "inside" ? Number((widthCm - 0.3).toFixed(4)) : widthCm;
     const finalHeightCm = Number((heightCm + 5.0).toFixed(4));
 
-    // 3. Price & Area Calculation
-    // Minimum Billing Area (400 sq.in as per Allesin logic or profit protection)
-    const MIN_AREA = 400;
-    const actualArea = widthInch * heightInch;
-    const billedArea = Math.max(actualArea, MIN_AREA);
+    // 3. Smartwings-style Pricing Logic
+    let totalPrice = this.BASE_PRICE;
 
-    // Price is based on Billed Area in Sq Inches
-    const price = Number((billedArea * this.pricePerSqInch).toFixed(2));
+    // Size Surcharges
+    if (widthInch > this.BASE_WIDTH) {
+      totalPrice += (widthInch - this.BASE_WIDTH) * this.WIDTH_SURCHARGE_PER_INCH;
+    }
+    if (heightInch > this.BASE_HEIGHT) {
+      totalPrice += (heightInch - this.BASE_HEIGHT) * this.HEIGHT_SURCHARGE_PER_INCH;
+    }
 
-    // Total SQM (Square Meters)
-    const totalSqm = Number(
-      ((finalWidthCm * finalHeightCm) / 10000).toFixed(12)
-    );
+    // Motor Surcharges
+    const motorPrices = {
+      standard: 0,
+      zigbee: 25,
+      alexa: 29,
+      matter: 94
+    };
+    const motorSurcharge = motorPrices[motorType] || 0;
+    totalPrice += motorSurcharge;
+
+    // Add-ons
+    if (solarPanel) totalPrice += 49;
+
+    // Remote Surcharges
+    const remotePrices = {
+      none: 0,
+      "1-channel": 25,
+      "5-channel": 35,
+      "15-channel": 45
+    };
+    const remoteSurcharge = remotePrices[remoteType] || 0;
+    totalPrice += remoteSurcharge;
 
     return {
       "Cus: Name": name,
@@ -68,13 +81,12 @@ export class JSBlindOrderEngine {
       "Final Height CM": finalHeightCm,
       "Fabric Code": fabricCode,
       Mount: mountType === "inside" ? "Inside Mount" : "Outside Mount",
-      "Price/ Sq I": this.pricePerSqInch,
-      Price: price,
-      Motor: motorPrice,
-      "Total Price": Number((price + motorPrice).toFixed(2)),
-      "Total SQM": totalSqm,
-      "Billed Area": billedArea,
-      "Is Min Area Applied": actualArea < MIN_AREA,
+      "Base Price": this.BASE_PRICE,
+      "Size Surcharge": totalPrice - this.BASE_PRICE - motorSurcharge - remoteSurcharge - (solarPanel ? 49 : 0),
+      "Motor Surcharge": motorSurcharge,
+      "Remote Surcharge": remoteSurcharge,
+      "Total Price": Number(totalPrice.toFixed(2)),
+      "Total SQM": Number(((finalWidthCm * finalHeightCm) / 10000).toFixed(6))
     };
   }
 }
