@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState } from 'react';
-import { auth } from '../lib/firebase';
+import { auth, db } from '../lib/firebase';
 import { onAuthStateChanged, signOut as firebaseSignOut } from 'firebase/auth';
+import { doc, getDoc } from 'firebase/firestore';
 
 const AuthContext = createContext();
 
@@ -11,15 +12,16 @@ export const AuthProvider = ({ children }) => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        // Safety timeout: if Firebase doesn't respond in 5s, unblock the app
+        const timeout = setTimeout(() => setLoading(false), 5000);
+
         const unsubscribe = onAuthStateChanged(auth, async (user) => {
+            clearTimeout(timeout);
             if (user) {
                 try {
-                    const { doc, getDoc } = await import('firebase/firestore');
-                    const { db } = await import('../lib/firebase');
                     const userDoc = await getDoc(doc(db, "users", user.uid));
                     if (userDoc.exists()) {
-                        const userData = userDoc.data();
-                        setCurrentUser({ ...user, ...userData });
+                        setCurrentUser({ ...user, ...userDoc.data() });
                     } else {
                         setCurrentUser(user);
                     }
@@ -33,21 +35,17 @@ export const AuthProvider = ({ children }) => {
             setLoading(false);
         });
 
-        return unsubscribe;
+        return () => {
+            clearTimeout(timeout);
+            unsubscribe();
+        };
     }, []);
 
-    const logout = () => {
-        return firebaseSignOut(auth);
-    };
-
-    const value = {
-        currentUser,
-        logout
-    };
+    const logout = () => firebaseSignOut(auth);
 
     return (
-        <AuthContext.Provider value={value}>
-            {!loading && children}
+        <AuthContext.Provider value={{ currentUser, logout }}>
+            {children}
         </AuthContext.Provider>
     );
 };

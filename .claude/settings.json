@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install *)",
+      "Bash(npm rebuild *)",
+      "Bash(node -e \"const esbuild = require\\('esbuild'\\); console.log\\('esbuild ok:', esbuild.version\\);\")"
+    ]
+  }
+}
