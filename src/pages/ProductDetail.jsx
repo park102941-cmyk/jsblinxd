@@ -652,43 +652,51 @@ const ProductDetail = () => {
                             onToggle={() => setActiveSection(activeSection === 'motor' ? '' : 'motor')}
                             helpText="Choose how you would like to operate your shades."
                         >
-                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px' }}>
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '15px' }}>
                                 {[
-                                    { id: 'standard', name: 'Cord Loop', price: 0, pos: '0%' },
-                                    { id: 'cordless', name: 'Cordless', price: 47, pos: '50%' },
-                                    { id: 'motorized', name: 'Motorized', price: 149, pos: '100%' }
+                                    { id: 'standard', name: 'Continuous Cord Loop', price: 0, pos: '0%', isKidFriendly: false },
+                                    { id: 'cordless', name: 'Premium Cordless', price: 47, pos: '50%', isKidFriendly: true },
+                                    { id: 'motorized', name: 'Motorization', price: 149, pos: '100%', isKidFriendly: true }
                                 ].map(l => (
                                     <div
                                         key={l.id}
                                         onClick={() => setMotorType(l.id)}
                                         style={{
-                                            border: motorType === l.id ? '2px solid #333' : '1px solid #ddd',
-                                            borderRadius: '8px', padding: '10px 5px', cursor: 'pointer', textAlign: 'center',
-                                            background: motorType === l.id ? '#fcfcfc' : '#fff', position: 'relative',
-                                            transition: 'all 0.2s ease',
-                                            boxShadow: motorType === l.id ? '0 2px 8px rgba(0,0,0,0.08)' : 'none'
+                                            padding: '5px', cursor: 'pointer', textAlign: 'center', position: 'relative',
+                                            transition: 'all 0.2s ease'
                                         }}
                                     >
-                                        <div style={{ width: '100%', aspectRatio: '1/1', background: '#fff', borderRadius: '6px', marginBottom: '8px', overflow: 'hidden', border: '1px solid #f0f0f0' }}>
+                                        <div style={{ 
+                                            width: '100%', aspectRatio: '1/1', background: '#f5f5f5', borderRadius: '4px', 
+                                            marginBottom: '12px', overflow: 'hidden', border: motorType === l.id ? '2px solid #333' : '1px solid transparent',
+                                            display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '10px'
+                                        }}>
                                             <img 
                                                 src="/images/lift_infographics.png" 
                                                 alt={l.name} 
                                                 style={{ 
-                                                    width: '300%', 
-                                                    height: '100%', 
-                                                    objectFit: 'cover',
+                                                    width: '280%', 
+                                                    height: 'auto', 
+                                                    objectFit: 'contain',
                                                     objectPosition: `${l.pos} 0%`
                                                 }} 
                                             />
                                         </div>
-                                        <div style={{ fontWeight: '700', fontSize: '0.8rem', marginBottom: '2px', color: '#333', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{l.name}</div>
-                                        <div style={{ fontSize: '0.75rem', color: l.price === 0 ? '#2e7d32' : '#333', fontWeight: '800' }}>
-                                            {l.price === 0 ? 'FREE' : `+$${l.price}`}
+                                        <div style={{ fontWeight: '600', fontSize: '0.85rem', color: '#333', lineHeight: '1.2' }}>{l.name}</div>
+                                        <div style={{ fontWeight: '800', fontSize: '0.9rem', color: '#333', margin: '4px 0' }}>
+                                            {l.price === 0 ? 'Free' : `+$${l.price.toFixed(2)}`}
                                         </div>
                                         
+                                        {l.isKidFriendly && (
+                                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px', marginTop: '6px' }}>
+                                                <span style={{ fontSize: '0.65rem', fontWeight: '800', color: '#333', letterSpacing: '0.5px' }}>KID FRIENDLY</span>
+                                                <Heart size={10} fill="#333" color="#333" />
+                                            </div>
+                                        )}
+                                        
                                         {motorType === l.id && (
-                                            <div style={{ position: 'absolute', top: '5px', right: '5px', background: '#333', color: 'white', borderRadius: '50%', width: '16px', height: '16px', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 2 }}>
-                                                <Check size={10} />
+                                            <div style={{ position: 'absolute', top: '10px', right: '10px', background: '#333', color: 'white', borderRadius: '50%', width: '18px', height: '18px', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 2 }}>
+                                                <Check size={12} />
                                             </div>
                                         )}
                                     </div>
