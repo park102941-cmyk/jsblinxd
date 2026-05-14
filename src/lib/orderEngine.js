@@ -47,9 +47,11 @@ export class JSBlindOrderEngine {
       totalPrice += (heightInch - this.BASE_HEIGHT) * this.HEIGHT_SURCHARGE_PER_INCH;
     }
 
-    // Motor Surcharges
+    // Motor & Lift Style Surcharges
     const motorPrices = {
       standard: 0,
+      cordless: 47,
+      motorized: 149,
       zigbee: 25,
       alexa: 29,
       matter: 94

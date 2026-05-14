@@ -174,11 +174,23 @@ const ProductDetail = () => {
             const w = parseFloat(width || 0) + parseFloat(widthFraction);
             const h = parseFloat(height || 0) + parseFloat(heightFraction);
 
-            if (!width || !height || w === 0 || h === 0) {
+            // Mandatory Field Checks
+            if (!selectedColor) {
+                setValidationError('Please select a color.');
+                setActiveSection('color');
+                return;
+            }
+            if (!w || !h || w === 0 || h === 0) {
                 setValidationError('Please enter valid measurements.');
                 setActiveSection('size');
                 return;
             }
+            if (motorType === 'motorized' && remoteType === 'none' && !bondBridge) {
+                setValidationError('Please select a remote or smart hub for motorized shades.');
+                setActiveSection('remote');
+                return;
+            }
+
             if (w < product.minWidth || w > product.maxWidth) {
                 setValidationError(`Width must be between ${product.minWidth}" and ${product.maxWidth}".`);
                 setActiveSection('size');
@@ -389,6 +401,8 @@ const ProductDetail = () => {
                                 isOpen={activeSection === 'color'}
                                 onToggle={() => setActiveSection(activeSection === 'color' ? '' : 'color')}
                                 helpText={EXPLANATIONS.color}
+                                isComplete={!!selectedColor}
+                                isRequired={true}
                             >
                                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(80px, 1fr))', gap: '10px' }}>
                                     {product.colors && product.colors.map((c, i) => (
@@ -419,6 +433,8 @@ const ProductDetail = () => {
                                 title={`${group.name}: ${group.options.find(o => o.id === selectedConfigs[group.id])?.name || 'Select'}`}
                                 isOpen={activeSection === group.id}
                                 onToggle={() => setActiveSection(activeSection === group.id ? '' : group.id)}
+                                isComplete={!!selectedConfigs[group.id]}
+                                isRequired={true}
                             >
                                 {group.type === 'select' ? (
                                     <select 
@@ -481,10 +497,12 @@ const ProductDetail = () => {
 
                         {/* 3. Mount Type */}
                         <OptionSection
-                            title={`Mount Type: ${mountType === 'inside' ? 'Inside Mount' : 'Outside Mount'}`}
+                            title={`Mount Type: ${mountType === 'inside' ? 'Inside' : 'Outside'}`}
                             isOpen={activeSection === 'mount'}
                             onToggle={() => setActiveSection(activeSection === 'mount' ? '' : 'mount')}
                             helpText={EXPLANATIONS.mount}
+                            isComplete={!!mountType}
+                            isRequired={true}
                         >
                             <div style={{ display: 'flex', gap: '15px' }}>
                                 <div
@@ -526,6 +544,8 @@ const ProductDetail = () => {
                             isOpen={activeSection === 'size'}
                             onToggle={() => setActiveSection(activeSection === 'size' ? '' : 'size')}
                             helpText={EXPLANATIONS.size}
+                            isComplete={parseFloat(width) > 0 && parseFloat(height) > 0}
+                            isRequired={true}
                             rightElement={
                                 <button 
                                     onClick={(e) => { e.stopPropagation(); setIsMeasureModalOpen(true); }}
@@ -649,13 +669,32 @@ const ProductDetail = () => {
                             )}
                         </OptionSection>
 
+                        {/* 5. Room Label */}
+                        <OptionSection
+                            title={`Room Label: ${roomLabel || 'Not Set'}`}
+                            isOpen={activeSection === 'room'}
+                            onToggle={() => setActiveSection(activeSection === 'room' ? '' : 'room')}
+                            helpText={EXPLANATIONS.room}
+                            isComplete={!!roomLabel}
+                            isRequired={false}
+                        >
+                            <input
+                                type="text"
+                                value={roomLabel}
+                                onChange={(e) => setRoomLabel(e.target.value)}
+                                placeholder="e.g. Master Bedroom"
+                                style={{ width: '100%', padding: '12px', border: '1px solid #ddd', borderRadius: '4px' }}
+                            />
+                        </OptionSection>
 
-                        {/* 5. Lift Styles */}
+                        {/* 6. Lift Styles */}
                         <OptionSection
                             title="Lift Styles"
                             isOpen={activeSection === 'motor'}
                             onToggle={() => setActiveSection(activeSection === 'motor' ? '' : 'motor')}
                             helpText="Choose how you would like to operate your shades."
+                            isComplete={motorType !== 'standard' || !isRequired} // standard is often default, but user wants active selection
+                            isRequired={true}
                         >
                             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '15px' }}>
                                 {[
@@ -714,6 +753,8 @@ const ProductDetail = () => {
                             isOpen={activeSection === 'remote'}
                             onToggle={() => setActiveSection(activeSection === 'remote' ? '' : 'remote')}
                             helpText={EXPLANATIONS.remote}
+                            isComplete={remoteType !== 'none' || motorType !== 'motorized'}
+                            isRequired={motorType === 'motorized'}
                         >
                             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))', gap: '10px' }}>
                                 {[
@@ -744,12 +785,14 @@ const ProductDetail = () => {
                             </div>
                         </OptionSection>
 
-                        {/* 7. Add-ons */}
+                        {/* 8. Add-ons */}
                         <OptionSection
                             title="Upgrades & Add-ons"
                             isOpen={activeSection === 'addons'}
                             onToggle={() => setActiveSection(activeSection === 'addons' ? '' : 'addons')}
                             helpText={EXPLANATIONS.addons}
+                            isComplete={solarPanel || bondBridge}
+                            isRequired={false}
                         >
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                                 <div 
@@ -792,21 +835,7 @@ const ProductDetail = () => {
                             </div>
                         </OptionSection>
 
-                        {/* 8. Final Details */}
-                        <OptionSection
-                            title="Room Label"
-                            isOpen={activeSection === 'room'}
-                            onToggle={() => setActiveSection(activeSection === 'room' ? '' : 'room')}
-                            helpText={EXPLANATIONS.room}
-                        >
-                            <input
-                                type="text"
-                                value={roomLabel}
-                                onChange={(e) => setRoomLabel(e.target.value)}
-                                placeholder="e.g. Master Bedroom"
-                                style={{ width: '100%', padding: '12px', border: '1px solid #ddd', borderRadius: '4px' }}
-                            />
-                        </OptionSection>
+                        {/* 8. Final Details (Removed from here) */}
                     </div>
 
                     <div style={{ marginTop: '40px', display: 'flex', gap: '15px', alignItems: 'center' }}>
@@ -1037,17 +1066,37 @@ const VisualRuler = ({ value }) => {
 };
 
 // Start of Helper Components
-const OptionSection = ({ title, isOpen, onToggle, helpText, rightElement, children }) => {
+const OptionSection = ({ title, isOpen, onToggle, helpText, rightElement, isComplete, isRequired, children }) => {
     const [showHelp, setShowHelp] = useState(false);
     
     return (
         <div style={{ borderBottom: '1px solid #eee' }}>
-            <div style={{ display: 'flex', alignItems: 'center', background: isOpen ? '#f9f9f9' : '#fff', paddingRight: '15px' }}>
+            <div style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                background: isOpen ? '#f9f9f9' : '#fff', 
+                paddingRight: '15px',
+                borderLeft: isRequired && !isComplete ? '4px solid #ef4444' : (isComplete ? '4px solid #22c55e' : '4px solid transparent')
+            }}>
+                <div style={{ paddingLeft: '15px', display: 'flex', alignItems: 'center' }}>
+                    {isComplete ? (
+                        <div style={{ background: '#22c55e', color: '#fff', borderRadius: '50%', width: '18px', height: '18px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                            <Check size={12} strokeWidth={4} />
+                        </div>
+                    ) : (
+                        isRequired && (
+                            <div style={{ background: '#ef4444', color: '#fff', borderRadius: '50%', width: '18px', height: '18px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                                <AlertCircle size={12} strokeWidth={4} />
+                            </div>
+                        )
+                    )}
+                </div>
                 <button
                     onClick={onToggle}
                     style={{
-                        flex: 1, padding: '15px', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                        background: 'transparent', border: 'none', cursor: 'pointer', textAlign: 'left', fontSize: '0.95rem', fontWeight: '600'
+                        flex: 1, padding: '15px 15px 15px 10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                        background: 'transparent', border: 'none', cursor: 'pointer', textAlign: 'left', fontSize: '0.95rem', 
+                        fontWeight: '600', color: isRequired && !isComplete ? '#ef4444' : '#333'
                     }}
                 >
                     {title}
