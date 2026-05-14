@@ -4,7 +4,7 @@ import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { db } from '../lib/firebase';
 import { doc, updateDoc, arrayUnion, getDoc, setDoc } from 'firebase/firestore';
-import { Star, MessageCircle, Heart, Share2, ChevronLeft, ChevronRight, Check, AlertCircle, ChevronDown, ChevronUp, Loader2, Sparkles, ShieldCheck, Truck, ShieldAlert, Cpu, Rss, Sun, Info } from 'lucide-react';
+import { Star, MessageCircle, Heart, Share2, ChevronLeft, ChevronRight, Check, AlertCircle, ChevronDown, ChevronUp, Loader2, Sparkles, ShieldCheck, Truck, ShieldAlert, Cpu, Rss, Sun, Info, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { orderEngine } from '../lib/orderEngine';
 import OrderingGuide from '../components/OrderingGuide';
@@ -51,6 +51,7 @@ const ProductDetail = () => {
     const [selectedConfigs, setSelectedConfigs] = useState({}); // { groupID: optionID }
     const [mainImageUrl, setMainImageUrl] = useState('');
     const [isGuideOpen, setIsGuideOpen] = useState(false);
+    const [isMeasureModalOpen, setIsMeasureModalOpen] = useState(false);
     const [hoveredOption, setHoveredOption] = useState(null); // { name, image, price }
 
     useEffect(() => {
@@ -521,9 +522,12 @@ const ProductDetail = () => {
                             helpText={EXPLANATIONS.size}
                         >
                             <div style={{ marginBottom: '15px' }}>
-                                <Link to="/support" style={{ fontSize: '0.85rem', color: 'var(--primary-green)', textDecoration: 'underline' }}>
+                                <span 
+                                    onClick={() => setIsMeasureModalOpen(true)}
+                                    style={{ fontSize: '0.85rem', color: 'var(--primary-green)', textDecoration: 'underline', cursor: 'pointer' }}
+                                >
                                     How to measure your windows?
-                                </Link>
+                                </span>
                             </div>
                             
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '20px' }}>
@@ -780,6 +784,64 @@ const ProductDetail = () => {
                     }
                 `}
             </style>
+            
+            {/* Measurement Guide Modal */}
+            {isMeasureModalOpen && (
+                <div style={{
+                    position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+                    backgroundColor: 'rgba(0,0,0,0.7)', zIndex: 10000,
+                    display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '20px'
+                }}>
+                    <div style={{
+                        backgroundColor: 'white', borderRadius: '12px', width: '800px', maxWidth: '100%',
+                        maxHeight: '90vh', overflowY: 'auto', position: 'relative', padding: '40px'
+                    }}>
+                        <button 
+                            onClick={() => setIsMeasureModalOpen(false)}
+                            style={{ position: 'absolute', top: '20px', right: '20px', background: 'none', border: 'none', cursor: 'pointer' }}
+                        >
+                            <X size={24} />
+                        </button>
+                        
+                        <h2 style={{ fontSize: '1.8rem', fontWeight: '700', marginBottom: '20px', textAlign: 'center' }}>How to Measure Guide</h2>
+                        
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '30px' }}>
+                            <div>
+                                <h3 style={{ fontSize: '1.2rem', fontWeight: '600', marginBottom: '15px', color: 'var(--primary-green)' }}>Inside Mount</h3>
+                                <p style={{ fontSize: '0.9rem', color: '#666', lineHeight: '1.6', marginBottom: '15px' }}>
+                                    Measure the inside width at top, middle, and bottom. Use the <strong>narrowest</strong> width. 
+                                    Measure the height at left, center, and right. Use the <strong>longest</strong> height.
+                                </p>
+                                <img src="/images/how-to-measure-guide.jpg" alt="Inside Mount" style={{ width: '100%', borderRadius: '8px' }} />
+                            </div>
+                            <div>
+                                <h3 style={{ fontSize: '1.2rem', fontWeight: '600', marginBottom: '15px', color: 'var(--primary-green)' }}>Outside Mount</h3>
+                                <p style={{ fontSize: '0.9rem', color: '#666', lineHeight: '1.6', marginBottom: '15px' }}>
+                                    Measure the exact width you want to cover. We recommend adding 2-3 inches on each side. 
+                                    Measure height from where you want the top to where you want the bottom.
+                                </p>
+                                <div style={{ background: '#f9f9f9', padding: '20px', borderRadius: '8px', borderLeft: '4px solid var(--primary-green)' }}>
+                                    <h4 style={{ fontSize: '0.9rem', fontWeight: '700', marginBottom: '10px' }}>Pro Tips:</h4>
+                                    <ul style={{ fontSize: '0.85rem', color: '#555', paddingLeft: '15px' }}>
+                                        <li>Always use a steel tape measure</li>
+                                        <li>Round to the nearest 1/8"</li>
+                                        <li>Don't make any deductions</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div style={{ textAlign: 'center', marginTop: '30px' }}>
+                            <button 
+                                onClick={() => setIsMeasureModalOpen(false)}
+                                style={{ background: 'var(--primary-green)', color: 'white', padding: '12px 40px', borderRadius: '25px', border: 'none', fontWeight: '600', cursor: 'pointer' }}
+                            >
+                                Got it, thanks!
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
