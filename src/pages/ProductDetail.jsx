@@ -1295,20 +1295,29 @@ const OptionSection = ({ title, isOpen, onToggle, helpText, rightElement, isComp
                     }}
                 >
                     {title}
-                    {isOpen ? <ChevronUp size={20} color="#666" /> : <ChevronDown size={20} color="#666" />}
+                    {/* Chevron removed from here to be placed at the end */}
                 </button>
-                {rightElement}
-                {helpText && (
-                    <button 
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            setShowHelp(!showHelp);
-                        }}
-                        style={{ padding: '0 15px', background: 'transparent', border: 'none', cursor: 'pointer', color: '#0369a1' }}
-                    >
-                        <Info size={18} />
-                    </button>
-                )}
+                
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    {rightElement}
+                    
+                    {helpText && (
+                        <button 
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                setShowHelp(!showHelp);
+                            }}
+                            style={{ padding: '0 5px', background: 'transparent', border: 'none', cursor: 'pointer', color: '#0369a1' }}
+                        >
+                            <Info size={18} />
+                        </button>
+                    )}
+
+                    {/* v (Chevron) at the far right */}
+                    <div style={{ cursor: 'pointer', padding: '0 5px' }} onClick={onToggle}>
+                        {isOpen ? <ChevronUp size={20} color="#666" /> : <ChevronDown size={20} color="#666" />}
+                    </div>
+                </div>
             </div>
             {showHelp && helpText && (
                 <div style={{ padding: '12px 15px', background: '#f0f9ff', color: '#0c4a6e', fontSize: '0.85rem', borderTop: '1px solid #e0f2fe', lineHeight: '1.5' }}>
