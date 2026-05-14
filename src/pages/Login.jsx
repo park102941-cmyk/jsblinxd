@@ -6,7 +6,7 @@ import {
     signInWithPopup,
     updateProfile
 } from 'firebase/auth';
-import { auth, db, googleProvider, facebookProvider } from '../lib/firebase';
+import { auth, db, googleProvider } from '../lib/firebase';
 import { doc, setDoc, getDoc, collection, addDoc, query, where, getDocs, deleteDoc } from 'firebase/firestore';
 
 const GOOGLE_SCRIPT_URL = import.meta.env.VITE_GOOGLE_SCRIPT_URL;
@@ -276,31 +276,6 @@ const Login = () => {
         }
     };
 
-    // Facebook login
-    const handleFacebookLogin = async () => {
-        setSocialLoading('facebook');
-        setError('');
-        try {
-            const result = await signInWithPopup(auth, facebookProvider);
-            await saveUserToFirestore(result.user, 'facebook');
-            navigate('/account');
-        } catch (err) {
-            console.error('Facebook login error:', err.code, err.message);
-            if (err.code === 'auth/popup-closed-by-user' || err.code === 'auth/cancelled-popup-request') {
-                // User closed popup, do nothing
-            } else if (err.code === 'auth/operation-not-allowed') {
-                setError('Facebook login is not enabled yet. Please contact support.');
-            } else if (err.code === 'auth/unauthorized-domain') {
-                setError('This domain is not authorized. Please contact support.');
-            } else if (err.code === 'auth/account-exists-with-different-credential') {
-                setError('An account already exists with this email using a different sign-in method.');
-            } else {
-                setError(`Facebook login failed: ${err.code || err.message}`);
-            }
-        } finally {
-            setSocialLoading('');
-        }
-    };
 
     const inputStyle = {
         width: '100%',
@@ -466,21 +441,6 @@ const Login = () => {
                                     </svg>
                                 )}
                                 {socialLoading === 'google' ? 'Connecting...' : 'Continue with Google'}
-                            </button>
-
-                            {/* Facebook */}
-                            <button onClick={handleFacebookLogin} disabled={!!socialLoading || loading}
-                                style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px', padding: '13px 20px', borderRadius: '12px', border: '2px solid #1877f2', background: '#1877f2', cursor: socialLoading || loading ? 'not-allowed' : 'pointer', fontSize: '0.95rem', fontWeight: '600', color: 'white', transition: 'all 0.2s', opacity: socialLoading === 'google' ? 0.6 : 1 }}
-                                onMouseOver={e => { if (!socialLoading && !loading) e.currentTarget.style.background = '#1565d8'; }}
-                                onMouseOut={e => { if (socialLoading !== 'facebook') e.currentTarget.style.background = '#1877f2'; }}>
-                                {socialLoading === 'facebook' ? (
-                                    <span style={{ width: '20px', height: '20px', border: '2px solid rgba(255,255,255,0.4)', borderTopColor: 'white', borderRadius: '50%', animation: 'spin 0.8s linear infinite', display: 'inline-block' }} />
-                                ) : (
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
-                                        <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-                                    </svg>
-                                )}
-                                {socialLoading === 'facebook' ? 'Connecting...' : 'Continue with Facebook'}
                             </button>
                         </div>
 
