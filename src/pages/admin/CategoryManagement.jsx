@@ -93,13 +93,11 @@ const CategoryManagement = () => {
     };
 
     const seedDefaults = async () => {
-        if (!window.confirm("This will add the standard categories (Roller, Zebra, etc.) to your management list. Continue?")) return;
+        if (!window.confirm("This will add the standard categories (Roller, Zebra) to your management list. Continue?")) return;
         
         const defaults = [
             { id: 'roller', name: 'Roller Shades', section: 'Shades', order: 10, isVisible: true },
             { id: 'zebra', name: 'Zebra Shades', section: 'Shades', order: 20, isVisible: true },
-            { id: 'cellular', name: 'Cellular Shades', section: 'Shades', order: 30, isVisible: true },
-            { id: 'roman', name: 'Roman Shades', section: 'Shades', order: 40, isVisible: true },
         ];
 
         try {
@@ -116,6 +114,25 @@ const CategoryManagement = () => {
         } catch (error) {
             console.error("Error seeding categories:", error);
             alert("Failed to seed categories.");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const cleanupLegacyCategories = async () => {
+        if (!window.confirm("WARNING: This will delete ALL categories except 'Roller Shades' and 'Zebra Shades'. This action cannot be undone. Continue?")) return;
+        
+        try {
+            setLoading(true);
+            const toDelete = categories.filter(c => !['roller', 'zebra'].includes(c.id));
+            for (const cat of toDelete) {
+                await deleteDoc(doc(db, "categories", cat.id));
+            }
+            alert(`Deleted ${toDelete.length} legacy categories.`);
+            fetchCategories();
+        } catch (error) {
+            console.error("Error cleaning up categories:", error);
+            alert("Failed to cleanup categories.");
         } finally {
             setLoading(false);
         }
@@ -181,6 +198,18 @@ const CategoryManagement = () => {
                     <p style={{ color: '#666', marginBottom: '20px' }}>Your category list is currently empty. Would you like to start with the default collections?</p>
                     <button onClick={seedDefaults} className="btn btn-secondary" style={{ padding: '10px 20px' }}>
                         Seed Default Categories
+                    </button>
+                </div>
+            )}
+            
+            {!showForm && categories.length > 0 && categories.some(c => !['roller', 'zebra'].includes(c.id)) && (
+                <div style={{ marginBottom: '20px', textAlign: 'right' }}>
+                    <button 
+                        onClick={cleanupLegacyCategories} 
+                        className="btn" 
+                        style={{ background: '#ffebee', color: '#c62828', border: '1px solid #ffcdd2', fontSize: '0.8rem', padding: '8px 16px' }}
+                    >
+                        <Trash2 size={14} style={{ marginRight: '8px' }} /> Cleanup Legacy Categories
                     </button>
                 </div>
             )}

@@ -21,12 +21,8 @@ const Home = () => {
             imageUrl: aiAssets.rollerHero
         },
         categories: [
-            { title: 'Roller Shades', img: aiAssets.rollerHero, link: '/products?category=Roller%20Shades' },
-            { title: 'Zebra Shades', img: aiAssets.zebraCat, link: '/products?category=Zebra%20Shades' },
-            { title: 'Nex-Doors™', img: aiAssets.glassDoors, link: '/products?category=Glass%20Doors' },
-            { title: 'Outdoor Tech', img: aiAssets.pergolaHero, link: '/products?category=Outdoor%20Tech' },
-            { title: 'Smart Curtains', img: 'https://images.unsplash.com/photo-1558603668-6570496b66f8?w=600', link: '/products?category=Smart%20Curtains' },
-            { title: 'Cellular Shades', img: 'https://images.unsplash.com/photo-1522771753062-5a49c1284524?w=600', link: '/products?category=Cellular%20Shades' }
+            { title: 'Roller Shades', img: aiAssets.rollerHero, link: '/products?category=roller' },
+            { title: 'Zebra Shades', img: aiAssets.zebraCat, link: '/products?category=zebra' }
         ],
         popularTitle: 'Most Popular',
         techHighlight: {

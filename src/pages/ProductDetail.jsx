@@ -8,7 +8,6 @@ import { Star, MessageCircle, Heart, Share2, ChevronLeft, ChevronRight, Check, A
 import { Link } from 'react-router-dom';
 import { orderEngine } from '../lib/orderEngine';
 import OrderingGuide from '../components/OrderingGuide';
-import AIColorVision from '../components/AIColorVision';
 
 
 const ProductDetail = () => {
@@ -52,6 +51,7 @@ const ProductDetail = () => {
     const [selectedConfigs, setSelectedConfigs] = useState({}); // { groupID: optionID }
     const [mainImageUrl, setMainImageUrl] = useState('');
     const [isGuideOpen, setIsGuideOpen] = useState(false);
+    const [hoveredOption, setHoveredOption] = useState(null); // { name, image, price }
 
     useEffect(() => {
         const fetchProduct = async () => {
@@ -120,6 +120,17 @@ const ProductDetail = () => {
     const [validationError, setValidationError] = useState('');
 
     // -- Helpers --
+    // -- Detailed Explanations for each step (SelectBlinds style) --
+    const EXPLANATIONS = {
+        color: "Choose from our premium fabric collections. Light-filtering fabrics diffuse sunlight gently, while blackout fabrics provide complete privacy and room darkening.",
+        mount: "Inside Mount: Fits within the window frame for a custom, built-in look. Requires at least 2\" of depth. Outside Mount: Fits on the wall or trim, offering maximum light blocking and covering the entire window opening.",
+        size: "Measurements are in inches. Always measure to the nearest 1/8\". For Inside Mount, we recommend measuring the width at the top, middle, and bottom, then providing the SMALLEST width.",
+        motor: "Standard RF: Simple remote control. Zigbee 3.0: Requires a hub for smart home control. Alexa Direct: Connects directly to Echo devices with built-in hubs. Matter: The latest industry standard for cross-platform smart home compatibility.",
+        remote: "1-Channel remotes control a single shade or a group together. 5 and 15-Channel remotes allow you to assign shades to different channels for individual or group control.",
+        addons: "The Solar Panel Charger uses natural light to keep your motor battery topped up, reducing the need for manual charging via USB cable.",
+        room: "Labeling your shades by room (e.g., 'Master Bedroom') helps us organize your order and makes installation much easier once they arrive."
+    };
+
     const calculatePrice = () => {
         if (!product) return 0;
 
@@ -394,15 +405,8 @@ const ProductDetail = () => {
                                 title={`Color: ${selectedColor?.name || 'Select Color'}`}
                                 isOpen={activeSection === 'color'}
                                 onToggle={() => setActiveSection(activeSection === 'color' ? '' : 'color')}
+                                helpText={EXPLANATIONS.color}
                             >
-                                <AIColorVision 
-                                    product={product} 
-                                    currentColor={selectedColor} 
-                                    onColorSelect={(color) => {
-                                        setSelectedColor(color);
-                                        if (color.image) setMainImageUrl(color.image);
-                                    }} 
-                                />
                                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(80px, 1fr))', gap: '10px' }}>
                                     {product.colors && product.colors.map((c, i) => (
                                         <div
@@ -477,10 +481,11 @@ const ProductDetail = () => {
                             onToggle={() => setActiveSection(activeSection === 'cassette' ? '' : 'cassette')}
                         >
                             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '10px' }}>
-                                {/* Mock Cassette Options */}
                                 {['White [MX01]', 'Gray [MX02]', 'Coffee [MX03]', 'Black [MX04]'].map((opt) => (
                                     <div
                                         key={opt}
+                                        onMouseEnter={() => setHoveredOption({ name: opt, image: `/images/details/cassette_${opt.split(' ')[0].toLowerCase()}.png`, price: 0 })}
+                                        onMouseLeave={() => setHoveredOption(null)}
                                         onClick={() => console.log('Cassette selected:', opt)} // Placeholder logic
                                         style={{ border: '1px solid #ddd', borderRadius: '6px', padding: '10px', textAlign: 'center', cursor: 'pointer' }}
                                     >
@@ -496,6 +501,7 @@ const ProductDetail = () => {
                             title={`Mount Type: ${mountType === 'inside' ? 'Inside Mount' : 'Outside Mount'}`}
                             isOpen={activeSection === 'mount'}
                             onToggle={() => setActiveSection(activeSection === 'mount' ? '' : 'mount')}
+                            helpText={EXPLANATIONS.mount}
                         >
                             <div style={{ display: 'flex', gap: '15px' }}>
                                 <div
@@ -536,6 +542,7 @@ const ProductDetail = () => {
                             title="Measurements"
                             isOpen={activeSection === 'size'}
                             onToggle={() => setActiveSection(activeSection === 'size' ? '' : 'size')}
+                            helpText={EXPLANATIONS.size}
                         >
                             <div style={{ marginBottom: '15px' }}>
                                 <Link to="/support" style={{ fontSize: '0.85rem', color: 'var(--primary-green)', textDecoration: 'underline' }}>
@@ -602,17 +609,19 @@ const ProductDetail = () => {
                             title="Motor Type"
                             isOpen={activeSection === 'motor'}
                             onToggle={() => setActiveSection(activeSection === 'motor' ? '' : 'motor')}
+                            helpText={EXPLANATIONS.motor}
                         >
-                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: '12px' }}>
                                 {[
-                                    { id: 'standard', name: 'Standard RF', icon: <Cpu size={20} />, desc: 'Remote controlled', price: 0 },
-                                    { id: 'zigbee', name: 'Zigbee 3.0', icon: <Rss size={20} />, desc: 'Hub required', price: 25 },
-                                    { id: 'alexa', name: 'Alexa Direct', icon: <Sparkles size={20} />, desc: 'No hub needed', price: 29 },
-                                    { id: 'matter', name: 'Matter / Thread', icon: <ShieldCheck size={20} />, desc: 'Future-proof', price: 94 }
+                                    { id: 'standard', name: 'Standard RF', icon: <Cpu size={20} />, desc: 'Remote controlled', price: 0, previewImage: '/images/details/standard_motor.png' },
+                                    { id: 'zigbee', name: 'Zigbee 3.0', icon: <Rss size={20} />, desc: 'Hub required', price: 25, previewImage: '/images/details/zigbee_motor.png' },
+                                    { id: 'alexa', name: 'Alexa Direct', icon: <Sparkles size={20} />, desc: 'No hub needed', price: 29, previewImage: '/images/details/alexa_motor.png' },
+                                    { id: 'matter', name: 'Matter / Thread', icon: <ShieldCheck size={20} />, desc: 'Future-proof', price: 94, previewImage: '/images/details/matter_motor.png' }
                                 ].map(m => (
                                     <div
                                         key={m.id}
                                         onClick={() => setMotorType(m.id)}
+                                        onMouseEnter={() => setHoveredOption({ name: m.name, image: m.previewImage, price: m.price })}
+                                        onMouseLeave={() => setHoveredOption(null)}
                                         style={{
                                             border: motorType === m.id ? '2px solid #333' : '1px solid #ddd',
                                             borderRadius: '8px', padding: '15px', cursor: 'pointer', textAlign: 'center',
@@ -634,6 +643,7 @@ const ProductDetail = () => {
                             title="Remote Control"
                             isOpen={activeSection === 'remote'}
                             onToggle={() => setActiveSection(activeSection === 'remote' ? '' : 'remote')}
+                            helpText={EXPLANATIONS.remote}
                         >
                             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))', gap: '10px' }}>
                                 {[
@@ -663,6 +673,7 @@ const ProductDetail = () => {
                             title="Upgrades & Add-ons"
                             isOpen={activeSection === 'addons'}
                             onToggle={() => setActiveSection(activeSection === 'addons' ? '' : 'addons')}
+                            helpText={EXPLANATIONS.addons}
                         >
                             <div 
                                 onClick={() => setSolarPanel(!solarPanel)}
@@ -688,6 +699,7 @@ const ProductDetail = () => {
                             title="Room Label"
                             isOpen={activeSection === 'room'}
                             onToggle={() => setActiveSection(activeSection === 'room' ? '' : 'room')}
+                            helpText={EXPLANATIONS.room}
                         >
                             <input
                                 type="text"
@@ -745,25 +757,98 @@ const ProductDetail = () => {
             </div>
 
             <OrderingGuide isOpen={isGuideOpen} onClose={() => setIsGuideOpen(false)} />
+
+            {/* Floating Quick View (Enlarge on Hover) */}
+            {hoveredOption && (
+                <div style={{
+                    position: 'fixed',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    width: '450px',
+                    backgroundColor: 'white',
+                    borderRadius: '12px',
+                    boxShadow: '0 20px 40px rgba(0,0,0,0.2)',
+                    zIndex: 10000,
+                    overflow: 'hidden',
+                    border: '1px solid #eee',
+                    pointerEvents: 'none', // Prevents jitter
+                    animation: 'fadeIn 0.2s ease-out'
+                }}>
+                    <div style={{ padding: '12px 20px', background: '#f8f9fa', borderBottom: '1px solid #eee', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <div style={{ fontWeight: '700', fontSize: '1.1rem' }}>{hoveredOption.name}</div>
+                        <div style={{ color: 'var(--primary-green)', fontWeight: '800' }}>+${hoveredOption.price}</div>
+                    </div>
+                    <div style={{ width: '100%', aspectRatio: '1/1', background: '#fff' }}>
+                        <img 
+                            src={hoveredOption.image} 
+                            alt={hoveredOption.name}
+                            style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                            onError={(e) => {
+                                e.target.onerror = null;
+                                // Fallback to a nice generic detail if image missing
+                                e.target.src = "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&q=80&w=800";
+                            }}
+                        />
+                    </div>
+                    <div style={{ padding: '15px', fontSize: '0.85rem', color: '#666', background: '#fcfcfc', textAlign: 'center' }}>
+                        Professional Detail View - Hover to inspect specifications
+                    </div>
+                </div>
+            )}
+            
+            <style>
+                {`
+                    @keyframes fadeIn {
+                        from { opacity: 0; transform: translate(-50%, -45%); }
+                        to { opacity: 1; transform: translate(-50%, -50%); }
+                    }
+                `}
+            </style>
         </div>
     );
 };
 
 // Start of Helper Components
-const OptionSection = ({ title, isOpen, onToggle, children }) => (
-    <div style={{ borderBottom: '1px solid #eee' }}>
-        <button
-            onClick={onToggle}
-            style={{
-                width: '100%', padding: '15px', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                background: isOpen ? '#f9f9f9' : '#fff', border: 'none', cursor: 'pointer', textAlign: 'left', fontSize: '0.95rem', fontWeight: '600'
-            }}
-        >
-            {title}
-            {isOpen ? <ChevronUp size={20} color="#666" /> : <ChevronDown size={20} color="#666" />}
-        </button>
-        {isOpen && <div style={{ padding: '15px' }}>{children}</div>}
-    </div>
-);
+const OptionSection = ({ title, isOpen, onToggle, helpText, children }) => {
+    const [showHelp, setShowHelp] = useState(false);
+    
+    return (
+        <div style={{ borderBottom: '1px solid #eee' }}>
+            <div style={{ display: 'flex', alignItems: 'center', background: isOpen ? '#f9f9f9' : '#fff' }}>
+                <button
+                    onClick={onToggle}
+                    style={{
+                        flex: 1, padding: '15px', display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                        background: 'transparent', border: 'none', cursor: 'pointer', textAlign: 'left', fontSize: '0.95rem', fontWeight: '600'
+                    }}
+                >
+                    {title}
+                    {isOpen ? <ChevronUp size={20} color="#666" /> : <ChevronDown size={20} color="#666" />}
+                </button>
+                {helpText && (
+                    <button 
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            setShowHelp(!showHelp);
+                        }}
+                        style={{ padding: '0 15px', background: 'transparent', border: 'none', cursor: 'pointer', color: '#0369a1' }}
+                    >
+                        <Info size={18} />
+                    </button>
+                )}
+            </div>
+            {showHelp && helpText && (
+                <div style={{ padding: '12px 15px', background: '#f0f9ff', color: '#0c4a6e', fontSize: '0.85rem', borderTop: '1px solid #e0f2fe', lineHeight: '1.5' }}>
+                    <div style={{ fontWeight: 'bold', marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                        <Sparkles size={14} /> Tip & Detail:
+                    </div>
+                    {helpText}
+                </div>
+            )}
+            {isOpen && <div style={{ padding: '15px' }}>{children}</div>}
+        </div>
+    );
+};
 
 export default ProductDetail;

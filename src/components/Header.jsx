@@ -99,59 +99,16 @@ const Header = () => {
                                     gap: '5px'
                                 }}>Blinds & Shades <ChevronDown size={14} /></Link>
                                 <div className="mega-menu">
-                                    <div className="mega-menu-content">
+                                    <div className="mega-menu-content" style={{ gridTemplateColumns: '1fr' }}>
                                         <div className="mega-column">
-                                            <h4>Shades</h4>
+                                            <h4>Shades Collections</h4>
                                             <Link to="/products?category=roller">Roller Shades</Link>
-                                            <Link to="/products?category=cellular">Cellular Shades</Link>
                                             <Link to="/products?category=zebra">Zebra Shades</Link>
-                                            <Link to="/products?category=roman">Roman Shades</Link>
-                                            <Link to="/products?category=woven">Woven Wood Shades</Link>
-                                        </div>
-                                        <div className="mega-column">
-                                            <h4>Blinds</h4>
-                                            <Link to="/products?category=wood">Wood Blinds</Link>
-                                            <Link to="/products?category=faux">Faux Wood Blinds</Link>
-                                            <Link to="/products?category=venetian">Venetian Blinds</Link>
-                                            <Link to="/products?category=vertical">Vertical Blinds</Link>
-                                        </div>
-                                        <div className="mega-column">
-                                            <h4>Specialty</h4>
-                                            <Link to="/products?category=outdoor">Outdoor Shades</Link>
-                                            <Link to="/products?category=dual">Dual Shades</Link>
-                                            <Link to="/products?category=skylight">Skylight Shades</Link>
                                         </div>
                                     </div>
-                                    {/* Dynamic Categories if any */}
-                                    {categories.length > 0 && (
-                                        <div className="mega-menu-content" style={{ borderTop: '1px solid #eee', marginTop: '20px', paddingTop: '20px' }}>
-                                            <div className="mega-column">
-                                                <h4>More Collections</h4>
-                                                {categories.filter(c => !['roller', 'cellular', 'zebra', 'roman', 'woven', 'wood', 'faux', 'venetian', 'vertical', 'outdoor', 'dual', 'skylight'].includes(c.id)).map(c => (
-                                                    <Link key={c.id} to={`/products?category=${c.id}`}>{c.name}</Link>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    )}
                                 </div>
                             </li>
 
-                            <li className="nav-item-dropdown" style={{ position: 'relative' }}>
-                                <Link to="/products?category=curtains" style={{ color: 'var(--text-main)', fontWeight: '600', fontSize: '0.85rem', textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: '5px' }}>Curtains <ChevronDown size={14} /></Link>
-                                <div className="dropdown-menu">
-                                    <Link to="/products?category=motor_curtain">Motorized Drapery</Link>
-                                    <Link to="/products?category=curtain_rods">Smart Rods</Link>
-                                </div>
-                            </li>
-
-                            <li className="nav-item-dropdown" style={{ position: 'relative' }}>
-                                <Link to="/products?category=motor" style={{ color: 'var(--text-main)', fontWeight: '600', fontSize: '0.85rem', textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: '5px' }}>Smart Tech <ChevronDown size={14} /></Link>
-                                <div className="dropdown-menu">
-                                    <Link to="/products?category=matter">Matter & Thread</Link>
-                                    <Link to="/products?category=homekit">Apple HomeKit</Link>
-                                    <Link to="/products?category=remotes">Remotes & Hubs</Link>
-                                </div>
-                            </li>
 
 
                             <li><Link to="/swatches" style={{ color: 'var(--text-main)', fontWeight: '600', fontSize: '0.85rem', textTransform: 'uppercase' }}>Swatches</Link></li>
@@ -240,6 +197,36 @@ const Header = () => {
                                 />
                                 <X size={24} onClick={() => setSearchOpen(false)} style={{ cursor: 'pointer' }} />
                             </form>
+                        </div>
+                    </div>
+                )}
+
+                {/* Mobile Menu Overlay */}
+                {mobileMenuOpen && (
+                    <div style={{
+                        position: 'fixed',
+                        top: '80px',
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        background: 'white',
+                        zIndex: 999,
+                        padding: '30px',
+                        overflowY: 'auto'
+                    }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '25px' }}>
+                            <div>
+                                <h4 style={{ fontSize: '0.9rem', color: 'var(--primary-blue)', marginBottom: '15px', textTransform: 'uppercase' }}>Shades</h4>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '15px', paddingLeft: '10px' }}>
+                                    <Link to="/products?category=roller" onClick={() => setMobileMenuOpen(false)} style={{ color: 'var(--text-main)', fontSize: '1rem', fontWeight: '500' }}>Roller Shades</Link>
+                                    <Link to="/products?category=zebra" onClick={() => setMobileMenuOpen(false)} style={{ color: 'var(--text-main)', fontSize: '1rem', fontWeight: '500' }}>Zebra Shades</Link>
+                                </div>
+                            </div>
+                            <Link to="/swatches" onClick={() => setMobileMenuOpen(false)} style={{ color: 'var(--text-main)', fontSize: '1.1rem', fontWeight: '600', textTransform: 'uppercase' }}>Swatches</Link>
+                            <Link to="/help" onClick={() => setMobileMenuOpen(false)} style={{ color: 'var(--text-main)', fontSize: '1.1rem', fontWeight: '600', textTransform: 'uppercase' }}>Help Center</Link>
+                            {!currentUser && (
+                                <Link to="/login" onClick={() => setMobileMenuOpen(false)} style={{ color: 'var(--primary-blue)', fontSize: '1.1rem', fontWeight: '600', textTransform: 'uppercase', marginTop: '20px' }}>Login</Link>
+                            )}
                         </div>
                     </div>
                 )}

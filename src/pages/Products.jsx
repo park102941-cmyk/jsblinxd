@@ -57,15 +57,7 @@ const Products = () => {
         const titles = {
             'zebra': 'Zebra Shades',
             'roller': 'Roller Shades',
-            'cellular': 'Cellular Shades',
-            'roman': 'Roman Shades',
-            'woven': 'Woven Wood Shades',
             'motor': 'Motorized Blinds',
-            'curtains': 'Smart Curtains',
-            'wood': 'Wood Blinds',
-            'faux': 'Faux Wood Blinds',
-            'outdoor': 'Outdoor Shades',
-            'dual': 'Dual Shades',
             'matter': 'Matter & Thread Tech',
             'homekit': 'Apple HomeKit Blinds'
         };
