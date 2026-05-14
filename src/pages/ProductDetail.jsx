@@ -652,53 +652,43 @@ const ProductDetail = () => {
                             onToggle={() => setActiveSection(activeSection === 'motor' ? '' : 'motor')}
                             helpText="Choose how you would like to operate your shades."
                         >
-                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '15px' }}>
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px' }}>
                                 {[
-                                    { id: 'standard', name: 'Continuous Cord Loop', price: 0, desc: 'Traditional cord operation', isKidFriendly: false, pos: '0%' },
-                                    { id: 'cordless', name: 'Premium Cordless', price: 47, desc: 'Safe and sleek', isKidFriendly: true, pos: '50%' },
-                                    { id: 'motorized', name: 'Motorization', price: 149, desc: 'Smart home integrated', isKidFriendly: true, pos: '100%' }
+                                    { id: 'standard', name: 'Cord Loop', price: 0, pos: '0%' },
+                                    { id: 'cordless', name: 'Cordless', price: 47, pos: '50%' },
+                                    { id: 'motorized', name: 'Motorized', price: 149, pos: '100%' }
                                 ].map(l => (
                                     <div
                                         key={l.id}
                                         onClick={() => setMotorType(l.id)}
                                         style={{
                                             border: motorType === l.id ? '2px solid #333' : '1px solid #ddd',
-                                            borderRadius: '12px', padding: '15px', cursor: 'pointer', textAlign: 'center',
+                                            borderRadius: '8px', padding: '10px 5px', cursor: 'pointer', textAlign: 'center',
                                             background: motorType === l.id ? '#fcfcfc' : '#fff', position: 'relative',
                                             transition: 'all 0.2s ease',
-                                            boxShadow: motorType === l.id ? '0 4px 12px rgba(0,0,0,0.1)' : 'none'
+                                            boxShadow: motorType === l.id ? '0 2px 8px rgba(0,0,0,0.08)' : 'none'
                                         }}
                                     >
-                                        <div style={{ width: '100%', aspectRatio: '1.2/1', background: '#fff', borderRadius: '8px', marginBottom: '12px', overflow: 'hidden', border: '1px solid #f0f0f0' }}>
+                                        <div style={{ width: '100%', aspectRatio: '1/1', background: '#fff', borderRadius: '6px', marginBottom: '8px', overflow: 'hidden', border: '1px solid #f0f0f0' }}>
                                             <img 
-                                                src="/Users/jdxblinds/.gemini/antigravity/brain/fa56cd91-6daa-43b4-a060-4b8e6da7e19d/blind_lift_infographics_1778787966632.png" 
+                                                src="/images/lift_infographics.png" 
                                                 alt={l.name} 
                                                 style={{ 
-                                                    width: '300%', // Scale up to show one at a time
+                                                    width: '300%', 
                                                     height: '100%', 
                                                     objectFit: 'cover',
-                                                    objectPosition: `${l.pos} 0%`,
-                                                    transition: 'transform 0.3s ease'
+                                                    objectPosition: `${l.pos} 0%`
                                                 }} 
                                             />
                                         </div>
-                                        <div style={{ fontWeight: '700', fontSize: '0.9rem', marginBottom: '4px', color: '#333' }}>{l.name}</div>
-                                        <div style={{ fontSize: '0.85rem', color: l.price === 0 ? '#2e7d32' : '#333', fontWeight: '800' }}>
-                                            {l.price === 0 ? 'FREE' : `+$${l.price.toFixed(2)}`}
+                                        <div style={{ fontWeight: '700', fontSize: '0.8rem', marginBottom: '2px', color: '#333', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{l.name}</div>
+                                        <div style={{ fontSize: '0.75rem', color: l.price === 0 ? '#2e7d32' : '#333', fontWeight: '800' }}>
+                                            {l.price === 0 ? 'FREE' : `+$${l.price}`}
                                         </div>
                                         
-                                        {l.isKidFriendly && (
-                                            <div style={{ 
-                                                marginTop: '8px', fontSize: '0.65rem', fontWeight: '800', color: '#fff', 
-                                                background: '#2e7d32', padding: '2px 8px', borderRadius: '4px', display: 'inline-block' 
-                                            }}>
-                                                KID FRIENDLY
-                                            </div>
-                                        )}
-                                        
                                         {motorType === l.id && (
-                                            <div style={{ position: 'absolute', top: '10px', right: '10px', background: '#333', color: 'white', borderRadius: '50%', width: '22px', height: '22px', display: 'flex', justifyContent: 'center', alignItems: 'center', boxShadow: '0 2px 4px rgba(0,0,0,0.2)' }}>
-                                                <Check size={14} />
+                                            <div style={{ position: 'absolute', top: '5px', right: '5px', background: '#333', color: 'white', borderRadius: '50%', width: '16px', height: '16px', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 2 }}>
+                                                <Check size={10} />
                                             </div>
                                         )}
                                     </div>
