@@ -9,6 +9,15 @@ class ErrorBoundary extends Component {
   static getDerivedStateFromError(error) {
     return { hasError: true, error };
   }
+  componentDidCatch(error) {
+    // Automatically reload when a chunk fails to load (common after new deployments)
+    if (error.name === 'ChunkLoadError' || 
+        error.message.includes('Failed to fetch dynamically imported module') ||
+        error.message.includes('chunk')) {
+      console.log("Chunk load error detected. Reloading for latest version...");
+      window.location.reload();
+    }
+  }
   render() {
     if (this.state.hasError) {
       return (
