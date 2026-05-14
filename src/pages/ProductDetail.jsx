@@ -654,9 +654,9 @@ const ProductDetail = () => {
                         >
                             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '15px' }}>
                                 {[
-                                    { id: 'standard', name: 'Continuous Cord Loop', price: 0, pos: '0%', isKidFriendly: false },
-                                    { id: 'cordless', name: 'Premium Cordless', price: 47, pos: '50%', isKidFriendly: true },
-                                    { id: 'motorized', name: 'Motorization', price: 149, pos: '100%', isKidFriendly: true }
+                                    { id: 'standard', name: 'Continuous Cord Loop', price: 0, img: '/images/lift_cord_loop.png', isKidFriendly: false },
+                                    { id: 'cordless', name: 'Premium Cordless', price: 47, img: '/images/lift_cordless.png', isKidFriendly: true },
+                                    { id: 'motorized', name: 'Motorization', price: 149, img: '/images/lift_motorized.png', isKidFriendly: true }
                                 ].map(l => (
                                     <div
                                         key={l.id}
@@ -667,20 +667,17 @@ const ProductDetail = () => {
                                         }}
                                     >
                                         <div style={{ 
-                                            width: '100%', aspectRatio: '1/1', background: '#f5f5f5', borderRadius: '4px', 
+                                            width: '100%', aspectRatio: '1/1', background: '#fff', borderRadius: '4px', 
                                             marginBottom: '12px', overflow: 'hidden', border: motorType === l.id ? '2px solid #333' : '1px solid #eee',
-                                            position: 'relative'
+                                            display: 'flex', justifyContent: 'center', alignItems: 'center'
                                         }}>
                                             <img 
-                                                src="/images/lift_infographics.png" 
+                                                src={l.img} 
                                                 alt={l.name} 
                                                 style={{ 
-                                                    position: 'absolute',
-                                                    width: '300%', // Since there are 3 icons side by side
+                                                    width: '100%', 
                                                     height: '100%', 
-                                                    top: 0,
-                                                    left: `-${parseFloat(l.pos) * 2}%`, // Precise shift: 0% -> 0, 50% -> -100%, 100% -> -200%
-                                                    objectFit: 'cover'
+                                                    objectFit: 'contain'
                                                 }} 
                                             />
                                         </div>
