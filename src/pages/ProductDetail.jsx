@@ -302,7 +302,14 @@ const ProductDetail = () => {
 
             console.log("Adding to cart:", finalItem);
             addToCart(finalItem, finalItem.options, finalItem.price, 1);
-            alert('Product added to cart!');
+            
+            // Clear only size and room info after adding to cart
+            setWidth('');
+            setHeight('');
+            setRoomType('');
+            setRoomDetail('');
+            
+            alert('Product added to cart! Please enter details for your next window.');
         } catch (err) {
             console.error("Cart Error:", err);
             alert("Error adding to cart: " + err.message);
@@ -811,7 +818,7 @@ const ProductDetail = () => {
                         {/* 7. Control Side */}
                         {(motorType === 'standard' || motorType === 'motorized') && (
                             <OptionSection
-                                title={`${motorType === 'motorized' ? 'Motor' : 'Handle'} Side: ${controlSide || 'Select'}`}
+                                title={`${motorType === 'motorized' ? 'Motor Side (Charging Port)' : 'Handle Side'} (Left/Right): ${controlSide || 'Select'}`}
                                 isOpen={activeSection === 'side'}
                                 onToggle={() => setActiveSection(activeSection === 'side' ? '' : 'side')}
                                 isComplete={!!controlSide}
