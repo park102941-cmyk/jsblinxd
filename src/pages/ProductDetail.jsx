@@ -143,17 +143,17 @@ const ProductDetail = () => {
         if (w <= 0 || h <= 0) return (product.basePrice || 0).toFixed(2);
 
         // 1. Calculate Base Price via Engine
-        let totalPrice = parseFloat(orderEngine.calculatePrice(product, {
-            width: w,
-            height: h,
-            color: selectedColor,
-            mount: mountType,
-            motor: motorType,
-            remote: remoteType,
-            solar: solarPanel,
-            hub: bondBridge,
-            configs: selectedConfigs
-        }));
+        const result = orderEngine.calculateOrder({
+            widthInch: w,
+            heightInch: h,
+            mountType: mountType,
+            motorType: motorType,
+            remoteType: remoteType,
+            solarPanel: solarPanel,
+            hub: bondBridge
+        });
+
+        let totalPrice = result?.["Total Price"] || 0;
 
         // 2. Add custom configs prices if not handled by engine
         if (product.configGroups) {
@@ -163,13 +163,6 @@ const ProductDetail = () => {
                 if (option) totalPrice += Number(option.price || 0);
             });
         }
-
-        // 3. Add Manual Add-ons (Prices updated as requested)
-        if (remoteType === '1-channel') totalPrice += 45;
-        if (remoteType === '5-channel') totalPrice += 55;
-        if (remoteType === '15-channel') totalPrice += 65;
-        if (solarPanel) totalPrice += 49;
-        if (bondBridge) totalPrice += 149;
         
         return totalPrice.toFixed(2);
     };

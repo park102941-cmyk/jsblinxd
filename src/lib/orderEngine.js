@@ -59,13 +59,14 @@ export class JSBlindOrderEngine {
 
     // Add-ons
     if (solarPanel) totalPrice += 49;
+    if (arguments[0].hub) totalPrice += 149; // Added Bond Bridge Hub support
 
-    // Remote Surcharges
+    // Remote Surcharges (Updated +$20)
     const remotePrices = {
       none: 0,
-      "1-channel": 25,
-      "5-channel": 35,
-      "15-channel": 45
+      "1-channel": 45,
+      "5-channel": 55,
+      "15-channel": 65
     };
     const remoteSurcharge = remotePrices[remoteType] || 0;
     totalPrice += remoteSurcharge;
