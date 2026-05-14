@@ -2,7 +2,7 @@ export const jdxProducts = [
   // --- Zebra Shades (Light Filtering) ---
   {
     id: 'jdx-zebra-coit',
-    title: 'JDX Zebra Shades - COIT',
+    title: 'JS Zebra Shades - COIT',
     category: 'Zebra Shades',
     subCategory: 'Light Filtering',
     basePrice: 92.00,
@@ -19,7 +19,7 @@ export const jdxProducts = [
       '/images/products/jdx-zebra-coit-2.png',
       '/images/products/jdx-zebra-coit-3.png'
     ],
-    description: 'Premium light filtering zebra shades from JDX COIT collection. Features antibacterial fabric and high UV protection.',
+    description: 'Premium light filtering zebra shades from JS COIT collection. Features antibacterial fabric and high UV protection.',
     colors: [
       { name: 'White', code: 'WHITE', hex: '#FFFFFF' },
       { name: 'Light Grey', code: 'L_GREY', hex: '#D3D3D3' },
@@ -34,7 +34,7 @@ export const jdxProducts = [
   },
   {
     id: 'jdx-zebra-las-colinas',
-    title: 'JDX Zebra Shades - LAS COLINAS',
+    title: 'JS Zebra Shades - LAS COLINAS',
     category: 'Zebra Shades',
     subCategory: 'Light Filtering',
     basePrice: 95.00,
@@ -60,7 +60,7 @@ export const jdxProducts = [
   },
   {
     id: 'jdx-zebra-legacy',
-    title: 'JDX Zebra Shades - LEGACY',
+    title: 'JS Zebra Shades - LEGACY',
     category: 'Zebra Shades',
     subCategory: 'Light Filtering',
     basePrice: 90.00,
@@ -87,7 +87,7 @@ export const jdxProducts = [
   // --- Zebra Shades (Blackout) ---
   {
     id: 'jdx-zebra-apache-blackout',
-    title: 'JDX Zebra Shades - APACHE (Blackout)',
+    title: 'JS Zebra Shades - APACHE (Blackout)',
     category: 'Zebra Shades',
     subCategory: 'Blackout',
     basePrice: 110.00,
@@ -113,7 +113,7 @@ export const jdxProducts = [
   },
   {
     id: 'jdx-zebra-hebron-blackout',
-    title: 'JDX Zebra Shades - HEBRON (Blackout)',
+    title: 'JS Zebra Shades - HEBRON (Blackout)',
     category: 'Zebra Shades',
     subCategory: 'Blackout',
     basePrice: 115.00,
@@ -140,7 +140,7 @@ export const jdxProducts = [
   // --- Roller Shades (Light Filtering) ---
   {
     id: 'jdx-roller-alamo',
-    title: 'JDX Roller Shades - ALAMO',
+    title: 'JS Roller Shades - ALAMO',
     category: 'Roller Shades',
     subCategory: 'Light Filtering',
     basePrice: 75.00,
@@ -165,7 +165,7 @@ export const jdxProducts = [
   },
   {
     id: 'jdx-roller-sunscreen-3',
-    title: 'JDX Sunscreen Roller Shades (3%)',
+    title: 'JS Sunscreen Roller Shades (3%)',
     category: 'Roller Shades',
     subCategory: 'Sunscreen',
     basePrice: 85.00,
@@ -192,7 +192,7 @@ export const jdxProducts = [
   // --- Roller Shades (Blackout) ---
   {
     id: 'jdx-roller-eldorado-blackout',
-    title: 'JDX Roller Shades - ELDORADO (Blackout)',
+    title: 'JS Roller Shades - ELDORADO (Blackout)',
     category: 'Roller Shades',
     subCategory: 'Blackout',
     basePrice: 88.00,
@@ -217,7 +217,7 @@ export const jdxProducts = [
   },
   {
     id: 'jdx-roller-arbor-hills-blackout',
-    title: 'JDX Roller Shades - ARBOR HILLS (Blackout)',
+    title: 'JS Roller Shades - ARBOR HILLS (Blackout)',
     category: 'Roller Shades',
     subCategory: 'Blackout',
     basePrice: 92.00,
@@ -244,7 +244,7 @@ export const jdxProducts = [
   // --- Unislat Living (Smart Curtains) ---
   {
     id: 'jdx-unislat-santorini',
-    title: 'JDX Unislat Living - SANTORINI',
+    title: 'JS Unislat Living - SANTORINI',
     category: 'Smart Curtains',
     subCategory: 'Unislat',
     basePrice: 195.00,

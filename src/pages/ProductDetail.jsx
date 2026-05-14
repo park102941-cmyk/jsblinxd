@@ -139,13 +139,7 @@ const ProductDetail = () => {
         
         if (w <= 0 || h <= 0) return (product.basePrice || 0).toFixed(2);
 
-        // Standard options (Legacy support or fixed defaults)
-        let motorPrice = 0;
-        if (motorOption === 'ble_motor') motorPrice = 148;
-        if (motorOption === 'zigbee_motor') motorPrice = 155;
-        
-        let remotePrice = 0;
-        if (remoteOption === 'basic_remote') remotePrice = 19;
+        // Custom Dynamic configurations
 
         // Custom Dynamic configurations
         let customPrice = 0;
@@ -227,8 +221,8 @@ const ProductDetail = () => {
                 width: w,
                 height: h,
                 mount: mountType,
-                control: motorOption,
-                remote: remoteOption,
+                control: motorType,
+                remote: remoteType,
                 room: roomLabel,
                 price: parseFloat(calculatePrice()),
                 quantity: 1,
@@ -238,8 +232,8 @@ const ProductDetail = () => {
                     color: selectedColor,
                     measurements: { width: w, height: h },
                     mount: mountType,
-                    motor: motorOption,
-                    remote: remoteOption,
+                    motor: motorType,
+                    remote: remoteType,
                     room: roomLabel,
                     customSelections: customConfigDetails
                 }
