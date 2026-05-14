@@ -354,24 +354,6 @@ const ProductDetail = () => {
                 <div style={{ flex: '1 1 400px' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <h1 style={{ fontSize: '1.8rem', fontWeight: '700', marginBottom: '10px' }}>{product.title}</h1>
-                        <button 
-                            onClick={() => setIsGuideOpen(true)}
-                            style={{ 
-                                display: 'flex', 
-                                alignItems: 'center', 
-                                gap: '8px', 
-                                background: '#f0f9ff', 
-                                color: '#0369a1', 
-                                border: '1px solid #bae6fd', 
-                                padding: '6px 12px', 
-                                borderRadius: '20px', 
-                                fontSize: '0.8rem', 
-                                fontWeight: '600',
-                                cursor: 'pointer' 
-                            }}
-                        >
-                            <Info size={14} /> Buying Guide
-                        </button>
                     </div>
                     <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: 'var(--secondary-olive)', marginBottom: '15px' }}>
                         ${calculatePrice()} <span style={{ fontSize: '1rem', color: '#666', fontWeight: '400' }}>USD</span>
