@@ -611,6 +611,7 @@ const ProductDetail = () => {
                             onToggle={() => setActiveSection(activeSection === 'motor' ? '' : 'motor')}
                             helpText={EXPLANATIONS.motor}
                         >
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))', gap: '10px' }}>
                                 {[
                                     { id: 'standard', name: 'Standard RF', icon: <Cpu size={20} />, desc: 'Remote controlled', price: 0, previewImage: '/images/details/standard_motor.png' },
                                     { id: 'zigbee', name: 'Zigbee 3.0', icon: <Rss size={20} />, desc: 'Hub required', price: 25, previewImage: '/images/details/zigbee_motor.png' },
@@ -709,22 +710,20 @@ const ProductDetail = () => {
                                 style={{ width: '100%', padding: '12px', border: '1px solid #ddd', borderRadius: '4px' }}
                             />
                         </OptionSection>
-
                     </div>
 
-                        <div style={{ marginTop: '40px', display: 'flex', gap: '15px', alignItems: 'center' }}>
-                            <div style={{ flex: 1 }}>
-                                <div style={{ fontSize: '0.85rem', color: '#666', marginBottom: '4px' }}>Estimated Total</div>
-                                <div style={{ fontSize: '2rem', fontWeight: '800', color: '#1d1d1f' }}>${calculatePrice()}</div>
-                            </div>
-                            <button
-                                onClick={handleAddToCart}
-                                className="btn btn-primary"
-                                style={{ flex: 2, padding: '20px', fontSize: '1.1rem', borderRadius: '8px' }}
-                            >
-                                Add to Cart
-                            </button>
+                    <div style={{ marginTop: '40px', display: 'flex', gap: '15px', alignItems: 'center' }}>
+                        <div style={{ flex: 1 }}>
+                            <div style={{ fontSize: '0.85rem', color: '#666', marginBottom: '4px' }}>Estimated Total</div>
+                            <div style={{ fontSize: '2rem', fontWeight: '800', color: '#1d1d1f' }}>${calculatePrice()}</div>
                         </div>
+                        <button
+                            onClick={handleAddToCart}
+                            className="btn btn-primary"
+                            style={{ flex: 2, padding: '20px', fontSize: '1.1rem', borderRadius: '8px' }}
+                        >
+                            Add to Cart
+                        </button>
                     </div>
                 </div>
             </div>

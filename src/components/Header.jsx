@@ -86,7 +86,7 @@ const Header = () => {
                             margin: 0,
                             padding: 0
                         }}>
-                            {/* Blinds & Shades Mega Dropdown */}
+                             {/* Blinds & Shades Mega Dropdown */}
                             <li className="nav-item-dropdown" style={{ position: 'relative' }}>
                                 <Link to="/products" style={{ 
                                     color: 'var(--text-main)', 
@@ -106,6 +106,24 @@ const Header = () => {
                                             <Link to="/products?category=zebra">Zebra Shades</Link>
                                         </div>
                                     </div>
+                                </div>
+                            </li>
+
+                            {/* SMART TECH Menu Restored */}
+                            <li className="nav-item-dropdown" style={{ position: 'relative' }}>
+                                <Link to="/help/smart-motors" style={{ 
+                                    color: 'var(--text-main)', 
+                                    fontWeight: '600', 
+                                    fontSize: '0.85rem', 
+                                    textTransform: 'uppercase',
+                                    letterSpacing: '0.5px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '5px'
+                                }}>Smart Tech <ChevronDown size={14} /></Link>
+                                <div className="dropdown-menu">
+                                    <Link to="/help/smart-motors">Smart Motors</Link>
+                                    <Link to="/products?category=motorized">Motorized Blinds</Link>
                                 </div>
                             </li>
 
@@ -220,6 +238,13 @@ const Header = () => {
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '15px', paddingLeft: '10px' }}>
                                     <Link to="/products?category=roller" onClick={() => setMobileMenuOpen(false)} style={{ color: 'var(--text-main)', fontSize: '1rem', fontWeight: '500' }}>Roller Shades</Link>
                                     <Link to="/products?category=zebra" onClick={() => setMobileMenuOpen(false)} style={{ color: 'var(--text-main)', fontSize: '1rem', fontWeight: '500' }}>Zebra Shades</Link>
+                                </div>
+                            </div>
+                            <div>
+                                <h4 style={{ fontSize: '0.9rem', color: 'var(--primary-blue)', marginBottom: '15px', textTransform: 'uppercase' }}>Smart Tech</h4>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '15px', paddingLeft: '10px' }}>
+                                    <Link to="/help/smart-motors" onClick={() => setMobileMenuOpen(false)} style={{ color: 'var(--text-main)', fontSize: '1rem', fontWeight: '500' }}>Smart Motors</Link>
+                                    <Link to="/products?category=motorized" onClick={() => setMobileMenuOpen(false)} style={{ color: 'var(--text-main)', fontSize: '1rem', fontWeight: '500' }}>Motorized Blinds</Link>
                                 </div>
                             </div>
                             <Link to="/swatches" onClick={() => setMobileMenuOpen(false)} style={{ color: 'var(--text-main)', fontSize: '1.1rem', fontWeight: '600', textTransform: 'uppercase' }}>Swatches</Link>
