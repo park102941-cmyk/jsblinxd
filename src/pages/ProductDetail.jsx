@@ -49,6 +49,7 @@ const ProductDetail = () => {
     const [solarPanel, setSolarPanel] = useState(false);
     const [bondBridge, setBondBridge] = useState(false);
     const [roomLabel, setRoomLabel] = useState('');
+    const [controlSide, setControlSide] = useState('Right');
     const [selectedConfigs, setSelectedConfigs] = useState({}); // { groupID: optionID }
     const [mainImageUrl, setMainImageUrl] = useState('');
     const [isGuideOpen, setIsGuideOpen] = useState(false);
@@ -154,6 +155,7 @@ const ProductDetail = () => {
         });
 
         let totalPrice = result?.["Total Price"] || 0;
+        console.log("Price Debug:", { motorType, remoteType, resultPrice: result?.["Total Price"], totalPrice });
 
         // 2. Add custom configs prices if not handled by engine
         if (product.configGroups) {
@@ -238,6 +240,7 @@ const ProductDetail = () => {
                 mount: mountType,
                 control: motorType,
                 remote: remoteType,
+                controlSide: controlSide,
                 room: roomLabel,
                 price: parseFloat(calculatePrice()),
                 quantity: 1,
@@ -693,7 +696,7 @@ const ProductDetail = () => {
                             isOpen={activeSection === 'motor'}
                             onToggle={() => setActiveSection(activeSection === 'motor' ? '' : 'motor')}
                             helpText="Choose how you would like to operate your shades."
-                            isComplete={motorType !== 'standard' || !isRequired} // standard is often default, but user wants active selection
+                            isComplete={!!motorType}
                             isRequired={true}
                         >
                             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '15px' }}>
@@ -746,6 +749,34 @@ const ProductDetail = () => {
                                 ))}
                             </div>
                         </OptionSection>
+
+                        {/* 7. Control Side */}
+                        {(motorType === 'standard' || motorType === 'motorized') && (
+                            <OptionSection
+                                title={`${motorType === 'motorized' ? 'Motor' : 'Handle'} Side: ${controlSide}`}
+                                isOpen={activeSection === 'side'}
+                                onToggle={() => setActiveSection(activeSection === 'side' ? '' : 'side')}
+                                isComplete={!!controlSide}
+                                isRequired={true}
+                            >
+                                <div style={{ display: 'flex', gap: '15px' }}>
+                                    {['Left', 'Right'].map(side => (
+                                        <div
+                                            key={side}
+                                            onClick={() => setControlSide(side)}
+                                            style={{
+                                                flex: 1, padding: '15px', border: controlSide === side ? '2px solid #333' : '1px solid #eee',
+                                                borderRadius: '8px', cursor: 'pointer', textAlign: 'center',
+                                                background: controlSide === side ? '#fcfcfc' : '#fff',
+                                                fontWeight: '700', fontSize: '0.9rem'
+                                            }}
+                                        >
+                                            {side}
+                                        </div>
+                                    ))}
+                                </div>
+                            </OptionSection>
+                        )}
 
                         {/* 6. Remote Control */}
                         <OptionSection
