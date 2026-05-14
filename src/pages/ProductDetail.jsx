@@ -668,17 +668,19 @@ const ProductDetail = () => {
                                     >
                                         <div style={{ 
                                             width: '100%', aspectRatio: '1/1', background: '#f5f5f5', borderRadius: '4px', 
-                                            marginBottom: '12px', overflow: 'hidden', border: motorType === l.id ? '2px solid #333' : '1px solid transparent',
-                                            display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '10px'
+                                            marginBottom: '12px', overflow: 'hidden', border: motorType === l.id ? '2px solid #333' : '1px solid #eee',
+                                            position: 'relative'
                                         }}>
                                             <img 
                                                 src="/images/lift_infographics.png" 
                                                 alt={l.name} 
                                                 style={{ 
-                                                    width: '280%', 
-                                                    height: 'auto', 
-                                                    objectFit: 'contain',
-                                                    objectPosition: `${l.pos} 0%`
+                                                    position: 'absolute',
+                                                    width: '300%', // Since there are 3 icons side by side
+                                                    height: '100%', 
+                                                    top: 0,
+                                                    left: `-${parseFloat(l.pos) * 2}%`, // Precise shift: 0% -> 0, 50% -> -100%, 100% -> -200%
+                                                    objectFit: 'cover'
                                                 }} 
                                             />
                                         </div>
