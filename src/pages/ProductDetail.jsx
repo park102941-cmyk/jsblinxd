@@ -645,36 +645,51 @@ const ProductDetail = () => {
                         </OptionSection>
 
 
-                        {/* 5. Motorization */}
+                        {/* 5. Lift Styles */}
                         <OptionSection
-                            title="Motor Type"
+                            title="Lift Styles"
                             isOpen={activeSection === 'motor'}
                             onToggle={() => setActiveSection(activeSection === 'motor' ? '' : 'motor')}
-                            helpText={EXPLANATIONS.motor}
+                            helpText="Choose how you would like to operate your shades."
                         >
-                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))', gap: '10px' }}>
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '15px' }}>
                                 {[
-                                    { id: 'standard', name: 'Standard RF', icon: <Cpu size={20} />, desc: 'Remote controlled', price: 0, previewImage: '/images/details/standard_motor.png' },
-                                    { id: 'zigbee', name: 'Zigbee 3.0', icon: <Rss size={20} />, desc: 'Hub required', price: 25, previewImage: '/images/details/zigbee_motor.png' },
-                                    { id: 'alexa', name: 'Alexa Direct', icon: <Sparkles size={20} />, desc: 'No hub needed', price: 29, previewImage: '/images/details/alexa_motor.png' },
-                                    { id: 'matter', name: 'Matter / Thread', icon: <ShieldCheck size={20} />, desc: 'Future-proof', price: 94, previewImage: '/images/details/matter_motor.png' }
-                                ].map(m => (
+                                    { id: 'standard', name: 'Continuous Cord Loop', price: 0, desc: 'Traditional cord operation', isKidFriendly: false, icon: 'https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&q=80&w=200' },
+                                    { id: 'cordless', name: 'Premium Cordless', price: 47, desc: 'Safe and sleek無繩', isKidFriendly: true, icon: 'https://images.unsplash.com/photo-1513519245088-0e12902e35ca?auto=format&fit=crop&q=80&w=200' },
+                                    { id: 'motorized', name: 'Motorization', price: 149, desc: 'Smart home integrated', isKidFriendly: true, icon: 'https://images.unsplash.com/photo-1558002038-1055907df827?auto=format&fit=crop&q=80&w=200' }
+                                ].map(l => (
                                     <div
-                                        key={m.id}
-                                        onClick={() => setMotorType(m.id)}
-                                        onMouseEnter={() => setHoveredOption({ name: m.name, image: m.previewImage, price: m.price })}
-                                        onMouseLeave={() => setHoveredOption(null)}
+                                        key={l.id}
+                                        onClick={() => setMotorType(l.id)}
                                         style={{
-                                            border: motorType === m.id ? '2px solid #333' : '1px solid #ddd',
-                                            borderRadius: '8px', padding: '15px', cursor: 'pointer', textAlign: 'center',
-                                            background: motorType === m.id ? '#fcfcfc' : '#fff', position: 'relative'
+                                            border: motorType === l.id ? '2px solid #333' : '1px solid #ddd',
+                                            borderRadius: '12px', padding: '15px', cursor: 'pointer', textAlign: 'center',
+                                            background: motorType === l.id ? '#fcfcfc' : '#fff', position: 'relative',
+                                            transition: 'all 0.2s ease'
                                         }}
                                     >
-                                        <div style={{ color: motorType === m.id ? 'var(--primary-green)' : '#666', marginBottom: '8px' }}>{m.icon}</div>
-                                        <div style={{ fontWeight: '700', fontSize: '0.85rem' }}>{m.name}</div>
-                                        <div style={{ fontSize: '0.7rem', color: '#888', marginTop: '4px' }}>{m.desc}</div>
-                                        <div style={{ fontSize: '0.85rem', fontWeight: '800', marginTop: '10px' }}>+${m.price}</div>
-                                        {motorType === m.id && <Check size={14} style={{ position: 'absolute', top: '8px', right: '8px' }} />}
+                                        <div style={{ width: '100%', aspectRatio: '1/1', background: '#f5f5f5', borderRadius: '8px', marginBottom: '12px', overflow: 'hidden' }}>
+                                            <img src={l.icon} alt={l.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                        </div>
+                                        <div style={{ fontWeight: '700', fontSize: '0.9rem', marginBottom: '4px' }}>{l.name}</div>
+                                        <div style={{ fontSize: '0.85rem', color: l.price === 0 ? '#2e7d32' : '#333', fontWeight: '800' }}>
+                                            {l.price === 0 ? 'FREE' : `+$${l.price.toFixed(2)}`}
+                                        </div>
+                                        
+                                        {l.isKidFriendly && (
+                                            <div style={{ 
+                                                marginTop: '8px', fontSize: '0.65rem', fontWeight: '800', color: '#fff', 
+                                                background: '#2e7d32', padding: '2px 6px', borderRadius: '4px', display: 'inline-block' 
+                                            }}>
+                                                KID FRIENDLY
+                                            </div>
+                                        )}
+                                        
+                                        {motorType === l.id && (
+                                            <div style={{ position: 'absolute', top: '10px', right: '10px', background: '#333', color: 'white', borderRadius: '50%', width: '20px', height: '20px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                                                <Check size={12} />
+                                            </div>
+                                        )}
                                     </div>
                                 ))}
                             </div>
