@@ -4,7 +4,7 @@ import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { db } from '../lib/firebase';
 import { doc, updateDoc, arrayUnion, getDoc, setDoc } from 'firebase/firestore';
-import { Star, MessageCircle, Heart, Share2, ChevronLeft, ChevronRight, Check, AlertCircle, ChevronDown, ChevronUp, Loader2, Sparkles, ShieldCheck, Truck, ShieldAlert, Cpu, Rss, Sun, Info, X } from 'lucide-react';
+import { Star, MessageCircle, Heart, Share2, ChevronLeft, ChevronRight, Check, AlertCircle, ChevronDown, ChevronUp, Loader2, Sparkles, ShieldCheck, Truck, ShieldAlert, Cpu, Rss, Sun, Info, X, Ruler } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { orderEngine } from '../lib/orderEngine';
 import OrderingGuide from '../components/OrderingGuide';
@@ -52,6 +52,7 @@ const ProductDetail = () => {
     const [mainImageUrl, setMainImageUrl] = useState('');
     const [isGuideOpen, setIsGuideOpen] = useState(false);
     const [isMeasureModalOpen, setIsMeasureModalOpen] = useState(false);
+    const [fitProtection, setFitProtection] = useState(false);
     const [hoveredOption, setHoveredOption] = useState(null); // { name, image, price }
 
     useEffect(() => {
@@ -520,58 +521,118 @@ const ProductDetail = () => {
                             isOpen={activeSection === 'size'}
                             onToggle={() => setActiveSection(activeSection === 'size' ? '' : 'size')}
                             helpText={EXPLANATIONS.size}
-                        >
-                            <div style={{ marginBottom: '15px' }}>
-                                <span 
-                                    onClick={() => setIsMeasureModalOpen(true)}
-                                    style={{ fontSize: '0.85rem', color: 'var(--primary-green)', textDecoration: 'underline', cursor: 'pointer' }}
+                            rightElement={
+                                <button 
+                                    onClick={(e) => { e.stopPropagation(); setIsMeasureModalOpen(true); }}
+                                    style={{ 
+                                        padding: '6px 12px', borderRadius: '20px', border: '1px solid var(--secondary-olive)',
+                                        background: 'transparent', color: 'var(--secondary-olive)', fontSize: '0.75rem', 
+                                        fontWeight: '600', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px'
+                                    }}
                                 >
-                                    How to measure your windows?
-                                </span>
-                            </div>
-                            
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '20px' }}>
-                                <div>
-                                    <label style={{ fontSize: '0.8rem', fontWeight: 'bold', display: 'block', marginBottom: '8px' }}>WIDTH (INCH)</label>
-                                    <div style={{ display: 'flex', gap: '5px' }}>
-                                        <select 
-                                            value={width} 
-                                            onChange={(e) => setWidth(e.target.value)}
-                                            style={{ flex: 1, padding: '12px', border: '1px solid #ddd', borderRadius: '4px' }}
-                                        >
-                                            {Array.from({length: 96}, (_, i) => i + 15).map(v => (
-                                                <option key={v} value={v}>{v}</option>
-                                            ))}
-                                        </select>
-                                        <select 
-                                            value={widthFraction} 
-                                            onChange={(e) => setWidthFraction(e.target.value)}
-                                            style={{ width: '80px', padding: '12px', border: '1px solid #ddd', borderRadius: '4px' }}
-                                        >
-                                            {fractions.map(f => <option key={f.value} value={f.value}>{f.label.replace('"', '')}</option>)}
-                                        </select>
+                                    <Ruler size={14} /> Help Me Measure
+                                </button>
+                            }
+                        >
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', marginBottom: '30px' }}>
+                                {/* Width Selection */}
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                                    <div style={{ width: '50px', height: '50px', border: '1px solid #eee', borderRadius: '4px', background: '#fcfcfc', display: 'flex', justifyContent: 'center', alignItems: 'center', flexShrink: 0 }}>
+                                        <svg width="30" height="30" viewBox="0 0 100 100">
+                                            <rect x="10" y="10" width="80" height="80" fill="none" stroke="#eee" strokeWidth="1" />
+                                            <line x1="15" y1="50" x2="85" y2="50" stroke="orange" strokeWidth="2" />
+                                            <polyline points="20,45 15,50 20,55" fill="none" stroke="orange" strokeWidth="2" />
+                                            <polyline points="80,45 85,50 80,55" fill="none" stroke="orange" strokeWidth="2" />
+                                        </svg>
                                     </div>
+                                    <div style={{ flex: 1 }}>
+                                        <label style={{ fontSize: '0.75rem', fontWeight: 'bold', color: '#666', marginBottom: '4px', display: 'block' }}>WIDTH (INCH)</label>
+                                        <div style={{ display: 'flex', gap: '8px' }}>
+                                            <select 
+                                                value={width} 
+                                                onChange={(e) => setWidth(e.target.value)}
+                                                style={{ flex: 1.5, padding: '10px', border: '1px solid #ddd', borderRadius: '4px', fontSize: '0.9rem' }}
+                                            >
+                                                {Array.from({length: 96}, (_, i) => i + 15).map(v => (
+                                                    <option key={v} value={v}>{v}"</option>
+                                                ))}
+                                            </select>
+                                            <select 
+                                                value={widthFraction} 
+                                                onChange={(e) => setWidthFraction(e.target.value)}
+                                                style={{ flex: 1, padding: '10px', border: '1px solid #ddd', borderRadius: '4px', fontSize: '0.9rem' }}
+                                            >
+                                                {fractions.map(f => (
+                                                    <option key={f.value} value={f.value}>{f.label}</option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <VisualRuler value={parseFloat(width) + parseFloat(widthFraction)} />
                                 </div>
-                                <div>
-                                    <label style={{ fontSize: '0.8rem', fontWeight: 'bold', display: 'block', marginBottom: '8px' }}>HEIGHT (INCH)</label>
-                                    <div style={{ display: 'flex', gap: '5px' }}>
-                                        <select 
-                                            value={height} 
-                                            onChange={(e) => setHeight(e.target.value)}
-                                            style={{ flex: 1, padding: '12px', border: '1px solid #ddd', borderRadius: '4px' }}
-                                        >
-                                            {Array.from({length: 106}, (_, i) => i + 15).map(v => (
-                                                <option key={v} value={v}>{v}</option>
-                                            ))}
-                                        </select>
-                                        <select 
-                                            value={heightFraction} 
-                                            onChange={(e) => setHeightFraction(e.target.value)}
-                                            style={{ width: '80px', padding: '12px', border: '1px solid #ddd', borderRadius: '4px' }}
-                                        >
-                                            {fractions.map(f => <option key={f.value} value={f.value}>{f.label.replace('"', '')}</option>)}
-                                        </select>
+
+                                {/* Height Selection */}
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                                    <div style={{ width: '50px', height: '50px', border: '1px solid #eee', borderRadius: '4px', background: '#fcfcfc', display: 'flex', justifyContent: 'center', alignItems: 'center', flexShrink: 0 }}>
+                                        <svg width="30" height="30" viewBox="0 0 100 100">
+                                            <rect x="10" y="10" width="80" height="80" fill="none" stroke="#eee" strokeWidth="1" />
+                                            <line x1="50" y1="15" x2="50" y2="85" stroke="orange" strokeWidth="2" />
+                                            <polyline points="45,20 50,15 55,20" fill="none" stroke="orange" strokeWidth="2" />
+                                            <polyline points="45,80 50,85 55,80" fill="none" stroke="orange" strokeWidth="2" />
+                                        </svg>
                                     </div>
+                                    <div style={{ flex: 1 }}>
+                                        <label style={{ fontSize: '0.75rem', fontWeight: 'bold', color: '#666', marginBottom: '4px', display: 'block' }}>HEIGHT (INCH)</label>
+                                        <div style={{ display: 'flex', gap: '8px' }}>
+                                            <select 
+                                                value={height} 
+                                                onChange={(e) => setHeight(e.target.value)}
+                                                style={{ flex: 1.5, padding: '10px', border: '1px solid #ddd', borderRadius: '4px', fontSize: '0.9rem' }}
+                                            >
+                                                {Array.from({length: 100}, (_, i) => i + 15).map(v => (
+                                                    <option key={v} value={v}>{v}"</option>
+                                                ))}
+                                            </select>
+                                            <select 
+                                                value={heightFraction} 
+                                                onChange={(e) => setHeightFraction(e.target.value)}
+                                                style={{ flex: 1, padding: '10px', border: '1px solid #ddd', borderRadius: '4px', fontSize: '0.9rem' }}
+                                            >
+                                                {fractions.map(f => (
+                                                    <option key={f.value} value={f.value}>{f.label}</option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <VisualRuler value={parseFloat(height) + parseFloat(heightFraction)} />
+                                </div>
+                            </div>
+
+                            {/* FIT Protection */}
+                            <div style={{ 
+                                background: 'rgba(235, 150, 108, 0.1)', border: '1px solid rgba(235, 150, 108, 0.3)',
+                                borderRadius: '12px', padding: '16px', display: 'flex', alignItems: 'center', gap: '15px'
+                            }}>
+                                <input 
+                                    type="checkbox" 
+                                    id="fit-protection"
+                                    checked={fitProtection}
+                                    onChange={(e) => setFitProtection(e.target.checked)}
+                                    style={{ width: '20px', height: '20px', cursor: 'pointer', accentColor: '#EB966C' }}
+                                />
+                                <div style={{ flex: 1 }}>
+                                    <label htmlFor="fit-protection" style={{ fontSize: '0.95rem', fontWeight: '700', color: '#333', cursor: 'pointer', display: 'block' }}>
+                                        FIT Protection! <span style={{ color: '#EB966C', fontSize: '0.8rem' }}>RECOMMENDED</span>
+                                    </label>
+                                    <p style={{ fontSize: '0.8rem', color: '#666', margin: '4px 0 0 0' }}>
+                                        Add our Measuring Guarantee for FREE. Measure wrong? We replace it!
+                                    </p>
+                                </div>
+                                <div 
+                                    style={{ cursor: 'help' }}
+                                    title="If you mismeasure, we will replace your blinds for free. One replacement per order. See terms for details."
+                                >
+                                    <Info size={18} color="#EB966C" />
                                 </div>
                             </div>
 
@@ -846,13 +907,59 @@ const ProductDetail = () => {
     );
 };
 
+// Visual Ruler Component
+const VisualRuler = ({ value }) => {
+    // Each inch is 50px wide
+    // Value is something like 24.125
+    const pixelsPerInch = 50;
+    const offset = value * pixelsPerInch;
+    
+    // Generate visible ticks for a range around the value
+    const startInch = Math.floor(value) - 2;
+    const endInch = Math.ceil(value) + 2;
+    const ticks = [];
+    
+    for (let i = startInch; i <= endInch; i++) {
+        if (i < 0) continue;
+        ticks.push(
+            <div key={i} style={{ position: 'absolute', left: `${i * pixelsPerInch}px`, height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'center' }}>
+                <div style={{ fontSize: '0.8rem', fontWeight: '700', marginBottom: '25px' }}>{i}</div>
+                <div style={{ width: '2px', height: '15px', background: '#333' }}></div>
+                {/* 1/2 tick */}
+                <div style={{ position: 'absolute', left: `${pixelsPerInch / 2}px`, bottom: 0, width: '1px', height: '10px', background: '#888' }}></div>
+                {/* 1/4 ticks */}
+                <div style={{ position: 'absolute', left: `${pixelsPerInch / 4}px`, bottom: 0, width: '1px', height: '6px', background: '#ccc' }}></div>
+                <div style={{ position: 'absolute', left: `${(pixelsPerInch / 4) * 3}px`, bottom: 0, width: '1px', height: '6px', background: '#ccc' }}></div>
+            </div>
+        );
+    }
+
+    return (
+        <div style={{ flex: 1, height: '65px', background: '#f5f5f5', borderRadius: '6px', overflow: 'hidden', position: 'relative', border: '1px solid #eee' }}>
+            <div style={{ 
+                position: 'absolute', top: 0, left: '50%', height: '100%', 
+                transition: 'transform 0.4s cubic-bezier(0.25, 0.1, 0.25, 1)',
+                transform: `translateX(${-offset}px)` 
+            }}>
+                {ticks}
+            </div>
+            {/* Center Pointer */}
+            <div style={{ position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <div style={{ width: '0', height: '0', borderLeft: '6px solid transparent', borderRight: '6px solid transparent', borderTop: '8px solid #EB966C' }}></div>
+                <div style={{ width: '2px', height: '100%', background: '#EB966C' }}></div>
+                <div style={{ width: '0', height: '0', borderLeft: '6px solid transparent', borderRight: '6px solid transparent', borderBottom: '8px solid #EB966C' }}></div>
+            </div>
+        </div>
+    );
+};
+
 // Start of Helper Components
-const OptionSection = ({ title, isOpen, onToggle, helpText, children }) => {
+const OptionSection = ({ title, isOpen, onToggle, helpText, rightElement, children }) => {
     const [showHelp, setShowHelp] = useState(false);
     
     return (
         <div style={{ borderBottom: '1px solid #eee' }}>
-            <div style={{ display: 'flex', alignItems: 'center', background: isOpen ? '#f9f9f9' : '#fff' }}>
+            <div style={{ display: 'flex', alignItems: 'center', background: isOpen ? '#f9f9f9' : '#fff', paddingRight: '15px' }}>
                 <button
                     onClick={onToggle}
                     style={{
@@ -863,6 +970,7 @@ const OptionSection = ({ title, isOpen, onToggle, helpText, children }) => {
                     {title}
                     {isOpen ? <ChevronUp size={20} color="#666" /> : <ChevronDown size={20} color="#666" />}
                 </button>
+                {rightElement}
                 {helpText && (
                     <button 
                         onClick={(e) => {
