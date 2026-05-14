@@ -923,7 +923,7 @@ const VisualRuler = ({ value }) => {
         
         // Full Inch
         ticks.push(
-            <div key={`inch-${i}`} style={{ position: 'absolute', left: `${i * pixelsPerInch}px`, height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center' }}>
+            <div key={`inch-${i}`} style={{ position: 'absolute', left: `${i * pixelsPerInch}px`, height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', transform: 'translateX(-50%)' }}>
                 <div style={{ fontSize: '0.9rem', fontWeight: '800', marginTop: '5px', color: '#333' }}>{i}</div>
                 <div style={{ position: 'absolute', bottom: 0, width: '2px', height: '24px', background: '#333' }}></div>
             </div>
@@ -946,7 +946,8 @@ const VisualRuler = ({ value }) => {
                     bottom: 0, 
                     width: width, 
                     height: `${height}px`, 
-                    background: color 
+                    background: color,
+                    transform: 'translateX(-50%)'
                 }}></div>
             );
         }
