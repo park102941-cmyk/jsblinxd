@@ -49,6 +49,8 @@ const ProductDetail = () => {
     const [solarPanel, setSolarPanel] = useState(false);
     const [bondBridge, setBondBridge] = useState(false);
     const [roomLabel, setRoomLabel] = useState('');
+    const [roomType, setRoomType] = useState('');
+    const [roomDetail, setRoomDetail] = useState('');
     const [controlSide, setControlSide] = useState('');
     const [selectedConfigs, setSelectedConfigs] = useState({}); // { groupID: optionID }
     const [mainImageUrl, setMainImageUrl] = useState('');
@@ -133,7 +135,7 @@ const ProductDetail = () => {
         motor: "Standard RF: Simple remote control. Zigbee 3.0: Requires a hub for smart home control. Alexa Direct: Connects directly to Echo devices with built-in hubs. Matter: The latest industry standard for cross-platform smart home compatibility.",
         remote: "Select a remote to control your shades. Our 5 and 15-channel remotes can operate multiple shades simultaneously. The Bond Bridge Hub adds Wi-Fi control via smartphone and integrates with Alexa, Google Home, and SmartThings.",
         addons: "The Solar Panel Charger uses natural light to keep your motor battery topped up, reducing the need for manual charging via USB cable.",
-        room: "Labeling your shades by room (e.g., 'Master Bedroom') helps us organize your order and makes installation much easier once they arrive."
+        room: "Labeling your shades by room (e.g., 'Master Bedroom') helps us organize your order and makes installation much easier once they arrive. You can pick a room name and add a specific detail like 'Left Window'."
     };
 
     const calculatePrice = () => {
@@ -231,6 +233,8 @@ const ProductDetail = () => {
                 });
             }
 
+            const finalRoomLabel = roomType ? `${roomType}${roomDetail ? ` - ${roomDetail}` : ''}` : roomDetail;
+
             const finalItem = {
                 ...product, // basic info
                 id: product.id,
@@ -242,7 +246,7 @@ const ProductDetail = () => {
                 control: motorType,
                 remote: remoteType,
                 controlSide: controlSide,
-                room: roomLabel,
+                room: finalRoomLabel,
                 price: parseFloat(calculatePrice()),
                 quantity: 1,
                 JSBlindData,
@@ -675,22 +679,39 @@ const ProductDetail = () => {
                             )}
                         </OptionSection>
 
-                        {/* 5. Room Label */}
+                        {/* 5. Room Name */}
                         <OptionSection
-                            title={`Room Label: ${roomLabel || 'Not Set'}`}
+                            title={`Room Name: ${roomType ? `${roomType}${roomDetail ? ` - ${roomDetail}` : ''}` : 'Select Room'}`}
                             isOpen={activeSection === 'room'}
                             onToggle={() => setActiveSection(activeSection === 'room' ? '' : 'room')}
                             helpText={EXPLANATIONS.room}
-                            isComplete={!!roomLabel}
+                            isComplete={!!roomType}
                             isRequired={false}
                         >
-                            <input
-                                type="text"
-                                value={roomLabel}
-                                onChange={(e) => setRoomLabel(e.target.value)}
-                                placeholder="e.g. Master Bedroom"
-                                style={{ width: '100%', padding: '12px', border: '1px solid #ddd', borderRadius: '4px' }}
-                            />
+                            <div style={{ display: 'flex', gap: '15px' }}>
+                                <select
+                                    value={roomType}
+                                    onChange={(e) => setRoomType(e.target.value)}
+                                    style={{ flex: 1, padding: '12px', border: '1px solid #ddd', borderRadius: '4px', fontSize: '0.95rem' }}
+                                >
+                                    <option value="">Select</option>
+                                    <option value="Bedroom">Bedroom</option>
+                                    <option value="Family Room">Family Room</option>
+                                    <option value="Kitchen">Kitchen</option>
+                                    <option value="Bathroom">Bathroom</option>
+                                    <option value="Office">Office</option>
+                                    <option value="Dining Room">Dining Room</option>
+                                    <option value="Living Room">Living Room</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                                <input
+                                    type="text"
+                                    value={roomDetail}
+                                    onChange={(e) => setRoomDetail(e.target.value)}
+                                    placeholder="Ex: West Wall"
+                                    style={{ flex: 1.5, padding: '12px', border: '1px solid #ddd', borderRadius: '4px', fontSize: '0.95rem' }}
+                                />
+                            </div>
                         </OptionSection>
 
                         {/* 6. Lift Styles */}
