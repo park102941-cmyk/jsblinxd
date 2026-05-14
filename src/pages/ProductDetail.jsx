@@ -909,9 +909,8 @@ const ProductDetail = () => {
 
 // Visual Ruler Component
 const VisualRuler = ({ value }) => {
-    // Each inch is 50px wide
-    // Value is something like 24.125
-    const pixelsPerInch = 50;
+    // Each inch is 80px wide for better detail
+    const pixelsPerInch = 80;
     const offset = value * pixelsPerInch;
     
     // Generate visible ticks for a range around the value
@@ -921,33 +920,60 @@ const VisualRuler = ({ value }) => {
     
     for (let i = startInch; i <= endInch; i++) {
         if (i < 0) continue;
+        
+        // Full Inch
         ticks.push(
-            <div key={i} style={{ position: 'absolute', left: `${i * pixelsPerInch}px`, height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'center' }}>
-                <div style={{ fontSize: '0.8rem', fontWeight: '700', marginBottom: '25px' }}>{i}</div>
-                <div style={{ width: '2px', height: '15px', background: '#333' }}></div>
-                {/* 1/2 tick */}
-                <div style={{ position: 'absolute', left: `${pixelsPerInch / 2}px`, bottom: 0, width: '1px', height: '10px', background: '#888' }}></div>
-                {/* 1/4 ticks */}
-                <div style={{ position: 'absolute', left: `${pixelsPerInch / 4}px`, bottom: 0, width: '1px', height: '6px', background: '#ccc' }}></div>
-                <div style={{ position: 'absolute', left: `${(pixelsPerInch / 4) * 3}px`, bottom: 0, width: '1px', height: '6px', background: '#ccc' }}></div>
+            <div key={`inch-${i}`} style={{ position: 'absolute', left: `${i * pixelsPerInch}px`, height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center' }}>
+                <div style={{ fontSize: '0.9rem', fontWeight: '800', marginTop: '5px', color: '#333' }}>{i}</div>
+                <div style={{ position: 'absolute', bottom: 0, width: '2px', height: '24px', background: '#333' }}></div>
             </div>
         );
+
+        // Sub-ticks (1/8, 1/4, 3/8, 1/2, 5/8, 3/4, 7/8)
+        for (let j = 1; j < 8; j++) {
+            const fraction = j / 8;
+            let height = 8; // 1/8
+            let color = '#ccc';
+            let width = '1px';
+
+            if (j === 4) { height = 16; color = '#666'; width = '1.5px'; } // 1/2
+            else if (j === 2 || j === 6) { height = 12; color = '#888'; width = '1px'; } // 1/4, 3/4
+
+            ticks.push(
+                <div key={`tick-${i}-${j}`} style={{ 
+                    position: 'absolute', 
+                    left: `${(i + fraction) * pixelsPerInch}px`, 
+                    bottom: 0, 
+                    width: width, 
+                    height: `${height}px`, 
+                    background: color 
+                }}></div>
+            );
+        }
     }
 
     return (
-        <div style={{ flex: 1, height: '65px', background: '#f5f5f5', borderRadius: '6px', overflow: 'hidden', position: 'relative', border: '1px solid #eee' }}>
+        <div style={{ 
+            flex: 1, height: '70px', background: '#fff', borderRadius: '8px', 
+            overflow: 'hidden', position: 'relative', border: '1px solid #ddd',
+            boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.05)'
+        }}>
+            {/* Background pattern to look like tape */}
+            <div style={{ position: 'absolute', inset: 0, opacity: 0.03, backgroundImage: 'radial-gradient(#000 1px, transparent 1px)', backgroundSize: '4px 4px' }}></div>
+            
             <div style={{ 
                 position: 'absolute', top: 0, left: '50%', height: '100%', 
-                transition: 'transform 0.4s cubic-bezier(0.25, 0.1, 0.25, 1)',
+                transition: 'transform 0.5s cubic-bezier(0.19, 1, 0.22, 1)',
                 transform: `translateX(${-offset}px)` 
             }}>
                 {ticks}
             </div>
+            
             {/* Center Pointer */}
-            <div style={{ position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                <div style={{ width: '0', height: '0', borderLeft: '6px solid transparent', borderRight: '6px solid transparent', borderTop: '8px solid #EB966C' }}></div>
-                <div style={{ width: '2px', height: '100%', background: '#EB966C' }}></div>
-                <div style={{ width: '0', height: '0', borderLeft: '6px solid transparent', borderRight: '6px solid transparent', borderBottom: '8px solid #EB966C' }}></div>
+            <div style={{ position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', zIndex: 2 }}>
+                <div style={{ width: '0', height: '0', borderLeft: '7px solid transparent', borderRight: '7px solid transparent', borderTop: '10px solid #EB966C' }}></div>
+                <div style={{ width: '2px', height: '100%', background: '#EB966C', boxShadow: '0 0 4px rgba(235, 150, 108, 0.5)' }}></div>
+                <div style={{ width: '0', height: '0', borderLeft: '7px solid transparent', borderRight: '7px solid transparent', borderBottom: '10px solid #EB966C' }}></div>
             </div>
         </div>
     );
