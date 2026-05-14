@@ -713,9 +713,9 @@ const ProductDetail = () => {
                             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))', gap: '10px' }}>
                                 {[
                                     { id: 'none', name: 'No Remote', price: 0 },
-                                    { id: '1-channel', name: '1-Channel', price: 25 },
-                                    { id: '5-channel', name: '5-Channel', price: 35 },
-                                    { id: '15-channel', name: '15-Channel', price: 45 }
+                                    { id: '1-channel', name: '1-Channel', price: 45 },
+                                    { id: '5-channel', name: '5-Channel', price: 55 },
+                                    { id: '15-channel', name: '15-Channel', price: 65 }
                                 ].map(r => (
                                     <div
                                         key={r.id}
