@@ -57,6 +57,7 @@ const ProductDetail = () => {
     const [isGuideOpen, setIsGuideOpen] = useState(false);
     const [isMeasureModalOpen, setIsMeasureModalOpen] = useState(false);
     const [fitProtection, setFitProtection] = useState(false);
+    const [rememberOptions, setRememberOptions] = useState(false);
     const [hoveredOption, setHoveredOption] = useState(null); // { name, image, price }
 
     useEffect(() => {
@@ -103,7 +104,40 @@ const ProductDetail = () => {
             }
         };
         fetchProduct();
+
+        // Load remembered options
+        const saved = localStorage.getItem('jsblind_remembered_options');
+        if (saved) {
+            try {
+                const options = JSON.parse(saved);
+                if (options.mountType) setMountType(options.mountType);
+                if (options.motorType) setMotorType(options.motorType);
+                if (options.remoteType) setRemoteType(options.remoteType);
+                if (options.controlSide) setControlSide(options.controlSide);
+                if (options.roomType) setRoomType(options.roomType);
+                setRememberOptions(true);
+            } catch (e) {
+                console.error("Failed to load saved options", e);
+            }
+        }
     }, [id]);
+
+    // Save options when they change
+    useEffect(() => {
+        if (rememberOptions) {
+            const toSave = {
+                mountType,
+                motorType,
+                remoteType,
+                controlSide,
+                roomType
+            };
+            localStorage.setItem('jsblind_remembered_options', JSON.stringify(toSave));
+        } else {
+            // Option: keep or clear? Usually clear if user unchecks
+            // localStorage.removeItem('jsblind_remembered_options');
+        }
+    }, [rememberOptions, mountType, motorType, remoteType, controlSide, roomType]);
 
     const images = product?.images && product.images.length > 0 
         ? product.images 
@@ -808,7 +842,7 @@ const ProductDetail = () => {
                             isOpen={activeSection === 'remote'}
                             onToggle={() => setActiveSection(activeSection === 'remote' ? '' : 'remote')}
                             helpText={EXPLANATIONS.remote}
-                            isComplete={motorType === 'motorized' ? (remoteType !== '' && remoteType !== 'none') : (motorType !== '' && remoteType !== '')}
+                            isComplete={!!remoteType}
                             isRequired={motorType === 'motorized'}
                         >
                             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))', gap: '10px' }}>
@@ -840,7 +874,7 @@ const ProductDetail = () => {
                             </div>
                         </OptionSection>
 
-                        {/* 8. Add-ons */}
+                        {/* 9. Upgrades & Add-ons */}
                         <OptionSection
                             title="Upgrades & Add-ons"
                             isOpen={activeSection === 'addons'}
@@ -890,7 +924,22 @@ const ProductDetail = () => {
                             </div>
                         </OptionSection>
 
-                        {/* 8. Final Details (Removed from here) */}
+                        {/* 10. Remember Options */}
+                        <div style={{ 
+                            marginTop: '20px', padding: '15px', background: '#f8f8f8', borderRadius: '8px',
+                            display: 'flex', alignItems: 'center', gap: '12px', border: '1px solid #eee'
+                        }}>
+                            <input 
+                                type="checkbox" 
+                                id="remember-options"
+                                checked={rememberOptions}
+                                onChange={(e) => setRememberOptions(e.target.checked)}
+                                style={{ width: '18px', height: '18px', cursor: 'pointer' }}
+                            />
+                            <label htmlFor="remember-options" style={{ fontSize: '0.9rem', fontWeight: '600', color: '#333', cursor: 'pointer' }}>
+                                Remember these options for my next item <span style={{ color: '#666', fontWeight: '400', fontSize: '0.8rem' }}>(Excluding Size)</span>
+                            </label>
+                        </div>
                     </div>
 
                     <div style={{ marginTop: '40px', display: 'flex', gap: '15px', alignItems: 'center' }}>
