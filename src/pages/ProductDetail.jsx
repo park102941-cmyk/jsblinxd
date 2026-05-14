@@ -965,6 +965,90 @@ const ProductDetail = () => {
                 </div>
             </div>
 
+            {/* Product Detailed Information Accordions */}
+            <div style={{ marginTop: '60px', borderTop: '1px solid #eee', paddingTop: '40px' }}>
+                <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 20px' }}>
+                    {/* 1. Product Information */}
+                    <OptionSection
+                        title="Product Information"
+                        isOpen={activeSection === 'info-desc'}
+                        onToggle={() => setActiveSection(activeSection === 'info-desc' ? '' : 'info-desc')}
+                        isRequired={false}
+                    >
+                        <div style={{ fontSize: '0.9rem', color: '#444', lineHeight: '1.6' }}>
+                            <p>Our custom roller shades offer a perfect blend of modern aesthetics and functional excellence. Designed for versatility, these shades complement any interior décor while providing superior light control and privacy.</p>
+                            <ul style={{ paddingLeft: '20px', marginTop: '10px' }}>
+                                <li>Premium fabric selections with diverse textures and colors.</li>
+                                <li>Precision-engineered hardware for smooth, long-lasting operation.</li>
+                                <li>Modern, low-profile design that maximizes your window view.</li>
+                            </ul>
+                        </div>
+                    </OptionSection>
+
+                    {/* 2. Specifications */}
+                    <OptionSection
+                        title="Specifications"
+                        isOpen={activeSection === 'info-specs'}
+                        onToggle={() => setActiveSection(activeSection === 'info-specs' ? '' : 'info-specs')}
+                        isRequired={false}
+                    >
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '30px', fontSize: '0.85rem', color: '#444', lineHeight: '1.5' }}>
+                            <div>
+                                <ul style={{ paddingLeft: '15px', listStyleType: 'circle' }}>
+                                    <li style={{ marginBottom: '8px' }}>All mounting brackets are finished in white and are visible from the top of the headrail.</li>
+                                    <li style={{ marginBottom: '8px' }}>Auto-Down and Premium Cordless headrails feature color-coordinated fabric inserts for a seamless, designer look.</li>
+                                    <li style={{ marginBottom: '8px' }}>This collection is <strong>Greenguard Gold Certified</strong>, ensuring low chemical emissions for a healthier home environment.</li>
+                                    <li style={{ marginBottom: '8px' }}>Protective bands should remain on the shade until fully installed to prevent edge fraying.</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <ul style={{ paddingLeft: '15px', listStyleType: 'circle' }}>
+                                    <li style={{ marginBottom: '8px' }}>Shades come standard with a matching fabric-wrapped cassette system.</li>
+                                    <li style={{ marginBottom: '8px' }}>The Premium Cordless lift mechanism is located on the right side, which may result in a slightly larger light gap on that end.</li>
+                                    <li style={{ marginBottom: '8px' }}>For optimal performance and to keep the shade level, always use both hands when adjusting cordless products.</li>
+                                    <li style={{ marginBottom: '8px' }}>Motorized options use rechargeable lithium-ion batteries. They ship at ~30% charge for safety; please charge fully before initial use.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </OptionSection>
+
+                    {/* 3. Measure and Install */}
+                    <OptionSection
+                        title="Measure and Install"
+                        isOpen={activeSection === 'info-install'}
+                        onToggle={() => setActiveSection(activeSection === 'info-install' ? '' : 'info-install')}
+                        isRequired={false}
+                    >
+                        <div style={{ fontSize: '0.9rem', color: '#444' }}>
+                            <p>Getting the perfect fit is easy with our comprehensive guides.</p>
+                            <div style={{ display: 'flex', gap: '20px', marginTop: '15px' }}>
+                                <a href="/help/how-to-measure" style={{ color: '#333', fontWeight: '700', textDecoration: 'underline' }}>Measuring Guide</a>
+                                <a href="/help/how-to-install" style={{ color: '#333', fontWeight: '700', textDecoration: 'underline' }}>Installation Guide</a>
+                            </div>
+                            <p style={{ marginTop: '15px', fontSize: '0.85rem', color: '#666' }}>Don't forget our <strong>FIT Protection</strong> guarantee—if you measure wrong, we'll replace it for free!</p>
+                        </div>
+                    </OptionSection>
+
+                    {/* 4. Shipping & Production */}
+                    <OptionSection
+                        title="Shipping & Production"
+                        isOpen={activeSection === 'info-shipping'}
+                        onToggle={() => setActiveSection(activeSection === 'info-shipping' ? '' : 'info-shipping')}
+                        isRequired={false}
+                    >
+                        <div style={{ fontSize: '0.9rem', color: '#444', lineHeight: '1.6' }}>
+                            <p>Every JSBlind product is custom-made to your exact measurements in our state-of-the-art facility.</p>
+                            <ul style={{ paddingLeft: '20px', marginTop: '10px' }}>
+                                <li><strong>Production Time:</strong> Typically ships within 5-8 business days.</li>
+                                <li><strong>Shipping:</strong> Free shipping on all standard orders within the continental US.</li>
+                                <li><strong>Tracking:</strong> You will receive a tracking number via email as soon as your order departs.</li>
+                                <li><strong>Packaging:</strong> Securely packed in heavy-duty tubing to ensure damage-free delivery.</li>
+                            </ul>
+                        </div>
+                    </OptionSection>
+                </div>
+            </div>
+
             {/* Mobile Sticky Bar */}
             <div style={{
                 position: 'fixed',
