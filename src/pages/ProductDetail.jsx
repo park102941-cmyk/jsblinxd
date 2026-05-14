@@ -47,6 +47,7 @@ const ProductDetail = () => {
     const [motorType, setMotorType] = useState('standard');
     const [remoteType, setRemoteType] = useState('none');
     const [solarPanel, setSolarPanel] = useState(false);
+    const [bondBridge, setBondBridge] = useState(false);
     const [roomLabel, setRoomLabel] = useState('');
     const [selectedConfigs, setSelectedConfigs] = useState({}); // { groupID: optionID }
     const [mainImageUrl, setMainImageUrl] = useState('');
@@ -134,36 +135,43 @@ const ProductDetail = () => {
     };
 
     const calculatePrice = () => {
-        if (!product) return 0;
+        if (!product) return "0.00";
 
         const w = parseFloat(width || 0) + parseFloat(widthFraction);
         const h = parseFloat(height || 0) + parseFloat(heightFraction);
         
         if (w <= 0 || h <= 0) return (product.basePrice || 0).toFixed(2);
 
-        // Custom Dynamic configurations
+        // 1. Calculate Base Price via Engine
+        let totalPrice = parseFloat(orderEngine.calculatePrice(product, {
+            width: w,
+            height: h,
+            color: selectedColor,
+            mount: mountType,
+            motor: motorType,
+            remote: remoteType,
+            solar: solarPanel,
+            hub: bondBridge,
+            configs: selectedConfigs
+        }));
 
-        // Custom Dynamic configurations
-        let customPrice = 0;
+        // 2. Add custom configs prices if not handled by engine
         if (product.configGroups) {
             product.configGroups.forEach(group => {
                 const selectedId = selectedConfigs[group.id];
                 const option = group.options.find(o => o.id === selectedId);
-                if (option) customPrice += Number(option.price || 0);
+                if (option) totalPrice += Number(option.price || 0);
             });
         }
 
-        const result = orderEngine.calculateOrder({
-            widthInch: w,
-            heightInch: h,
-            mountType: mountType,
-            motorType: motorType,
-            remoteType: remoteType,
-            solarPanel: solarPanel
-        });
-
-        const baseCalculatedPrice = result?.["Total Price"] || 0;
-        return (Number(baseCalculatedPrice) + customPrice).toFixed(2);
+        // 3. Add Manual Add-ons (Prices updated as requested)
+        if (remoteType === '1-channel') totalPrice += 45;
+        if (remoteType === '5-channel') totalPrice += 55;
+        if (remoteType === '15-channel') totalPrice += 65;
+        if (solarPanel) totalPrice += 49;
+        if (bondBridge) totalPrice += 149;
+        
+        return totalPrice.toFixed(2);
     };
 
 
@@ -230,12 +238,16 @@ const ProductDetail = () => {
                 quantity: 1,
                 JSBlindData,
                 customConfigs: customConfigDetails,
+                solarPanel: solarPanel,
+                bondBridge: bondBridge,
                 options: {
                     color: selectedColor,
                     measurements: { width: w, height: h },
                     mount: mountType,
                     motor: motorType,
                     remote: remoteType,
+                    solar: solarPanel,
+                    hub: bondBridge,
                     room: roomLabel,
                     customSelections: customConfigDetails
                 }
@@ -715,8 +727,7 @@ const ProductDetail = () => {
                                     { id: 'none', name: 'No Remote', price: 0 },
                                     { id: '1-channel', name: '1-Channel', price: 45 },
                                     { id: '5-channel', name: '5-Channel', price: 55 },
-                                    { id: '15-channel', name: '15-Channel', price: 65 },
-                                    { id: 'bond-bridge', name: 'Bond Bridge Hub', price: 149, image: '/images/bond_bridge.png', isSmart: true }
+                                    { id: '15-channel', name: '15-Channel', price: 65 }
                                 ].map(r => (
                                     <div
                                         key={r.id}
@@ -747,22 +758,44 @@ const ProductDetail = () => {
                             onToggle={() => setActiveSection(activeSection === 'addons' ? '' : 'addons')}
                             helpText={EXPLANATIONS.addons}
                         >
-                            <div 
-                                onClick={() => setSolarPanel(!solarPanel)}
-                                style={{ 
-                                    display: 'flex', alignItems: 'center', justifyContent: 'space-between', 
-                                    padding: '15px', border: solarPanel ? '2px solid #333' : '1px solid #eee', 
-                                    borderRadius: '8px', cursor: 'pointer', background: solarPanel ? '#fcfcfc' : '#fff'
-                                }}
-                            >
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                                    <div style={{ background: '#fff9c4', color: '#fbc02d', padding: '8px', borderRadius: '50%' }}><Sun size={20} /></div>
-                                    <div>
-                                        <div style={{ fontWeight: '700', fontSize: '0.9rem' }}>Solar Panel Charger</div>
-                                        <div style={{ fontSize: '0.75rem', color: '#666' }}>Eco-friendly continuous charging</div>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                                <div 
+                                    onClick={() => setSolarPanel(!solarPanel)}
+                                    style={{ 
+                                        display: 'flex', alignItems: 'center', justifyContent: 'space-between', 
+                                        padding: '15px', border: solarPanel ? '2px solid #333' : '1px solid #eee', 
+                                        borderRadius: '8px', cursor: 'pointer', background: solarPanel ? '#fcfcfc' : '#fff'
+                                    }}
+                                >
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                        <div style={{ background: '#fff9c4', color: '#fbc02d', padding: '8px', borderRadius: '50%' }}><Sun size={20} /></div>
+                                        <div>
+                                            <div style={{ fontWeight: '700', fontSize: '0.9rem' }}>Solar Panel Charger</div>
+                                            <div style={{ fontSize: '0.75rem', color: '#666' }}>Eco-friendly continuous charging</div>
+                                        </div>
                                     </div>
+                                    <div style={{ fontWeight: '800' }}>+$49.00</div>
                                 </div>
-                                <div style={{ fontWeight: '800' }}>+$49.00</div>
+
+                                <div 
+                                    onClick={() => setBondBridge(!bondBridge)}
+                                    onMouseEnter={() => setHoveredOption({ name: 'Bond Bridge Smart Hub', image: '/images/bond_bridge.png', price: 149 })}
+                                    onMouseLeave={() => setHoveredOption(null)}
+                                    style={{ 
+                                        display: 'flex', alignItems: 'center', justifyContent: 'space-between', 
+                                        padding: '15px', border: bondBridge ? '2px solid #333' : '1px solid #eee', 
+                                        borderRadius: '8px', cursor: 'pointer', background: bondBridge ? '#fcfcfc' : '#fff'
+                                    }}
+                                >
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                        <div style={{ background: '#e0f2fe', color: '#0369a1', padding: '8px', borderRadius: '50%' }}><Cpu size={20} /></div>
+                                        <div>
+                                            <div style={{ fontWeight: '700', fontSize: '0.9rem' }}>Bond Bridge Smart Hub</div>
+                                            <div style={{ fontSize: '0.75rem', color: '#666' }}>Wi-Fi, Alexa & Google Home Control</div>
+                                        </div>
+                                    </div>
+                                    <div style={{ fontWeight: '800' }}>+$149.00</div>
+                                </div>
                             </div>
                         </OptionSection>
 
