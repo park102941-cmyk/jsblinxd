@@ -39,17 +39,17 @@ const ProductDetail = () => {
 
     // Selection States
     const [selectedColor, setSelectedColor] = useState(null);
-    const [width, setWidth] = useState('24');
+    const [width, setWidth] = useState('');
     const [widthFraction, setWidthFraction] = useState('0');
-    const [height, setHeight] = useState('36');
+    const [height, setHeight] = useState('');
     const [heightFraction, setHeightFraction] = useState('0');
-    const [mountType, setMountType] = useState('inside');
-    const [motorType, setMotorType] = useState('standard');
-    const [remoteType, setRemoteType] = useState('none');
+    const [mountType, setMountType] = useState('');
+    const [motorType, setMotorType] = useState('');
+    const [remoteType, setRemoteType] = useState('');
     const [solarPanel, setSolarPanel] = useState(false);
     const [bondBridge, setBondBridge] = useState(false);
     const [roomLabel, setRoomLabel] = useState('');
-    const [controlSide, setControlSide] = useState('Right');
+    const [controlSide, setControlSide] = useState('');
     const [selectedConfigs, setSelectedConfigs] = useState({}); // { groupID: optionID }
     const [mainImageUrl, setMainImageUrl] = useState('');
     const [isGuideOpen, setIsGuideOpen] = useState(false);
@@ -66,7 +66,8 @@ const ProductDetail = () => {
                     const data = docSnap.data();
                     setProduct({ id: docSnap.id, ...data });
                     if (data.colors && data.colors.length > 0) {
-                        setSelectedColor(data.colors[0]);
+                        // Don't auto-select color unless the user wants to
+                        // setSelectedColor(data.colors[0]); 
                     }
 
                     // Pre-calculate images array for effects
@@ -500,7 +501,7 @@ const ProductDetail = () => {
 
                         {/* 3. Mount Type */}
                         <OptionSection
-                            title={`Mount Type: ${mountType === 'inside' ? 'Inside' : 'Outside'}`}
+                            title={`Mount Type: ${mountType ? (mountType === 'inside' ? 'Inside' : 'Outside') : 'Select Mount'}`}
                             isOpen={activeSection === 'mount'}
                             onToggle={() => setActiveSection(activeSection === 'mount' ? '' : 'mount')}
                             helpText={EXPLANATIONS.mount}
@@ -543,11 +544,11 @@ const ProductDetail = () => {
 
                         {/* 4. Measurements */}
                         <OptionSection
-                            title="Measurements"
+                            title={`Measurements: ${width && height ? `${width}${widthFraction !== '0' ? ` ${fractions.find(f => f.value === widthFraction)?.label}` : ''}" x ${height}${heightFraction !== '0' ? ` ${fractions.find(f => f.value === heightFraction)?.label}` : ''}"` : 'Select Size'}`}
                             isOpen={activeSection === 'size'}
                             onToggle={() => setActiveSection(activeSection === 'size' ? '' : 'size')}
                             helpText={EXPLANATIONS.size}
-                            isComplete={parseFloat(width) > 0 && parseFloat(height) > 0}
+                            isComplete={!!width && !!height}
                             isRequired={true}
                             rightElement={
                                 <button 
@@ -581,6 +582,7 @@ const ProductDetail = () => {
                                                 onChange={(e) => setWidth(e.target.value)}
                                                 style={{ flex: 1.5, padding: '10px', border: '1px solid #ddd', borderRadius: '4px', fontSize: '0.9rem' }}
                                             >
+                                                <option value="">Select Width</option>
                                                 {Array.from({length: 96}, (_, i) => i + 15).map(v => (
                                                     <option key={v} value={v}>{v}"</option>
                                                 ))}
@@ -617,6 +619,7 @@ const ProductDetail = () => {
                                                 onChange={(e) => setHeight(e.target.value)}
                                                 style={{ flex: 1.5, padding: '10px', border: '1px solid #ddd', borderRadius: '4px', fontSize: '0.9rem' }}
                                             >
+                                                <option value="">Select Height</option>
                                                 {Array.from({length: 100}, (_, i) => i + 15).map(v => (
                                                     <option key={v} value={v}>{v}"</option>
                                                 ))}
@@ -692,7 +695,7 @@ const ProductDetail = () => {
 
                         {/* 6. Lift Styles */}
                         <OptionSection
-                            title="Lift Styles"
+                            title={`Lift Style: ${motorType ? (motorType === 'standard' ? 'Cord Loop' : (motorType === 'cordless' ? 'Cordless' : 'Motorized')) : 'Select Style'}`}
                             isOpen={activeSection === 'motor'}
                             onToggle={() => setActiveSection(activeSection === 'motor' ? '' : 'motor')}
                             helpText="Choose how you would like to operate your shades."
@@ -753,7 +756,7 @@ const ProductDetail = () => {
                         {/* 7. Control Side */}
                         {(motorType === 'standard' || motorType === 'motorized') && (
                             <OptionSection
-                                title={`${motorType === 'motorized' ? 'Motor' : 'Handle'} Side: ${controlSide}`}
+                                title={`${motorType === 'motorized' ? 'Motor' : 'Handle'} Side: ${controlSide || 'Select'}`}
                                 isOpen={activeSection === 'side'}
                                 onToggle={() => setActiveSection(activeSection === 'side' ? '' : 'side')}
                                 isComplete={!!controlSide}
@@ -778,13 +781,13 @@ const ProductDetail = () => {
                             </OptionSection>
                         )}
 
-                        {/* 6. Remote Control */}
+                        {/* 8. Remote Control */}
                         <OptionSection
-                            title="Remote Control"
+                            title={`Remote Control: ${remoteType ? (remoteType === 'none' ? 'None' : (remoteType === '1-channel' ? '1-Ch' : (remoteType === '5-channel' ? '5-Ch' : '15-Ch'))) : 'Select'}`}
                             isOpen={activeSection === 'remote'}
                             onToggle={() => setActiveSection(activeSection === 'remote' ? '' : 'remote')}
                             helpText={EXPLANATIONS.remote}
-                            isComplete={remoteType !== 'none' || motorType !== 'motorized'}
+                            isComplete={motorType === 'motorized' ? (remoteType !== '' && remoteType !== 'none') : (motorType !== '' && remoteType !== '')}
                             isRequired={motorType === 'motorized'}
                         >
                             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))', gap: '10px' }}>
