@@ -62,7 +62,9 @@ const SidebarFilter = ({ categories }) => {
     ];
 
     const displayCategories = (categories && categories.length > 0) 
-        ? categories.map(c => ({ label: c.name || c.title, key: c.id || c.key })) 
+        ? categories
+            .filter(c => ['roller', 'zebra'].includes(c.id?.toLowerCase()))
+            .map(c => ({ label: c.name || c.title, key: c.id || c.key })) 
         : productCategories;
 
     return (
