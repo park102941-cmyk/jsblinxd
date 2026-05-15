@@ -61,7 +61,9 @@ const SidebarFilter = ({ categories }) => {
         { label: "Remotes & Hubs", key: "motor" }
     ];
 
-    const displayCategories = categories || productCategories;
+    const displayCategories = (categories && categories.length > 0) 
+        ? categories.map(c => ({ label: c.name || c.title, key: c.id || c.key })) 
+        : productCategories;
 
     return (
         <div style={{ paddingRight: '10px' }}>
@@ -78,7 +80,7 @@ const SidebarFilter = ({ categories }) => {
             </FilterSection>
 
             {/* Tech Categories */}
-            <FilterSection title="Smart Technology" defaultOpen={false}>
+            <FilterSection title="Remotes & Smart Tech" defaultOpen={true}>
                 {techCategories.map((cat, index) => (
                     <CategoryLink
                         key={index}

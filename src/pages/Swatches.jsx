@@ -89,7 +89,7 @@ const Swatches = () => {
                         key={product.id}
                         id={product.id}
                         title={product.title}
-                        price={product.basePrice}
+                        price={product.basePrice || 9.99}
                         image={product.imageUrl}
                         badge={product.badge}
                         reviews={product.reviews || 0}
@@ -114,7 +114,10 @@ const Swatches = () => {
                 <div style={{ marginBottom: '30px', fontSize: '0.9rem', color: '#666' }}>
                     Collection / SWATCHES
                 </div>
-                <h1 style={{ fontSize: '2rem', marginBottom: '30px' }}>Simpler & Smarter Fabric Swatches</h1>
+                <h1 style={{ fontSize: '2rem', marginBottom: '10px' }}>Simpler & Smarter Fabric Swatches</h1>
+                <p style={{ color: '#666', marginBottom: '30px', fontSize: '1rem' }}>
+                    Experience our premium fabrics in your own home. <strong>$9.99</strong> per kit + Tax & Shipping.
+                </p>
 
                 {loading ? <div>Loading swatches...</div> : (
                     <>

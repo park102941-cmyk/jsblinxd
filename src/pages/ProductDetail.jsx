@@ -13,7 +13,7 @@ import OrderingGuide from '../components/OrderingGuide';
 const ProductDetail = () => {
     const { id } = useParams();
     const navigate = useNavigate();
-    const { addToCart } = useCart();
+    const { addToCart, cartItems } = useCart();
     const { currentUser } = useAuth();
     const location = useLocation();
 
@@ -59,6 +59,19 @@ const ProductDetail = () => {
     const [fitProtection, setFitProtection] = useState(false);
     const [rememberOptions, setRememberOptions] = useState(false);
     const [hoveredOption, setHoveredOption] = useState(null); // { name, image, price }
+    const [itemQuantity, setItemQuantity] = useState(1);
+    const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+
+    const isStandalone = !!(
+        ['smart-remote-1', 'smart-remote-4', 'smart-remote-15', 'smart-hub-1', 'smart-tech-1'].includes(product?.id) ||
+        product?.category?.toLowerCase().includes('motor') || 
+        product?.category?.toLowerCase().includes('hub') || 
+        product?.title?.toLowerCase().includes('remote') || 
+        product?.title?.toLowerCase().includes('hub') ||
+        product?.category?.startsWith('swatch') ||
+        product?.id?.toLowerCase().includes('remote') ||
+        product?.id?.toLowerCase().includes('hub')
+    );
 
     useEffect(() => {
         const fetchProduct = async () => {
@@ -139,6 +152,56 @@ const ProductDetail = () => {
         }
     }, [rememberOptions, mountType, motorType, remoteType, controlSide, roomType]);
 
+    useEffect(() => {
+        if (product && location.state?.editSelection) {
+            const edit = location.state.editSelection;
+            console.log("Restoring edit selection:", edit);
+            
+            if (edit.color) setSelectedColor(edit.color);
+            if (edit.measurements) {
+                const w = parseFloat(edit.measurements.width);
+                const h = parseFloat(edit.measurements.height);
+                setWidth(Math.floor(w).toString());
+                const wFrac = w - Math.floor(w);
+                const closestW = fractions.reduce((prev, curr) => 
+                    Math.abs(parseFloat(curr.value) - wFrac) < Math.abs(parseFloat(prev.value) - wFrac) ? curr : prev
+                );
+                setWidthFraction(closestW.value);
+
+                setHeight(Math.floor(h).toString());
+                const hFrac = h - Math.floor(h);
+                const closestH = fractions.reduce((prev, curr) => 
+                    Math.abs(parseFloat(curr.value) - hFrac) < Math.abs(parseFloat(prev.value) - hFrac) ? curr : prev
+                );
+                setHeightFraction(closestH.value);
+            }
+            if (edit.mount) setMountType(edit.mount);
+            if (edit.motor) setMotorType(edit.motor);
+            if (edit.remote) setRemoteType(edit.remote);
+            if (edit.solar !== undefined) setSolarPanel(edit.solar);
+            if (edit.hub !== undefined) setBondBridge(edit.hub);
+            if (edit.roomType) setRoomType(edit.roomType);
+            if (edit.roomDetail) setRoomDetail(edit.roomDetail);
+            if (edit.customSelections) {
+                // Map back custom selections
+                const restoredConfigs = {};
+                if (product.configGroups) {
+                    product.configGroups.forEach(group => {
+                        const savedOptionName = edit.customSelections[group.name];
+                        if (savedOptionName) {
+                            const option = group.options.find(o => o.name === savedOptionName);
+                            if (option) restoredConfigs[group.id] = option.id;
+                        }
+                    });
+                }
+                setSelectedConfigs(prev => ({...prev, ...restoredConfigs}));
+            }
+            
+            // Open the first section or where info might be missing
+            setActiveSection('color');
+        }
+    }, [product, location.state, fractions]);
+
     const images = product?.images && product.images.length > 0 
         ? product.images 
         : product?.imageUrl 
@@ -169,16 +232,29 @@ const ProductDetail = () => {
         motor: "Standard RF: Simple remote control. Zigbee 3.0: Requires a hub for smart home control. Alexa Direct: Connects directly to Echo devices with built-in hubs. Matter: The latest industry standard for cross-platform smart home compatibility.",
         remote: "Select a remote to control your shades. Our 5 and 15-channel remotes can operate multiple shades simultaneously. The Bond Bridge Hub adds Wi-Fi control via smartphone and integrates with Alexa, Google Home, and SmartThings.",
         addons: "The Solar Panel Charger uses natural light to keep your motor battery topped up, reducing the need for manual charging via USB cable.",
-        room: "Labeling your shades by room (e.g., 'Master Bedroom') helps us organize your order and makes installation much easier once they arrive. You can pick a room name and add a specific detail like 'Left Window'."
+        room: "Labeling your shades by room (e.g., 'Master Bedroom') helps us organize your order and makes installation much easier once they arrive. You can pick a room name and add a specific detail like 'Left Window'.",
+        side: "Depending on the handle or motor direction, there is an additional light gap of approximately 1/4\" between the fabric and the wall on the control side."
     };
 
     const calculatePrice = () => {
         if (!product) return "0.00";
 
+        if (product.category?.startsWith('swatch')) return "9.99";
+
+        const isStandaloneItem = product?.category?.toLowerCase().includes('motor') || 
+                                product?.category?.toLowerCase().includes('hub') || 
+                                product?.category?.toLowerCase().includes('smart') ||
+                                product?.title?.toLowerCase().includes('remote') ||
+                                product?.title?.toLowerCase().includes('hub');
+
+        if (isStandaloneItem) {
+            return ((product.basePrice || product.price || 0) * itemQuantity).toFixed(2);
+        }
+
         const w = parseFloat(width || 0) + parseFloat(widthFraction);
         const h = parseFloat(height || 0) + parseFloat(heightFraction);
         
-        if (w <= 0 || h <= 0) return (product.basePrice || 0).toFixed(2);
+        if (w <= 0 || h <= 0) return (product.basePrice || 9.99).toFixed(2);
 
         // 1. Calculate Base Price via Engine
         const result = orderEngine.calculateOrder({
@@ -213,32 +289,49 @@ const ProductDetail = () => {
             const w = parseFloat(width || 0) + parseFloat(widthFraction);
             const h = parseFloat(height || 0) + parseFloat(heightFraction);
 
-            // Mandatory Field Checks
-            if (!selectedColor) {
-                setValidationError('Please select a color.');
-                setActiveSection('color');
-                return;
-            }
-            if (!w || !h || w === 0 || h === 0) {
-                setValidationError('Please enter valid measurements.');
-                setActiveSection('size');
-                return;
-            }
-            if (motorType === 'motorized' && remoteType === 'none' && !bondBridge) {
-                setValidationError('Please select a remote or smart hub for motorized shades.');
-                setActiveSection('remote');
-                return;
-            }
+            if (!isStandalone) {
+                // Mandatory Field Checks
+                if (!selectedColor) {
+                    setValidationError('Please select a color.');
+                    setActiveSection('color');
+                    return;
+                }
+                if (!w || !h || w === 0 || h === 0) {
+                    setValidationError('Please enter valid measurements.');
+                    setActiveSection('size');
+                    return;
+                }
+                if (motorType === 'motorized' && remoteType === 'none' && !bondBridge) {
+                    setValidationError('Please select a remote or smart hub for motorized shades.');
+                    setActiveSection('remote');
+                    return;
+                }
+                if (!roomType) {
+                    setValidationError('Please select a Room Name.');
+                    setActiveSection('room');
+                    return;
+                }
 
-            if (w < product.minWidth || w > product.maxWidth) {
-                setValidationError(`Width must be between ${product.minWidth}" and ${product.maxWidth}".`);
-                setActiveSection('size');
-                return;
-            }
-            if (h < product.minHeight || h > product.maxHeight) {
-                setValidationError(`Height must be between ${product.minHeight}" and ${product.maxHeight}".`);
-                setActiveSection('size');
-                return;
+                const finalRoomLabel = roomType ? `${roomType}${roomDetail ? ` - ${roomDetail}` : ''}` : roomDetail;
+
+                // Check for duplicate room name in current cart
+                const isDuplicate = cartItems.some(item => (item.product?.room || item.room) === finalRoomLabel);
+                if (isDuplicate) {
+                    setValidationError(`The room name "${finalRoomLabel}" already exists in your cart. Each window must have a unique room name (e.g., "${finalRoomLabel} 1", "${finalRoomLabel} 2").`);
+                    setActiveSection('room');
+                    return;
+                }
+
+                if (w < product.minWidth || w > product.maxWidth) {
+                    setValidationError(`Width must be between ${product.minWidth}" and ${product.maxWidth}".`);
+                    setActiveSection('size');
+                    return;
+                }
+                if (h < product.minHeight || h > product.maxHeight) {
+                    setValidationError(`Height must be between ${product.minHeight}" and ${product.maxHeight}".`);
+                    setActiveSection('size');
+                    return;
+                }
             }
 
             setValidationError('');
@@ -267,7 +360,7 @@ const ProductDetail = () => {
                 });
             }
 
-            const finalRoomLabel = roomType ? `${roomType}${roomDetail ? ` - ${roomDetail}` : ''}` : roomDetail;
+            // finalRoomLabel already calculated above for duplicate check
 
             const finalItem = {
                 ...product, // basic info
@@ -295,13 +388,14 @@ const ProductDetail = () => {
                     remote: remoteType,
                     solar: solarPanel,
                     hub: bondBridge,
-                    room: roomLabel,
+                    room: finalRoomLabel,
+                    roomType: roomType,
+                    roomDetail: roomDetail,
                     customSelections: customConfigDetails
                 }
             };
-
             console.log("Adding to cart:", finalItem);
-            addToCart(finalItem, finalItem.options, finalItem.price, 1);
+            addToCart(finalItem, finalItem.options, finalItem.price, isStandalone ? itemQuantity : 1);
             
             // Clear only size and room info after adding to cart
             setWidth('');
@@ -377,7 +471,14 @@ const ProductDetail = () => {
                         <img
                             src={mainImageUrl || images[currentImageIndex]}
                             alt={product.title}
-                            style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'all 0.4s ease' }}
+                            onClick={() => setIsLightboxOpen(true)}
+                            style={{ 
+                                width: '100%', 
+                                height: '100%', 
+                                objectFit: 'cover', 
+                                transition: 'all 0.4s ease',
+                                cursor: 'zoom-in'
+                            }}
                             onError={(e) => {
                                 e.target.onerror = null; 
                                 e.target.src = "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&q=80&w=800";
@@ -428,20 +529,23 @@ const ProductDetail = () => {
                     </div>
 
                     {/* Trust Banners (Benchmarked from Graywind) */}
-                    <div style={{ display: 'flex', gap: '8px', marginBottom: '25px', flexWrap: 'wrap' }}>
-                        <div style={{ background: 'var(--bg-soft)', color: 'var(--primary-green)', padding: '6px 12px', borderRadius: '20px', fontSize: '0.75rem', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '5px', border: '1px solid var(--border-color)' }}>
-                            <Truck size={14} /> Free Shipping within US
+                    {!isStandalone && (
+                        <div style={{ display: 'flex', gap: '8px', marginBottom: '25px', flexWrap: 'wrap' }}>
+                            <div style={{ background: 'var(--bg-soft)', color: 'var(--primary-green)', padding: '6px 12px', borderRadius: '20px', fontSize: '0.75rem', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '5px', border: '1px solid var(--border-color)' }}>
+                                <Truck size={14} /> {product.category?.startsWith('swatch') ? 'Shipping at Checkout' : 'Free Shipping within US'}
+                            </div>
+                            <div style={{ background: '#f0fdf4', color: '#16a34a', padding: '6px 12px', borderRadius: '20px', fontSize: '0.75rem', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '5px', border: '1px solid #dcfce7' }}>
+                                <ShieldCheck size={14} /> No-Return Replacement
+                            </div>
+                            <div style={{ background: '#fff7ed', color: '#ea580c', padding: '6px 12px', borderRadius: '20px', fontSize: '0.75rem', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '5px', border: '1px solid #ffedd5' }}>
+                                <Sparkles size={14} /> JSBlind™ Factory Direct
+                            </div>
                         </div>
-                        <div style={{ background: '#f0fdf4', color: '#16a34a', padding: '6px 12px', borderRadius: '20px', fontSize: '0.75rem', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '5px', border: '1px solid #dcfce7' }}>
-                            <ShieldCheck size={14} /> No-Return Replacement
-                        </div>
-                        <div style={{ background: '#fff7ed', color: '#ea580c', padding: '6px 12px', borderRadius: '20px', fontSize: '0.75rem', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '5px', border: '1px solid #ffedd5' }}>
-                            <Sparkles size={14} /> JSBlind™ Factory Direct
-                        </div>
-                    </div>
+                    )}
 
                     {/* Option List Style UI */}
-                    <div style={{ border: '1px solid #e0e0e0', borderRadius: '8px', overflow: 'hidden' }}>
+                    {!isStandalone ? (
+                        <div style={{ border: '1px solid #e0e0e0', borderRadius: '8px', overflow: 'hidden' }}>
 
                         {/* 1. Colors */}
                         {(product.showColor !== false) && (
@@ -727,13 +831,18 @@ const ProductDetail = () => {
                             onToggle={() => setActiveSection(activeSection === 'room' ? '' : 'room')}
                             helpText={EXPLANATIONS.room}
                             isComplete={!!roomType}
-                            isRequired={false}
+                            isRequired={true}
                         >
                             <div style={{ display: 'flex', gap: '15px' }}>
                                 <select
                                     value={roomType}
                                     onChange={(e) => setRoomType(e.target.value)}
-                                    style={{ flex: 1, padding: '12px', border: '1px solid #ddd', borderRadius: '4px', fontSize: '0.95rem' }}
+                                    style={{ 
+                                        flex: 1, padding: '12px', 
+                                        border: validationError.includes('Room Name') && !roomType ? '2px solid #ef4444' : '1px solid #ddd', 
+                                        borderRadius: '4px', fontSize: '0.95rem',
+                                        backgroundColor: validationError.includes('Room Name') && !roomType ? '#fff5f5' : '#fff'
+                                    }}
                                 >
                                     <option value="">Select</option>
                                     <option value="Bedroom">Bedroom</option>
@@ -821,6 +930,7 @@ const ProductDetail = () => {
                                 title={`${motorType === 'motorized' ? 'Motor Side (Charging Port)' : 'Handle Side'} (Left/Right): ${controlSide || 'Select'}`}
                                 isOpen={activeSection === 'side'}
                                 onToggle={() => setActiveSection(activeSection === 'side' ? '' : 'side')}
+                                helpText={EXPLANATIONS.side}
                                 isComplete={!!controlSide}
                                 isRequired={true}
                             >
@@ -948,6 +1058,34 @@ const ProductDetail = () => {
                             </label>
                         </div>
                     </div>
+                    ) : (
+                        <div style={{ padding: '30px', border: '1px solid #e0e0e0', borderRadius: '8px', background: '#f9f9fb' }}>
+                            <h3 style={{ fontSize: '1.1rem', fontWeight: '700', marginBottom: '20px' }}>Purchase Details</h3>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+                                <label style={{ fontWeight: '600', fontSize: '0.9rem' }}>Quantity:</label>
+                                <div style={{ display: 'flex', alignItems: 'center', border: '1px solid #ddd', borderRadius: '6px', overflow: 'hidden', background: '#fff' }}>
+                                    <button 
+                                        onClick={() => setItemQuantity(Math.max(1, itemQuantity - 1))}
+                                        style={{ padding: '10px 15px', border: 'none', background: 'none', cursor: 'pointer', borderRight: '1px solid #ddd' }}
+                                    >-</button>
+                                    <input 
+                                        type="number" 
+                                        value={itemQuantity}
+                                        onChange={(e) => setItemQuantity(Math.max(1, parseInt(e.target.value) || 1))}
+                                        style={{ width: '50px', textAlign: 'center', border: 'none', fontSize: '1rem', fontWeight: '600' }}
+                                    />
+                                    <button 
+                                        onClick={() => setItemQuantity(itemQuantity + 1)}
+                                        style={{ padding: '10px 15px', border: 'none', background: 'none', cursor: 'pointer', borderLeft: '1px solid #ddd' }}
+                                    >+</button>
+                                </div>
+                            </div>
+                            <p style={{ marginTop: '20px', fontSize: '0.85rem', color: '#666', lineHeight: '1.6' }}>
+                                This is a standalone accessory compatible with fixed code 433.92MHz motors. 
+                                Battery not included due to shipping regulations.
+                            </p>
+                        </div>
+                    )}
 
                     <div style={{ marginTop: '40px', display: 'flex', gap: '15px', alignItems: 'center' }}>
                         <div style={{ flex: 1 }}>
@@ -1181,6 +1319,59 @@ const ProductDetail = () => {
                             </button>
                         </div>
                     </div>
+                </div>
+            )}
+
+            {/* Full Screen Image Lightbox */}
+            {isLightboxOpen && (
+                <div 
+                    style={{
+                        position: 'fixed',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        backgroundColor: 'rgba(0,0,0,0.95)',
+                        zIndex: 9999,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        padding: '40px'
+                    }}
+                    onClick={() => setIsLightboxOpen(false)}
+                >
+                    <button 
+                        onClick={() => setIsLightboxOpen(false)}
+                        style={{
+                            position: 'absolute',
+                            top: '30px',
+                            right: '30px',
+                            background: 'white',
+                            border: 'none',
+                            borderRadius: '50%',
+                            width: '44px',
+                            height: '44px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            cursor: 'pointer',
+                            boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+                            zIndex: 10000
+                        }}
+                    >
+                        <X size={28} />
+                    </button>
+
+                    <img 
+                        src={mainImageUrl || images[currentImageIndex]} 
+                        alt="Full Screen Product View"
+                        style={{
+                            maxWidth: '100%',
+                            maxHeight: '100%',
+                            objectFit: 'contain',
+                            borderRadius: '8px'
+                        }}
+                    />
                 </div>
             )}
         </div>

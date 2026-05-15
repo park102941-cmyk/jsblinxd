@@ -71,11 +71,6 @@ const AdminDashboard = () => {
                             </Link>
                         </li>
                         <li style={{ marginBottom: '10px' }}>
-                            <Link to="/admin/zshine-importer" style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px', color: 'var(--secondary-color)', borderRadius: '4px', background: '#fff3e0' }}>
-                                <Package size={18} /> ZSHINE 제품 가져오기 🆕
-                            </Link>
-                        </li>
-                        <li style={{ marginBottom: '10px' }}>
                             <Link to="/admin/product-importer" style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px', color: 'var(--secondary-color)', borderRadius: '4px', background: '#e3f2fd' }}>
                                 <Upload size={18} /> 제품 가져오기 ⚡
                             </Link>

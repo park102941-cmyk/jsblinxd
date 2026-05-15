@@ -18,10 +18,10 @@ const Products = () => {
             try {
                 let q = collection(db, "products");
                 const querySnapshot = await getDocs(q);
-                let fetchedProducts = querySnapshot.docs.map(doc => ({
+                let fetchedProducts = (querySnapshot.docs || []).map(doc => ({
                     id: doc.id,
                     ...doc.data()
-                }));
+                })).filter(p => !p.isHidden);
 
                 if (categoryFilter) {
                     fetchedProducts = fetchedProducts.filter(p => {
@@ -37,7 +37,7 @@ const Products = () => {
 
                 // Fetch categories to get title
                 const catSnap = await getDocs(collection(db, "categories"));
-                const catList = catSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                const catList = (catSnap.docs || []).map(doc => ({ id: doc.id, ...doc.data() }));
                 setCategories(catList);
             } catch (error) {
                 console.error("Error fetching products:", error);
@@ -71,7 +71,7 @@ const Products = () => {
         return colors.map(c => typeof c === 'string' ? c : (c.image || c.hex));
     };
 
-    const productCards = products.map(product => (
+    const productCards = (products || []).map(product => (
         <ProductCard
             key={product.id}
             id={product.id}
@@ -93,6 +93,7 @@ const Products = () => {
     return (
         <ProductListing
             title={getPageTitle()}
+            categories={categories}
             products={productCards.length > 0 ? productCards : (
                 <div style={{ 
                     gridColumn: '1 / -1',

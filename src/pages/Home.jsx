@@ -92,7 +92,9 @@ const Home = () => {
 
                 // 2. Best Sellers (Products)
                 const productsSnap = await getDocs(collection(db, "products"));
-                const products = productsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                const products = productsSnap.docs
+                    .map(doc => ({ id: doc.id, ...doc.data() }))
+                    .filter(p => !p.isHidden);
                 setBestSellers(products.slice(0, 4));
             } catch (error) {
                 console.error("Error fetching home data:", error);
@@ -158,7 +160,7 @@ const Home = () => {
                             Shop Now
                         </Link>
                         <Link to="/swatches" className="btn-secondary hover-lift" style={{ padding: '15px 35px', borderRadius: '30px', backgroundColor: 'rgba(255,255,255,0.1)', backdropFilter: 'blur(10px)', color: 'white', border: '1px solid rgba(255,255,255,0.3)' }}>
-                            Free Swatches
+                            Order Swatches
                         </Link>
                     </div>
                 </div>
@@ -167,7 +169,7 @@ const Home = () => {
             {/* Values Bar */}
             <div style={{ backgroundColor: '#f5f5f7', borderBottom: '1px solid #e5e5e5' }}>
                 <div className="container" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', padding: '30px 20px' }}>
-                    {homeData.values.map((v, i) => (
+                    {(homeData.values && Array.isArray(homeData.values)) && homeData.values.map((v, i) => (
                         <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '15px', padding: '10px' }}>
                             <div style={{ color: 'var(--primary-blue)' }}>{renderIcon(v.icon)}</div>
                             <div>
@@ -191,7 +193,7 @@ const Home = () => {
                 </ScrollReveal>
                 
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '30px' }}>
-                    {homeData.categories.map((cat, i) => (
+                    {(homeData.categories && Array.isArray(homeData.categories)) && homeData.categories.map((cat, i) => (
                         <ScrollReveal key={i} animation="scale" delay={i * 100}>
                             <Link to={cat.link} className="hover-lift" style={{ position: 'relative', height: '500px', borderRadius: '20px', overflow: 'hidden', display: 'block' }}>
                                 <img src={cat.img} style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.5s ease' }} alt={cat.title} />
@@ -220,14 +222,20 @@ const Home = () => {
                 <div className="container" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', alignItems: 'center' }}>
                     <ScrollReveal animation="left">
                         <div style={{ padding: '100px 60px' }}>
-                            <span style={{ color: 'var(--primary-green)', fontWeight: '700', letterSpacing: '2px', fontSize: '0.9rem' }}>{homeData.techHighlight.tag}</span>
-                            <h2 style={{ fontSize: '3rem', fontWeight: '800', margin: '20px 0', lineHeight: '1.1', color: '#1d1d1f' }}>{homeData.techHighlight.title}</h2>
-                            <p style={{ fontSize: '1.1rem', color: '#666', marginBottom: '40px', lineHeight: '1.6' }}>{homeData.techHighlight.description}</p>
+                            <span style={{ color: 'var(--primary-green)', fontWeight: '700', letterSpacing: '2px', fontSize: '0.9rem', textTransform: 'uppercase' }}>Smart Ecosystem</span>
+                            <h2 style={{ fontSize: '3rem', fontWeight: '800', margin: '20px 0', lineHeight: '1.1', color: '#1d1d1f' }}>Total Control.<br /><span style={{ color: '#86868b' }}>Seamless Integration.</span></h2>
+                            <p style={{ fontSize: '1.1rem', color: '#666', marginBottom: '40px', lineHeight: '1.6' }}>
+                                Our complete smart ecosystem brings together precision engineering and modern connectivity for the ultimate window treatment experience.
+                            </p>
                             
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '30px' }}>
-                                {homeData.techHighlight.features.map((f, i) => (
+                                {[
+                                    { title: '1-Channel Remote', desc: 'Precision control for single shades.' },
+                                    { title: '4-Channel Remote', desc: 'Group control for multiple windows.' },
+                                    { title: '15-Channel Remote', desc: 'Advanced LCD multi-zone management.' },
+                                    { title: 'Smart Bridge Hub', desc: 'Alexa, Google, and App integration.' }
+                                ].map((f, i) => (
                                     <div key={i}>
-                                        <div style={{ color: 'var(--primary-green)', marginBottom: '15px' }}>{renderIcon(f.icon)}</div>
                                         <h4 style={{ margin: '0 0 5px', fontSize: '1rem', fontWeight: '700', color: '#1d1d1f' }}>{f.title}</h4>
                                         <p style={{ margin: 0, fontSize: '0.85rem', color: '#666' }}>{f.desc}</p>
                                     </div>
@@ -236,8 +244,27 @@ const Home = () => {
                         </div>
                     </ScrollReveal>
                     <ScrollReveal animation="right">
-                        <div style={{ height: '700px', backgroundColor: '#f5f5f7' }}>
-                            <img src={homeData.techHighlight.imageUrl} style={{ width: '100%', height: '100%', objectFit: 'cover', mixBlendMode: 'multiply' }} alt="Smart Tech" />
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                            <div style={{ position: 'relative', height: '500px', backgroundColor: '#f5f5f7', borderRadius: '24px', overflow: 'hidden' }}>
+                                <img src={homeData.techHighlight.imageUrl} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="Smart Tech" />
+                                <div style={{ position: 'absolute', bottom: '20px', left: '20px', right: '20px', background: 'rgba(255,255,255,0.9)', backdropFilter: 'blur(10px)', padding: '20px', borderRadius: '15px', border: '1px solid rgba(255,255,255,0.3)', boxShadow: '0 10px 30px rgba(0,0,0,0.1)' }}>
+                                    <h4 style={{ fontSize: '12px', fontWeight: '700', color: '#ff3b30', marginBottom: '5px', textTransform: 'uppercase' }}>⚠️ Remote Technical Notice</h4>
+                                    <p style={{ fontSize: '11px', color: '#1d1d1f', lineHeight: '1.4', margin: 0 }}>
+                                        Fixed code (433.92 MHz) only. Not compatible with rolling code motors. Battery not included.
+                                    </p>
+                                </div>
+                            </div>
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '15px' }}>
+                                <div style={{ height: '140px', background: '#fff', borderRadius: '15px', overflow: 'hidden', border: '1px solid #eee' }}>
+                                    <img src={aiAssets.remote2} style={{ width: '100%', height: '100%', objectFit: 'contain', padding: '10px' }} alt="Multi-channel Remote" />
+                                </div>
+                                <div style={{ height: '140px', background: '#fff', borderRadius: '15px', overflow: 'hidden', border: '1px solid #eee' }}>
+                                    <img src={aiAssets.remote3} style={{ width: '100%', height: '100%', objectFit: 'contain', padding: '10px' }} alt="Single-channel Remote" />
+                                </div>
+                                <div style={{ height: '140px', background: '#fff', borderRadius: '15px', overflow: 'hidden', border: '1px solid #eee' }}>
+                                    <img src={aiAssets.remote4} style={{ width: '100%', height: '100%', objectFit: 'contain', padding: '10px' }} alt="15-channel Remote" />
+                                </div>
+                            </div>
                         </div>
                     </ScrollReveal>
                 </div>
@@ -254,11 +281,11 @@ const Home = () => {
                             <ProductCard 
                                 id={product.id}
                                 title={product.title}
-                                price={product.basePrice}
+                                price={product.basePrice || 9.99}
                                 image={product.imageUrl}
                                 badge={product.badge}
                                 reviews={product.reviews || 0}
-                                colors={product.colors && Array.isArray(product.colors) ? product.colors.map(c => typeof c === 'string' ? c : c.hex) : []}
+                                colors={product.colors && Array.isArray(product.colors) ? product.colors.map(c => c ? (typeof c === 'string' ? c : c.hex) : '') : []}
                             />
                         </ScrollReveal>
                     ))}

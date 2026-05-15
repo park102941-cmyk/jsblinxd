@@ -42,11 +42,29 @@ const Cart = () => {
                         }}>
                             <img src={item.product.imageUrl || 'https://via.placeholder.com/100'} alt={item.product.title} style={{ width: '100px', height: '100px', objectFit: 'cover', borderRadius: '4px' }} />
                             <div style={{ flex: 1 }}>
-                                <h3 style={{ margin: '0 0 5px 0' }}>{item.product.title}</h3>
-                                <p style={{ fontSize: '0.9rem', color: '#666', margin: 0 }}>
-                                    {item.width}cm x {item.height}cm | Color: <span style={{ display: 'inline-block', width: '10px', height: '10px', backgroundColor: item.color, border: '1px solid #ccc' }}></span>
-                                </p>
-                                <p style={{ fontSize: '0.9rem', color: '#666' }}>Qty: {item.quantity}</p>
+                                <h3 style={{ margin: '0 0 5px 0', fontSize: '1.05rem' }}>{item.product.title}</h3>
+                                <div style={{ fontSize: '0.85rem', color: '#666', display: 'flex', flexDirection: 'column', gap: '3px' }}>
+                                    <p style={{ margin: 0 }}>
+                                        <strong>Size:</strong> {item.product.width}" W x {item.product.height}" H
+                                    </p>
+                                    <p style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                        <strong>Color:</strong> {item.product.selectedColor} 
+                                        <span style={{ display: 'inline-block', width: '12px', height: '12px', borderRadius: '50%', backgroundColor: item.options?.color?.hex || '#eee', border: '1px solid #ddd' }}></span>
+                                    </p>
+                                    {item.product.room && (
+                                        <p style={{ margin: 0 }}><strong>Room:</strong> {item.product.room}</p>
+                                    )}
+                                    {item.product.mount && (
+                                        <p style={{ margin: 0 }}><strong>Mount:</strong> {item.product.mount === 'inside' ? 'Inside' : 'Outside'}</p>
+                                    )}
+                                    {item.product.customConfigs && Object.entries(item.product.customConfigs).length > 0 && (
+                                        <div style={{ marginTop: '4px', paddingTop: '4px', borderTop: '1px dashed #eee' }}>
+                                            {Object.entries(item.product.customConfigs).map(([key, value]) => (
+                                                <p key={key} style={{ margin: 0, fontSize: '0.75rem' }}>• {key}: {value}</p>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                             <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '10px' }}>
                                 <p style={{ fontWeight: 'bold', fontSize: '1.1rem' }}>${(item.price * item.quantity).toLocaleString()}</p>
@@ -60,11 +78,11 @@ const Cart = () => {
                                 <div style={{ display: 'flex', gap: '10px' }}>
                                     {/* Edit Options (Simulated by navigating back - sophisticated logic would require pre-filling state) */}
                                     <button onClick={() => {
-                                        if (window.confirm('To edit options, we need to remove this item and go back to the product page. Proceed?')) {
+                                        if (window.confirm('Would you like to edit the options for this item? It will be removed from your cart while you make changes.')) {
                                             removeFromCart(item.id);
-                                            navigate(`/product/${item.product.id || 1}`, { state: { editSelection: item.options } });
+                                            navigate(`/product/${item.product.id}`, { state: { editSelection: item.options } });
                                         }
-                                    }} style={{ fontSize: '0.8rem', textDecoration: 'underline', color: 'var(--accent-color)', background: 'none', border: 'none', cursor: 'pointer' }}>
+                                    }} style={{ fontSize: '0.8rem', fontWeight: '600', textDecoration: 'underline', color: '#0369a1', background: 'none', border: 'none', cursor: 'pointer' }}>
                                         Edit
                                     </button>
                                     <button onClick={() => removeFromCart(item.id)} style={{ background: 'none', border: 'none', color: '#999', cursor: 'pointer' }}>

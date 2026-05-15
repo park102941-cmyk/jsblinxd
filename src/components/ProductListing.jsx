@@ -2,7 +2,7 @@ import React from 'react';
 import SidebarFilter from './SidebarFilter';
 import { ChevronDown, SlidersHorizontal } from 'lucide-react';
 
-const ProductListing = ({ title, products, breadcrumbs }) => {
+const ProductListing = ({ title, products, breadcrumbs, categories }) => {
     return (
         <div style={{ backgroundColor: '#fafafa', minHeight: '100vh' }}>
             {/* Collection Header Banner */}
@@ -39,7 +39,7 @@ const ProductListing = ({ title, products, breadcrumbs }) => {
                 <div style={{ display: 'flex', gap: '60px' }}>
                     {/* Sidebar */}
                     <aside className="desktop-sidebar" style={{ width: '220px', flexShrink: 0 }}>
-                        <SidebarFilter />
+                        <SidebarFilter categories={categories} />
                     </aside>
 
                     {/* Product Grid Area */}

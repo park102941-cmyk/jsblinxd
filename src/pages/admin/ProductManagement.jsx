@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { db } from '../../lib/firebase';
 import { collection, addDoc, getDocs, doc, deleteDoc, updateDoc } from 'firebase/firestore';
-import { Plus, X, Image as ImageIcon, ExternalLink, Sparkles, Loader2, Trash2, Pencil } from 'lucide-react';
+import { Plus, X, Image as ImageIcon, ExternalLink, Sparkles, Loader2, Trash2, Pencil, Eye, EyeOff } from 'lucide-react';
 import { GOOGLE_SCRIPT_URL, GEMINI_API_KEY } from '../../lib/config';
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import ImageUploader from '../../components/ImageUploader';
@@ -39,7 +39,9 @@ const ProductManagement = () => {
         torque: '', // Torque in Nm (Newton meters)
         voltage: '', // e.g., '12V DC', '110V AC'
         batteryType: '', // e.g., 'Rechargeable Li-ion', 'AA batteries', 'N/A'
-        compatibleBlinds: '' // e.g., 'Roller, Zebra, Cellular'
+        compatibleBlinds: '', // e.g., 'Roller, Zebra, Cellular'
+        youtubeUrl: '', // YouTube video link
+        isHidden: false // Hide from storefront
     };
     const [newProduct, setNewProduct] = useState(initialFormState);
 
@@ -69,10 +71,13 @@ const ProductManagement = () => {
         setLoading(true);
         try {
             const querySnapshot = await getDocs(collection(db, "products"));
-            const productsList = querySnapshot.docs.map(doc => ({
-                id: doc.id,
-                ...doc.data()
-            }));
+            const productsList = querySnapshot.docs.map(doc => {
+                const data = doc.data();
+                return {
+                    ...data,
+                    id: doc.id // This MUST come after ...data to ensure doc.id is used for deletion
+                };
+            });
             setProducts(productsList);
         } catch (error) {
             console.error("Error fetching products:", error);
@@ -198,8 +203,12 @@ const ProductManagement = () => {
     const handleDuplicate = (product) => {
         const { id, createdAt, updatedAt, ...rest } = product;
         setNewProduct({
+            ...initialFormState,
             ...rest,
-            title: `${rest.title} (Copy)`
+            title: `${rest.title} (Copy)`,
+            colors: Array.isArray(rest.colors) ? rest.colors : [],
+            configGroups: Array.isArray(rest.configGroups) ? rest.configGroups : [],
+            images: Array.isArray(rest.images) ? rest.images : (rest.imageUrl ? [rest.imageUrl] : [])
         });
         setIsEditing(false);
         setCurrentProductId(null);
@@ -276,6 +285,8 @@ const ProductManagement = () => {
             maxHeight: product.maxHeight || 120,
             showMotor: product.showMotor !== undefined ? product.showMotor : true,
             showColor: product.showColor !== undefined ? product.showColor : true,
+            youtubeUrl: product.youtubeUrl || '',
+            isHidden: product.isHidden || false,
         });
         setCurrentProductId(product.id);
         setIsEditing(true);
@@ -283,15 +294,46 @@ const ProductManagement = () => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
-    const handleDeleteClick = async (id) => {
-        if (window.confirm("Are you sure you want to delete this product?")) {
+    const handleDeleteClick = async (productId) => {
+        console.log("handleDeleteClick triggered for:", productId);
+        if (!productId) {
+            alert("Error: Product ID is missing. Cannot delete.");
+            return;
+        }
+
+        const confirmText = "⚠️ Are you sure you want to delete this product? This action is permanent and cannot be undone.";
+        if (window.confirm(confirmText)) {
             try {
-                await deleteDoc(doc(db, "products", id));
-                setProducts(prev => prev.filter(p => p.id !== id));
+                console.log("Attempting to delete document with ID:", productId);
+                
+                // Explicitly reference the document
+                const productRef = doc(db, "products", productId);
+                
+                await deleteDoc(productRef);
+                
+                console.log("Delete successful for ID:", productId);
+                setProducts(prev => prev.filter(p => p.id !== productId));
+                alert("Product successfully deleted from database.");
             } catch (error) {
-                console.error("Error deleting product:", error);
-                alert("Failed to delete product.");
+                console.error("CRITICAL DELETE ERROR:", error);
+                alert(`FAILED TO DELETE PRODUCT.\n\nError Code: ${error.code || 'Unknown'}\nMessage: ${error.message}\n\nNote: Please check Firebase console security rules for the "products" collection.`);
             }
+        }
+    };
+
+    const handleToggleVisibility = async (product) => {
+        try {
+            const newHiddenStatus = !product.isHidden;
+            await updateDoc(doc(db, "products", product.id), {
+                isHidden: newHiddenStatus,
+                updatedAt: new Date().toISOString()
+            });
+            setProducts(prev => prev.map(p => 
+                p.id === product.id ? { ...p, isHidden: newHiddenStatus } : p
+            ));
+        } catch (error) {
+            console.error("Error toggling visibility:", error);
+            alert("Failed to update visibility.");
         }
     };
 
@@ -316,6 +358,8 @@ const ProductManagement = () => {
                 showColor: newProduct.showColor !== undefined ? newProduct.showColor : true,
                 colors: newProduct.colors || [],
                 configGroups: newProduct.configGroups || [],
+                youtubeUrl: newProduct.youtubeUrl || '',
+                isHidden: newProduct.isHidden || false,
                 updatedAt: new Date().toISOString()
             };
 
@@ -733,6 +777,15 @@ const ProductManagement = () => {
                                 />
                                 Show Color Option
                             </label>
+                            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', color: '#d32f2f', fontWeight: '600' }}>
+                                <input
+                                    type="checkbox"
+                                    name="isHidden"
+                                    checked={newProduct.isHidden}
+                                    onChange={(e) => setNewProduct({ ...newProduct, isHidden: e.target.checked })}
+                                />
+                                Hide Product (Private)
+                            </label>
                         </div>
 
                         {/* Size Constraints */}
@@ -755,6 +808,30 @@ const ProductManagement = () => {
                                     <label style={{ fontSize: '0.8rem', color: '#666' }}>Max Height</label>
                                     <input type="number" name="maxHeight" value={newProduct.maxHeight} onChange={handleInputChange} className="form-input" style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ddd' }} />
                                 </div>
+                            </div>
+                        </div>
+
+                        {/* Video Link Support */}
+                        <div style={{ gridColumn: '1 / -1', background: '#f8f9fa', padding: '15px', borderRadius: '8px', border: '1px solid #eee' }}>
+                            <label style={{ display: 'block', marginBottom: '10px', fontWeight: '600', color: '#555' }}>Video Content</label>
+                            <div>
+                                <label style={{ fontSize: '0.8rem', color: '#666' }}>YouTube Video URL</label>
+                                <div style={{ display: 'flex', gap: '10px' }}>
+                                    <input 
+                                        type="text" 
+                                        name="youtubeUrl" 
+                                        value={newProduct.youtubeUrl} 
+                                        onChange={handleInputChange} 
+                                        placeholder="https://www.youtube.com/watch?v=..." 
+                                        style={{ flex: 1, padding: '12px', borderRadius: '4px', border: '1px solid #ddd' }} 
+                                    />
+                                    {newProduct.youtubeUrl && (
+                                        <a href={newProduct.youtubeUrl} target="_blank" rel="noreferrer" style={{ display: 'flex', alignItems: 'center', gap: '5px', color: '#c4302b', textDecoration: 'none', fontWeight: '500', fontSize: '0.9rem' }}>
+                                            <ExternalLink size={16} /> Preview
+                                        </a>
+                                    )}
+                                </div>
+                                <p style={{ fontSize: '0.75rem', color: '#888', marginTop: '5px' }}>Link an installation or product showcase video from YouTube.</p>
                             </div>
                         </div>
 
@@ -894,7 +971,7 @@ const ProductManagement = () => {
 
                             {/* Color List */}
                             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: '10px' }}>
-                                {newProduct.colors.map((c, i) => (
+                                {(newProduct.colors || []).map((c, i) => (
                                     <div key={i} style={{ position: 'relative', border: '1px solid #ddd', borderRadius: '6px', padding: '10px', background: 'white', display: 'flex', flexDirection: 'column', gap: '5px' }}>
                                         <div style={{ height: '80px', background: c.image ? `url(${c.image}) center/cover` : c.hex, borderRadius: '4px', border: '1px solid #eee' }}></div>
                                         <div style={{ fontWeight: '600', fontSize: '0.9rem' }}>{c.name}</div>
@@ -991,7 +1068,7 @@ const ProductManagement = () => {
 
                                     {/* Temp Options List */}
                                     <div style={{ marginTop: '15px', display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                                        {tempConfig.options.map(opt => (
+                                        {(tempConfig.options || []).map(opt => (
                                             <div key={opt.id} style={{ background: 'white', border: '1px solid #ddd', padding: '5px 12px', borderRadius: '20px', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
                                                 <span>{opt.name} (+${opt.price})</span>
                                                 <X size={14} style={{ cursor: 'pointer', color: '#999' }} onClick={() => removeOptionFromTempConfig(opt.id)} />
@@ -1079,7 +1156,12 @@ const ProductManagement = () => {
                                             )}
                                         </td>
                                         <td style={{ padding: '15px' }}>
-                                            <div style={{ fontWeight: '500', color: '#333' }}>{product.title}</div>
+                                            <div style={{ fontWeight: '500', color: '#333' }}>
+                                                {product.title}
+                                                {product.isHidden && (
+                                                    <span style={{ marginLeft: '8px', fontSize: '0.65rem', background: '#333', color: 'white', padding: '2px 6px', borderRadius: '4px', verticalAlign: 'middle' }}>HIDDEN</span>
+                                                )}
+                                            </div>
                                             <div style={{ fontSize: '0.85rem', color: '#777', marginTop: '4px' }}>
                                                 {product.colors && product.colors.length} Colors / Options
                                             </div>
@@ -1112,6 +1194,20 @@ const ProductManagement = () => {
                                         <td style={{ padding: '15px', textAlign: 'right' }}>
                                             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
                                                 <button
+                                                    onClick={() => handleToggleVisibility(product)}
+                                                    style={{
+                                                        padding: '8px',
+                                                        background: 'none',
+                                                        border: product.isHidden ? '1px solid #ddd' : '1px solid #e3f2fd',
+                                                        borderRadius: '4px',
+                                                        cursor: 'pointer',
+                                                        color: product.isHidden ? '#999' : '#1565c0'
+                                                    }}
+                                                    title={product.isHidden ? "Show Product" : "Hide Product"}
+                                                >
+                                                    {product.isHidden ? <EyeOff size={18} /> : <Eye size={18} />}
+                                                </button>
+                                                <button
                                                     onClick={() => handleDuplicate(product)}
                                                     style={{
                                                         padding: '8px',
@@ -1141,7 +1237,10 @@ const ProductManagement = () => {
                                                     <Pencil size={18} />
                                                 </button>
                                                 <button
-                                                    onClick={() => handleDeleteClick(product.id)}
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        handleDeleteClick(product.id);
+                                                    }}
                                                     style={{
                                                         padding: '8px',
                                                         background: 'none',
