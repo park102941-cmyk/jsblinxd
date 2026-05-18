@@ -3,7 +3,7 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { db } from '../lib/firebase';
-import { doc, updateDoc, arrayUnion, getDoc, setDoc, collection, getDocs } from 'firebase/firestore';
+import { doc, updateDoc, arrayUnion, getDoc, setDoc, collection, getDocs, query, where } from 'firebase/firestore';
 import { Star, MessageCircle, Heart, Share2, ChevronLeft, ChevronRight, Check, AlertCircle, ChevronDown, ChevronUp, Loader2, Sparkles, ShieldCheck, Truck, ShieldAlert, Cpu, Rss, Sun, Info, X, Ruler, Maximize2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { orderEngine } from '../lib/orderEngine';
@@ -424,6 +424,33 @@ const ProductDetail = () => {
         } catch (err) {
             console.error("Cart Error:", err);
             alert("Error adding to cart: " + err.message);
+        }
+    };
+
+    const handleOrderSwatch = () => {
+        if (!selectedColor) {
+            alert("Please select a color/fabric first to order a swatch.");
+            setActiveSection('color');
+            return;
+        }
+
+        try {
+            // Construct the swatch product object directly in memory matching Swatches.jsx / Cart.jsx structure
+            const swatchItem = {
+                id: `swatch-${product.id}-${selectedColor.code || selectedColor.name}`,
+                title: `[Swatch] ${product.title} (${selectedColor.name})`,
+                category: product.category?.toLowerCase().includes('zebra') ? 'swatch-zebra' : 'swatch-roller',
+                imageUrl: selectedColor.image || product.imageUrl || product.image || 'https://via.placeholder.com/100',
+                selectedColor: selectedColor.name,
+                isStandalone: true
+            };
+
+            // Add directly to Cart using CartContext addToCart function
+            addToCart(swatchItem, { color: selectedColor }, 9.99, 1);
+            alert(`[Swatch] ${product.title} (${selectedColor.name}) has been added to your cart!`);
+        } catch (err) {
+            console.error("Swatch Cart Error:", err);
+            alert("Error adding swatch to cart: " + err.message);
         }
     };
 
@@ -1123,11 +1150,9 @@ const ProductDetail = () => {
                         (product?.category?.toLowerCase().includes('zebra') || product?.title?.toLowerCase().includes('zebra') ||
                          product?.category?.toLowerCase().includes('roller') || product?.title?.toLowerCase().includes('roller'))
                     ) && (() => {
-                        const isZebraProduct = product?.category?.toLowerCase().includes('zebra') || product?.title?.toLowerCase().includes('zebra');
-                        const swatchCategory = isZebraProduct ? 'swatch-zebra' : 'swatch-roller';
                         return (
                             <button
-                                onClick={() => navigate(`/swatches?productName=${encodeURIComponent(product.title)}&category=${swatchCategory}`)}
+                                onClick={handleOrderSwatch}
                                 style={{
                                     marginTop: '12px',
                                     width: '100%',
@@ -1266,10 +1291,7 @@ const ProductDetail = () => {
                         product?.category?.toLowerCase().includes('roller') || product?.title?.toLowerCase().includes('roller')
                     ) && (
                         <button
-                            onClick={() => {
-                                const isZebraProduct = product?.category?.toLowerCase().includes('zebra') || product?.title?.toLowerCase().includes('zebra');
-                                navigate(`/swatches?productName=${encodeURIComponent(product.title)}&category=${isZebraProduct ? 'swatch-zebra' : 'swatch-roller'}`);
-                            }}
+                            onClick={handleOrderSwatch}
                             style={{ background: 'transparent', color: 'var(--primary-green)', border: '1px solid var(--primary-green)', padding: '8px 16px', borderRadius: '6px', fontWeight: '600', fontSize: '0.78rem' }}
                         >
                             Order Swatch

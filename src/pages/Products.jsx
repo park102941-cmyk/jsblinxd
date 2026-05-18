@@ -26,7 +26,7 @@ const Products = () => {
                 let fetchedProducts = (querySnapshot.docs || []).map(doc => ({
                     id: doc.id,
                     ...doc.data()
-                })).filter(p => !p.isHidden);
+                })).filter(p => !p.isHidden && !p.category?.toLowerCase().startsWith('swatch') && !p.title?.startsWith('[Swatch]'));
 
                 setAllProducts(fetchedProducts);
 

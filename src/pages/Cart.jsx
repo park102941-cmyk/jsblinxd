@@ -44,25 +44,48 @@ const Cart = () => {
                             <div style={{ flex: 1 }}>
                                 <h3 style={{ margin: '0 0 5px 0', fontSize: '1.05rem' }}>{item.product.title}</h3>
                                 <div style={{ fontSize: '0.85rem', color: '#666', display: 'flex', flexDirection: 'column', gap: '3px' }}>
-                                    <p style={{ margin: 0 }}>
-                                        <strong>Size:</strong> {item.product.width}" W x {item.product.height}" H
-                                    </p>
-                                    <p style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '6px' }}>
-                                        <strong>Color:</strong> {item.product.selectedColor} 
-                                        <span style={{ display: 'inline-block', width: '12px', height: '12px', borderRadius: '50%', backgroundColor: item.options?.color?.hex || '#eee', border: '1px solid #ddd' }}></span>
-                                    </p>
-                                    {item.product.room && (
-                                        <p style={{ margin: 0 }}><strong>Room:</strong> {item.product.room}</p>
-                                    )}
-                                    {item.product.mount && (
-                                        <p style={{ margin: 0 }}><strong>Mount:</strong> {item.product.mount === 'inside' ? 'Inside' : 'Outside'}</p>
-                                    )}
-                                    {item.product.customConfigs && Object.entries(item.product.customConfigs).length > 0 && (
-                                        <div style={{ marginTop: '4px', paddingTop: '4px', borderTop: '1px dashed #eee' }}>
-                                            {Object.entries(item.product.customConfigs).map(([key, value]) => (
-                                                <p key={key} style={{ margin: 0, fontSize: '0.75rem' }}>• {key}: {value}</p>
-                                            ))}
-                                        </div>
+                                    {(item.product.isStandalone || 
+                                      item.product.category?.toLowerCase().includes('motor') || 
+                                      item.product.category?.toLowerCase().includes('hub') || 
+                                      item.product.title?.toLowerCase().includes('remote') || 
+                                      item.product.title?.toLowerCase().includes('hub') || 
+                                      item.product.title?.toLowerCase().includes('swatch') ||
+                                      item.product.category?.startsWith('swatch') ||
+                                      item.product.id?.toLowerCase().includes('remote') ||
+                                      item.product.id?.toLowerCase().includes('hub')) ? (
+                                        <>
+                                            {item.product.selectedColor && (
+                                                <p style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                                    <strong>Color:</strong> {item.product.selectedColor}
+                                                    {item.options?.color?.hex && (
+                                                        <span style={{ display: 'inline-block', width: '12px', height: '12px', borderRadius: '50%', backgroundColor: item.options.color.hex, border: '1px solid #ddd' }}></span>
+                                                    )}
+                                                </p>
+                                            )}
+                                        </>
+                                    ) : (
+                                        <>
+                                            <p style={{ margin: 0 }}>
+                                                <strong>Size:</strong> {item.product.width}" W x {item.product.height}" H
+                                            </p>
+                                            <p style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                                <strong>Color:</strong> {item.product.selectedColor} 
+                                                <span style={{ display: 'inline-block', width: '12px', height: '12px', borderRadius: '50%', backgroundColor: item.options?.color?.hex || '#eee', border: '1px solid #ddd' }}></span>
+                                            </p>
+                                            {item.product.room && (
+                                                <p style={{ margin: 0 }}><strong>Room:</strong> {item.product.room}</p>
+                                            )}
+                                            {item.product.mount && (
+                                                <p style={{ margin: 0 }}><strong>Mount:</strong> {item.product.mount === 'inside' ? 'Inside' : 'Outside'}</p>
+                                            )}
+                                            {item.product.customConfigs && Object.entries(item.product.customConfigs).length > 0 && (
+                                                <div style={{ marginTop: '4px', paddingTop: '4px', borderTop: '1px dashed #eee' }}>
+                                                    {Object.entries(item.product.customConfigs).map(([key, value]) => (
+                                                        <p key={key} style={{ margin: 0, fontSize: '0.75rem' }}>• {key}: {value}</p>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </>
                                     )}
                                 </div>
                             </div>

@@ -94,7 +94,7 @@ const Home = () => {
                 const productsSnap = await getDocs(collection(db, "products"));
                 const products = productsSnap.docs
                     .map(doc => ({ id: doc.id, ...doc.data() }))
-                    .filter(p => !p.isHidden);
+                    .filter(p => !p.isHidden && !p.category?.toLowerCase().startsWith('swatch') && !p.title?.startsWith('[Swatch]'));
                 setBestSellers(products.slice(0, 4));
             } catch (error) {
                 console.error("Error fetching home data:", error);

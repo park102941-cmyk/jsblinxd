@@ -22,6 +22,7 @@ const Search = () => {
                 const allProducts = productSnaps.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
                 const filteredProducts = allProducts.filter(p => {
+                    if (p.isHidden || p.category?.toLowerCase().startsWith('swatch') || p.title?.startsWith('[Swatch]')) return false;
                     const titleMatch = (p.title || p.name || '').toLowerCase().includes(query.toLowerCase());
                     const categoryMatch = (p.category || '').toLowerCase().includes(query.toLowerCase());
                     const descriptionMatch = (p.description || '').toLowerCase().includes(query.toLowerCase());
