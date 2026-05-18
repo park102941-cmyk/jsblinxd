@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, Outlet } from 'react-router-dom';
-import { PieChart, Users, Package, ShoppingBag, Layout, FileText, ArrowLeftRight, Sheet, ExternalLink, BarChart3, PackageSearch, Bell, Sparkles, UserCog, List, Upload, Mail } from 'lucide-react';
+import { PieChart, Users, Package, ShoppingBag, Layout, FileText, ArrowLeftRight, Sheet, ExternalLink, BarChart3, PackageSearch, Bell, Sparkles, UserCog, List, Upload, Mail, Image } from 'lucide-react';
 
 const AdminDashboard = () => {
     return (
@@ -103,6 +103,11 @@ const AdminDashboard = () => {
                         <li style={{ marginBottom: '10px' }}>
                             <Link to="/admin/content" style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px', color: 'var(--secondary-color)', borderRadius: '4px' }}>
                                 <FileText size={18} /> Page Content
+                            </Link>
+                        </li>
+                        <li style={{ marginBottom: '10px' }}>
+                            <Link to="/admin/gallery" style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px', color: 'var(--secondary-color)', borderRadius: '4px', background: '#ffebee', fontWeight: 'bold' }}>
+                                <Image size={18} color="#e53e3e" /> 갤러리 관리 🖼️
                             </Link>
                         </li>
 

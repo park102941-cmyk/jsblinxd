@@ -81,6 +81,7 @@ const CategoryManagement = lazy(() => import('./pages/admin/CategoryManagement')
 const ZshineProductImporter = lazy(() => import('./pages/admin/ZshineProductImporter'));
 const ProductImporter = lazy(() => import('./pages/admin/ProductImporter'));
 const EmailManagement = lazy(() => import('./pages/admin/EmailManagement'));
+const GalleryManagement = lazy(() => import('./pages/admin/GalleryManagement'));
 
 import { db } from './lib/firebase';
 import { doc, getDoc } from 'firebase/firestore';
@@ -211,6 +212,7 @@ function App() {
                       <Route path="home-edit" element={<HomeManagement />} />
                       <Route path="categories" element={<CategoryManagement />} />
                       <Route path="content" element={<ContentManagement />} />
+                      <Route path="gallery" element={<GalleryManagement />} />
                       <Route path="email-management" element={<EmailManagement />} />
                     </Route>
                   </Routes>
