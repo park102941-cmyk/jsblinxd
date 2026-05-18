@@ -92,6 +92,7 @@ const Footer = () => {
                         <ul className="footer-links">
                             <li><Link to="/products?category=roller">Roller Shades</Link></li>
                             <li><Link to="/products?category=zebra">Zebra Shades</Link></li>
+                            <li><Link to="/products?category=motor">Accessories</Link></li>
                         </ul>
                     </div>
 
