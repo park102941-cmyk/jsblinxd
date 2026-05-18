@@ -180,18 +180,22 @@ const ContentManagement = () => {
     };
 
     const handleDeleteGalleryItem = async (id) => {
-        if (!window.confirm("Are you sure you want to delete this installation photo from the Lookbook Gallery?")) {
+        if (!window.confirm("정말로 이 시공 사진을 룩북 갤러리에서 삭제하시겠습니까?")) {
             return;
         }
 
         setLoading(true);
+        console.log("Attempting to delete lookbook item from Firestore (ContentManagement) with ID:", id);
         try {
-            await deleteDoc(doc(db, "gallery_items", id));
+            const docRef = doc(db, "gallery_items", id);
+            await deleteDoc(docRef);
+            
+            console.log("Successfully deleted document from Firestore collection 'gallery_items' (ContentManagement) with ID:", id);
             setGalleryItems(prev => prev.filter(item => item.id !== id));
-            alert("Photo deleted successfully.");
+            alert("삭제 완료되었습니다! 🖼️");
         } catch (error) {
-            console.error("Error deleting lookbook photo:", error);
-            alert("Failed to delete.");
+            console.error("CRITICAL LOOKBOOK DELETE ERROR:", error);
+            alert(`시공 사진 삭제 실패!\n\n오류 코드: ${error.code || 'Unknown'}\n오류 메시지: ${error.message}\n\n💡 도움말: Firestore 보안 규칙(Rules)에서 'gallery_items' 컬렉션의 'delete' 권한이 허용되어 있는지 확인해 주세요. (예: allow delete: if true;)`);
         } finally {
             setLoading(false);
         }
