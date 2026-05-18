@@ -40,7 +40,7 @@ const Cart = () => {
                             paddingBottom: '20px',
                             borderBottom: '1px solid #eee'
                         }}>
-                            <img src={item.product.imageUrl || 'https://via.placeholder.com/100'} alt={item.product.title} style={{ width: '100px', height: '100px', objectFit: 'cover', borderRadius: '4px' }} />
+                            <img src={item.product.imageUrl || item.product.image || 'https://via.placeholder.com/100'} alt={item.product.title} style={{ width: '100px', height: '100px', objectFit: 'cover', borderRadius: '4px' }} />
                             <div style={{ flex: 1 }}>
                                 <h3 style={{ margin: '0 0 5px 0', fontSize: '1.05rem' }}>{item.product.title}</h3>
                                 <div style={{ fontSize: '0.85rem', color: '#666', display: 'flex', flexDirection: 'column', gap: '3px' }}>

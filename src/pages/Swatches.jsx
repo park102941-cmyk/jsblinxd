@@ -89,8 +89,8 @@ const Swatches = () => {
                         key={product.id}
                         id={product.id}
                         title={product.title}
-                        price={product.basePrice || 9.99}
-                        image={product.imageUrl}
+                        price={product.basePrice !== undefined ? product.basePrice : (product.price || 9.99)}
+                        image={product.imageUrl || product.image}
                         badge={product.badge}
                         reviews={product.reviews || 0}
                         questions={product.questions || 0}

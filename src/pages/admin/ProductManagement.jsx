@@ -272,10 +272,10 @@ const ProductManagement = () => {
         setNewProduct({
             title: product.title || '',
             category: product.category || 'wood',
-            basePrice: product.basePrice || 0,
+            basePrice: product.basePrice !== undefined ? product.basePrice : (product.price || 0),
             description: product.description || '',
-            imageUrl: product.imageUrl || '',
-            images: product.images || [],
+            imageUrl: product.imageUrl || product.image || '',
+            images: product.images && product.images.length > 0 ? product.images : (product.image ? [product.image] : []),
             colors: formattedColors,
             configGroups: product.configGroups || [],
             sizeRatio: product.sizeRatio || 0,
@@ -349,6 +349,9 @@ const ProductManagement = () => {
             const productData = {
                 ...newProduct,
                 basePrice: Number(newProduct.basePrice) || 0,
+                price: Number(newProduct.basePrice) || 0, // Legacy/Smart Tech compatibility
+                imageUrl: newProduct.imageUrl || '',
+                image: newProduct.imageUrl || '', // Legacy/Smart Tech compatibility
                 sizeRatio: parseFloat(newProduct.sizeRatio) || 0,
                 minWidth: Number(newProduct.minWidth) || 0,
                 maxWidth: Number(newProduct.maxWidth) || 0,
@@ -1147,8 +1150,8 @@ const ProductManagement = () => {
                                 return (
                                     <tr key={product.id} style={{ borderBottom: '1px solid #eee' }}>
                                         <td style={{ padding: '15px', width: '80px' }}>
-                                            {product.imageUrl ? (
-                                                <img src={product.imageUrl} alt={product.title} style={{ width: '60px', height: '60px', objectFit: 'cover', borderRadius: '4px' }} />
+                                            {product.imageUrl || product.image ? (
+                                                <img src={product.imageUrl || product.image} alt={product.title} style={{ width: '60px', height: '60px', objectFit: 'cover', borderRadius: '4px' }} />
                                             ) : (
                                                 <div style={{ width: '60px', height: '60px', background: '#eee', borderRadius: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#999' }}>
                                                     <ImageIcon size={24} />
@@ -1175,11 +1178,11 @@ const ProductManagement = () => {
                                                 fontSize: '0.8rem',
                                                 textTransform: 'capitalize'
                                             }}>
-                                                {product.category}
+                                                {categories.find(c => c.id === product.category)?.name || product.category}
                                             </span>
                                         </td>
                                         <td style={{ padding: '15px', fontWeight: '500' }}>
-                                            ${product.basePrice}
+                                            ${product.basePrice !== undefined ? product.basePrice : (product.price !== undefined ? product.price : '0')}
                                         </td>
                                         <td style={{ padding: '15px', textAlign: 'center' }}>
                                             {hasStock ? (

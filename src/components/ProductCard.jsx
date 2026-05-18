@@ -125,7 +125,9 @@ const ProductCard = ({ id, title, price, originalPrice, image, badge, reviews, c
 
                     {/* Price */}
                     <div style={{ marginTop: 'auto', display: 'flex', alignItems: 'baseline', gap: '8px' }}>
-                        <span style={{ color: '#1d1d1f', fontWeight: '600', fontSize: '1.15rem' }}>From ${price}</span>
+                        <span style={{ color: '#1d1d1f', fontWeight: '600', fontSize: '1.15rem' }}>
+                            {badge === 'Smart' || title?.toLowerCase().includes('remote') || title?.toLowerCase().includes('hub') ? `$${price}` : `From $${price}`}
+                        </span>
                         {originalPrice && (
                             <span style={{ color: '#86868b', textDecoration: 'line-through', fontSize: '0.9rem' }}>${originalPrice}</span>
                         )}

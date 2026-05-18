@@ -89,9 +89,9 @@ const ProductDetail = () => {
                     // Pre-calculate images array for effects
                     const prodImages = data.images && data.images.length > 0 
                         ? data.images 
-                        : data.imageUrl 
-                            ? [data.imageUrl] 
-                            : ["https://via.placeholder.com/600x600/f5f5f5/333?text=No+Image"];
+                        : (data.imageUrl || data.image) 
+                            ? [data.imageUrl || data.image] 
+                            : ["https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&q=80&w=800"];
                     
                     if (!mainImageUrl && prodImages.length > 0) {
                         setMainImageUrl(prodImages[0]);
@@ -204,9 +204,9 @@ const ProductDetail = () => {
 
     const images = product?.images && product.images.length > 0 
         ? product.images 
-        : product?.imageUrl 
-            ? [product.imageUrl] 
-            : ["https://via.placeholder.com/600x600/f5f5f5/333?text=No+Image"];
+        : (product?.imageUrl || product?.image) 
+            ? [product.imageUrl || product.image] 
+            : ["https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&q=80&w=800"];
 
     // Handle Image Switching logic
     useEffect(() => {
@@ -254,7 +254,7 @@ const ProductDetail = () => {
         const w = parseFloat(width || 0) + parseFloat(widthFraction);
         const h = parseFloat(height || 0) + parseFloat(heightFraction);
         
-        if (w <= 0 || h <= 0) return (product.basePrice || 9.99).toFixed(2);
+        if (w <= 0 || h <= 0) return (product.basePrice || product.price || 9.99).toFixed(2);
 
         // 1. Calculate Base Price via Engine
         const result = orderEngine.calculateOrder({
@@ -423,8 +423,8 @@ const ProductDetail = () => {
                 favorites: arrayUnion({
                     id: id,
                     title: product.title,
-                    price: product.basePrice || 0,
-                    image: product.imageUrl || (product.colors && product.colors[0]?.image) || ""
+                    price: product.basePrice || product.price || 0,
+                    image: product.imageUrl || product.image || (product.colors && product.colors[0]?.image) || ""
                 })
             }, { merge: true });
             

@@ -49,41 +49,17 @@ const SidebarFilter = ({ categories }) => {
     const [searchParams] = useSearchParams();
     const currentCategory = searchParams.get('category');
 
-    const productCategories = [
-        { label: "All Collections", key: null },
+    const displayCategories = [
         { label: "Roller Shades", key: "roller" },
-        { label: "Zebra Shades", key: "zebra" }
+        { label: "Zebra Shades", key: "zebra" },
+        { label: "Accessories", key: "motor" }
     ];
-
-    const techCategories = [
-        { label: "Matter & Thread", key: "matter" },
-        { label: "Apple HomeKit", key: "homekit" },
-        { label: "Remotes & Hubs", key: "motor" }
-    ];
-
-    const displayCategories = (categories && categories.length > 0) 
-        ? categories
-            .filter(c => ['roller', 'zebra'].includes(c.id?.toLowerCase()))
-            .map(c => ({ label: c.name || c.title, key: c.id || c.key })) 
-        : productCategories;
 
     return (
         <div style={{ paddingRight: '10px' }}>
             {/* Main Collections */}
             <FilterSection title="Collections">
                 {displayCategories.map((cat, index) => (
-                    <CategoryLink
-                        key={index}
-                        label={cat.label}
-                        categoryKey={cat.key}
-                        currentCategory={currentCategory}
-                    />
-                ))}
-            </FilterSection>
-
-            {/* Tech Categories */}
-            <FilterSection title="Remotes & Smart Tech" defaultOpen={true}>
-                {techCategories.map((cat, index) => (
                     <CategoryLink
                         key={index}
                         label={cat.label}

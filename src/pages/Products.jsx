@@ -26,7 +26,8 @@ const Products = () => {
                 if (categoryFilter) {
                     fetchedProducts = fetchedProducts.filter(p => {
                         const productCategory = p.category?.toLowerCase() || '';
-                        const filter = categoryFilter.toLowerCase();
+                        let filter = categoryFilter.toLowerCase();
+                        if (filter === 'accessories') filter = 'motor';
                         // Support both exact match and partial match
                         // e.g., "zebra" matches "Zebra Shades"
                         return productCategory === filter || productCategory.includes(filter);
@@ -51,17 +52,17 @@ const Products = () => {
 
     // Extended Title Mapping for Smartwings Variety
     const getPageTitle = () => {
-        const foundCategory = categories.find(c => c.id === categoryFilter?.toLowerCase());
+        const lowerFilter = categoryFilter?.toLowerCase();
+        if (lowerFilter === 'motor' || lowerFilter === 'accessories') return 'Accessories';
+
+        const foundCategory = categories.find(c => c.id === lowerFilter);
         if (foundCategory) return foundCategory.name;
 
         const titles = {
             'zebra': 'Zebra Shades',
-            'roller': 'Roller Shades',
-            'motor': 'Motorized Blinds',
-            'matter': 'Matter & Thread Tech',
-            'homekit': 'Apple HomeKit Blinds'
+            'roller': 'Roller Shades'
         };
-        return titles[categoryFilter?.toLowerCase()] || 'All Collections';
+        return titles[lowerFilter] || 'All Collections';
     };
 
     const breadcrumbs = ["Collection", getPageTitle()];
@@ -76,8 +77,8 @@ const Products = () => {
             key={product.id}
             id={product.id}
             title={product.title || 'Untitled Product'}
-            price={product.basePrice || 0}
-            image={product.imageUrl}
+            price={product.basePrice !== undefined ? product.basePrice : (product.price || 0)}
+            image={product.imageUrl || product.image}
             badge={product.badge || (product.category === 'motor' ? 'Smart' : null)}
             reviews={product.reviews || 0}
             colors={product.showColor !== false ? extractColorImages(product.colors) : []}
