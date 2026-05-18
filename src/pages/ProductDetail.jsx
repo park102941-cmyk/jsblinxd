@@ -4,7 +4,7 @@ import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { db } from '../lib/firebase';
 import { doc, updateDoc, arrayUnion, getDoc, setDoc } from 'firebase/firestore';
-import { Star, MessageCircle, Heart, Share2, ChevronLeft, ChevronRight, Check, AlertCircle, ChevronDown, ChevronUp, Loader2, Sparkles, ShieldCheck, Truck, ShieldAlert, Cpu, Rss, Sun, Info, X, Ruler } from 'lucide-react';
+import { Star, MessageCircle, Heart, Share2, ChevronLeft, ChevronRight, Check, AlertCircle, ChevronDown, ChevronUp, Loader2, Sparkles, ShieldCheck, Truck, ShieldAlert, Cpu, Rss, Sun, Info, X, Ruler, Maximize2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { orderEngine } from '../lib/orderEngine';
 import OrderingGuide from '../components/OrderingGuide';
@@ -1321,6 +1321,177 @@ const ProductDetail = () => {
                     </div>
                 </div>
             )}
+
+            {/* Customer Installation Showcase Section */}
+            {(() => {
+                const isMotor = product.category === 'motor' || product.title?.toLowerCase().includes('remote') || product.title?.toLowerCase().includes('bridge') || product.title?.toLowerCase().includes('hub') || product.title?.toLowerCase().includes('wand') || product.title?.toLowerCase().includes('charger');
+                const isZebra = product.category === 'zebra' || product.title?.toLowerCase().includes('zebra');
+                const isRoller = product.category === 'roller' || product.title?.toLowerCase().includes('roller');
+                
+                const titleLower = product.title?.toLowerCase() || '';
+                const descLower = product.description?.toLowerCase() || '';
+                const tags = Array.isArray(product.tags) ? product.tags.map(t => t.toLowerCase()) : [];
+                
+                const isBlackout = tags.includes('blackout') || titleLower.includes('blackout') || descLower.includes('blackout');
+                
+                let selectedRefs = [];
+                let categoryLabel = "";
+                
+                if (isMotor) {
+                    categoryLabel = "Smart Devices & Accessories";
+                    selectedRefs = [
+                        { title: 'Bond Bridge Home Smart Hub', image: '/images/bond_bridge.png', desc: 'Smart wings hub integrated perfectly in home office.' },
+                        { title: 'Smart Automation Remote Hub', image: '/images/smart-tech.png', desc: 'Low-power multi-channel remote wand control panel.' },
+                        { title: 'Rechargeable Smart Motor Wand', image: '/images/lift_motorized.png', desc: 'Heavy duty rechargeable wand concealed nicely behind headrail.' }
+                    ];
+                } else if (isZebra) {
+                    if (isBlackout) {
+                        categoryLabel = "Blackout Zebra Shades";
+                        selectedRefs = [
+                            { title: 'Modern Living Zebra Blackout', image: '/images/gallery/media_c2491bc7-c990-420c-a66b-cfde0360a96d_1779116619667.png', desc: 'Installed in dynamic 50% opacity block mode in modern white cozy living rooms.' },
+                            { title: 'High-Ceiling Living Room Zebra Blackout', image: '/images/gallery/media_c2491bc7-c990-420c-a66b-cfde0360a96d_1779116622344.png', desc: 'Installed on double height vertical glass frame architectural sections.' },
+                            { title: 'Elegant Bay Windows Zebra Blackout', image: '/images/gallery/media_c2491bc7-c990-420c-a66b-cfde0360a96d_1779116624739.png', desc: 'Beautiful beige blackout zebra shades with high alignment precision in bedroom.' },
+                            { title: 'Luxury Double-Height Zebra Blackout', image: '/images/gallery/media_c2491bc7-c990-420c-a66b-cfde0360a96d_1779116630201.png', desc: 'Dark woven blackout shades blocking severe heat and UV rays perfectly.' }
+                        ];
+                    } else {
+                        categoryLabel = "Light Filtering Zebra Shades";
+                        selectedRefs = [
+                            { title: 'Apache Golden Zebra', image: '/images/products/jdx-zebra-apache-1.png', desc: 'Rich golden stripes filtering daylight into a luxurious workspace.' },
+                            { title: 'Las Colinas Cream Zebra', image: '/images/products/jdx-zebra-las-colinas-1.png', desc: 'Diffusing daylight while offering complete structural privacy.' },
+                            { title: 'Legacy Silver Zebra', image: '/images/products/jdx-zebra-legacy-1.png', desc: 'Modern silver grey stripe pattern for urban apartment glass frameworks.' }
+                        ];
+                    }
+                } else if (isRoller) {
+                    if (isBlackout) {
+                        categoryLabel = "Blackout Roller Shades";
+                        selectedRefs = [
+                            { title: 'Midnight Premium Blackout Roller', image: '/images/products/jdx-roller-blackout.png', desc: '100% blackout backing installed in master bedrooms.' },
+                            { title: 'Eldorado Slate Blackout Roller', image: '/images/products/jdx-roller-eldorado-2.png', desc: 'Deep grey heavy-duty weave blocking severe external reflections.' }
+                        ];
+                    } else {
+                        categoryLabel = "Light Filtering Roller Shades";
+                        selectedRefs = [
+                            { title: 'Eldorado Soft Cream Roller', image: '/images/products/jdx-roller-eldorado-1.png', desc: 'Translucent material filtering daylight beautifully in dining areas.' },
+                            { title: 'Pure White Light-Filtering Roller', image: '/images/products/jdx-roller-light-filtering.png', desc: 'Clean white roller shading diffusing morning glare in open kitchens.' }
+                        ];
+                    }
+                }
+                
+                if (selectedRefs.length === 0) return null;
+                
+                return (
+                    <div style={{
+                        marginTop: '60px',
+                        padding: '40px 24px',
+                        background: '#ffffff',
+                        borderRadius: '24px',
+                        boxShadow: '0 8px 30px rgba(0,0,0,0.03)',
+                        border: '1px solid #f0f0f2',
+                        marginBottom: '40px'
+                    }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', flexWrap: 'wrap', gap: '16px' }}>
+                            <div>
+                                <span style={{
+                                    fontSize: '0.8rem',
+                                    fontWeight: '700',
+                                    color: 'var(--primary-green)',
+                                    textTransform: 'uppercase',
+                                    letterSpacing: '1.5px',
+                                    display: 'block',
+                                    marginBottom: '4px'
+                                }}>
+                                    In Real Homes ({categoryLabel})
+                                </span>
+                                <h3 style={{ fontSize: '1.6rem', fontWeight: '800', color: '#1d1d1f', margin: 0, letterSpacing: '-0.5px' }}>
+                                    Customer Installation & Reference Photos
+                                </h3>
+                            </div>
+                            
+                            <Link 
+                                to="/gallery" 
+                                style={{
+                                    fontSize: '0.9rem',
+                                    fontWeight: '600',
+                                    color: 'var(--primary-green)',
+                                    textDecoration: 'none'
+                                }}
+                            >
+                                View Full Lookbook Gallery →
+                            </Link>
+                        </div>
+                        
+                        <p style={{ color: '#86868b', fontSize: '0.95rem', lineHeight: '1.6', margin: '0 0 30px 0', maxWidth: '700px' }}>
+                            Take design inspiration from how our customers set up these exact products inside their home decors. Click on any photo to view in high resolution.
+                        </p>
+                        
+                        {/* Reference Grid */}
+                        <div style={{
+                            display: 'grid',
+                            gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))',
+                            gap: '20px'
+                        }}>
+                            {selectedRefs.map((ref, idx) => (
+                                <div 
+                                    key={idx}
+                                    onClick={() => {
+                                        setMainImageUrl(ref.image);
+                                        setIsLightboxOpen(true);
+                                    }}
+                                    style={{
+                                        borderRadius: '16px',
+                                        overflow: 'hidden',
+                                        background: '#f5f5f7',
+                                        cursor: 'pointer',
+                                        boxShadow: '0 4px 15px rgba(0,0,0,0.02)',
+                                        border: '1px solid #f5f5f7',
+                                        transition: 'transform 0.3s ease, box-shadow 0.3s ease'
+                                    }}
+                                    onMouseEnter={(e) => {
+                                        e.currentTarget.style.transform = 'translateY(-4px)';
+                                        e.currentTarget.style.boxShadow = '0 8px 24px rgba(0,0,0,0.06)';
+                                    }}
+                                    onMouseLeave={(e) => {
+                                        e.currentTarget.style.transform = 'translateY(0)';
+                                        e.currentTarget.style.boxShadow = '0 4px 15px rgba(0,0,0,0.02)';
+                                    }}
+                                >
+                                    <div style={{ width: '100%', paddingTop: '100%', position: 'relative', overflow: 'hidden' }}>
+                                        <img 
+                                            src={ref.image} 
+                                            alt={ref.title} 
+                                            loading="lazy"
+                                            style={{
+                                                position: 'absolute',
+                                                top: 0,
+                                                left: 0,
+                                                width: '100%',
+                                                height: '100%',
+                                                objectFit: 'cover'
+                                            }}
+                                        />
+                                        <div style={{
+                                            position: 'absolute',
+                                            bottom: 0,
+                                            left: 0,
+                                            right: 0,
+                                            background: 'linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0) 100%)',
+                                            padding: '16px 12px 12px 12px',
+                                            color: '#ffffff'
+                                        }}>
+                                            <h4 style={{ margin: '0 0 4px 0', fontSize: '0.9rem', fontWeight: '700', textOverflow: 'ellipsis', whiteSpace: 'nowrap', overflow: 'hidden' }}>
+                                                {ref.title}
+                                            </h4>
+                                            <p style={{ margin: 0, fontSize: '0.75rem', opacity: 0.85, textOverflow: 'ellipsis', whiteSpace: 'nowrap', overflow: 'hidden' }}>
+                                                {ref.desc}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                );
+            })()}
 
             {/* Full Screen Image Lightbox */}
             {isLightboxOpen && (
