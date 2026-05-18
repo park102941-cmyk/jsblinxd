@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { db } from '../../lib/firebase';
 import { doc, getDoc, setDoc, collection, getDocs, addDoc, deleteDoc } from 'firebase/firestore';
 import { Save, Loader, Trash2, Plus, Image as ImageIcon, ExternalLink, RefreshCw } from 'lucide-react';
+import ImageUploader from '../../components/ImageUploader';
 
 const GALLERY_CATEGORIES = [
   { id: 'light-zebra', name: 'Zebra (Light Filter)' },
@@ -136,21 +137,6 @@ const ContentManagement = () => {
             category: catId,
             link: defaultLink
         }));
-    };
-
-    const handleFileChange = (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-
-        if (file.size > 900 * 1024) {
-            alert("Notice: File size is quite large. To ensure lightning-fast loading for customers, we recommend lookbook photos stay under 900KB.");
-        }
-
-        const reader = new FileReader();
-        reader.onloadend = () => {
-            setNewItem(prev => ({ ...prev, image: reader.result }));
-        };
-        reader.readAsDataURL(file);
     };
 
     const handleAddGalleryItem = async (e) => {
@@ -472,64 +458,12 @@ const ContentManagement = () => {
                             </div>
 
                             <div style={{ marginBottom: '20px' }}>
-                                <label style={{ display: 'block', marginBottom: '6px', fontSize: '0.85rem', fontWeight: '600', color: '#444' }}>Image Selection *</label>
-                                
-                                <div style={{ display: 'flex', gap: '8px', marginBottom: '10px' }}>
-                                    <input 
-                                        type="file"
-                                        accept="image/*"
-                                        id="gallery-file-picker"
-                                        onChange={handleFileChange}
-                                        style={{ display: 'none' }}
-                                    />
-                                    <label 
-                                        htmlFor="gallery-file-picker"
-                                        style={{
-                                            flex: 1,
-                                            padding: '10px',
-                                            border: '1px dashed #999',
-                                            borderRadius: '6px',
-                                            textAlign: 'center',
-                                            cursor: 'pointer',
-                                            fontWeight: '500',
-                                            fontSize: '0.8rem',
-                                            background: '#f8f9fa',
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'center',
-                                            gap: '6px',
-                                            color: '#555'
-                                        }}
-                                    >
-                                        <ImageIcon size={14} />
-                                        Upload Image File
-                                    </label>
-                                </div>
-
-                                <div style={{ fontSize: '0.85rem', color: '#555', textAlign: 'center', margin: '8px 0', fontWeight: 'bold' }}>OR</div>
-
-                                <input 
-                                    type="text"
-                                    value={newItem.image.startsWith('data:') ? '' : newItem.image}
-                                    onChange={(e) => setNewItem(prev => ({ ...prev, image: e.target.value }))}
-                                    placeholder="Paste Image URL directly (e.g. /images/...)"
-                                    style={{ width: '100%', padding: '10px', border: '1px solid #ddd', borderRadius: '6px', fontSize: '0.85rem' }}
+                                <ImageUploader 
+                                    onUploadComplete={(url) => setNewItem(prev => ({ ...prev, image: url }))}
+                                    currentImageUrl={newItem.image}
+                                    label="Lookbook Photo (Cloudinary Upload) *"
                                 />
                             </div>
-
-                            {/* Image Preview Card */}
-                            {newItem.image && (
-                                <div style={{ marginBottom: '20px', border: '1px solid #eee', padding: '10px', borderRadius: '8px', background: '#fafafa' }}>
-                                    <span style={{ fontSize: '0.75rem', fontWeight: 'bold', color: '#777', display: 'block', marginBottom: '6px' }}>Image Preview:</span>
-                                    <div style={{ position: 'relative', width: '100%', paddingTop: '75%', borderRadius: '4px', overflow: 'hidden', background: '#eee' }}>
-                                        <img 
-                                            src={newItem.image} 
-                                            alt="Preview" 
-                                            style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover' }} 
-                                        />
-                                    </div>
-                                </div>
-                            )}
 
                             <button 
                                 type="submit"
