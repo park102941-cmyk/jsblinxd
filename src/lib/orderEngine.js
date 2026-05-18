@@ -26,7 +26,8 @@ export class JSBlindOrderEngine {
     mountType = "inside",
     motorType = "standard", // standard, zigbee, alexa, matter
     solarPanel = false,
-    remoteType = "none" // none, 1-channel, 5-channel, 15-channel
+    remoteType = "none", // none, 1-channel, 5-channel, 15-channel
+    basePrice = null
   }) {
     // 1. Basic CM conversion for manufacturing
     const widthCm = Number((widthInch * this.inchToCm).toFixed(4));
@@ -37,7 +38,8 @@ export class JSBlindOrderEngine {
     const finalHeightCm = Number((heightCm + 5.0).toFixed(4));
 
     // 3. Smartwings-style Pricing Logic
-    let totalPrice = this.BASE_PRICE;
+    const currentBasePrice = basePrice !== null ? Number(basePrice) : this.BASE_PRICE;
+    let totalPrice = currentBasePrice;
 
     // Size Surcharges
     if (widthInch > this.BASE_WIDTH) {
@@ -84,8 +86,8 @@ export class JSBlindOrderEngine {
       "Final Height CM": finalHeightCm,
       "Fabric Code": fabricCode,
       Mount: mountType === "inside" ? "Inside Mount" : "Outside Mount",
-      "Base Price": this.BASE_PRICE,
-      "Size Surcharge": totalPrice - this.BASE_PRICE - motorSurcharge - remoteSurcharge - (solarPanel ? 49 : 0),
+      "Base Price": currentBasePrice,
+      "Size Surcharge": totalPrice - currentBasePrice - motorSurcharge - remoteSurcharge - (solarPanel ? 49 : 0),
       "Motor Surcharge": motorSurcharge,
       "Remote Surcharge": remoteSurcharge,
       "Total Price": Number(totalPrice.toFixed(2)),

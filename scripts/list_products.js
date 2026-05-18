@@ -19,7 +19,8 @@ async function listProducts() {
     console.log("Listing all products in Firestore:");
     const snapshot = await getDocs(collection(db, "products"));
     snapshot.forEach(d => {
-        console.log(`- ID: ${d.id} | Title: ${d.data().title}`);
+        const data = d.data();
+        console.log(`- Title: ${data.title} | BasePrice: ${data.basePrice} | Price: ${data.price} | Category: ${data.category}`);
     });
 }
 

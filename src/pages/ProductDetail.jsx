@@ -279,7 +279,8 @@ const ProductDetail = () => {
             motorType: motorType,
             remoteType: remoteType,
             solarPanel: solarPanel,
-            hub: bondBridge
+            hub: bondBridge,
+            basePrice: product.basePrice || product.price
         });
 
         let totalPrice = result?.["Total Price"] || 0;
@@ -360,7 +361,8 @@ const ProductDetail = () => {
                 mountType: mountType,
                 motorType: motorType,
                 remoteType: remoteType,
-                solarPanel: solarPanel
+                solarPanel: solarPanel,
+                basePrice: product.basePrice || product.price
             });
 
             // Resolve custom config details for cart display
