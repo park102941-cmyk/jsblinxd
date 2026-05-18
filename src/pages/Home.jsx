@@ -247,12 +247,6 @@ const Home = () => {
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                             <div style={{ position: 'relative', height: '500px', backgroundColor: '#f5f5f7', borderRadius: '24px', overflow: 'hidden' }}>
                                 <img src={homeData.techHighlight.imageUrl} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="Smart Tech" />
-                                <div style={{ position: 'absolute', bottom: '20px', left: '20px', right: '20px', background: 'rgba(255,255,255,0.9)', backdropFilter: 'blur(10px)', padding: '20px', borderRadius: '15px', border: '1px solid rgba(255,255,255,0.3)', boxShadow: '0 10px 30px rgba(0,0,0,0.1)' }}>
-                                    <h4 style={{ fontSize: '12px', fontWeight: '700', color: '#ff3b30', marginBottom: '5px', textTransform: 'uppercase' }}>⚠️ Remote Technical Notice</h4>
-                                    <p style={{ fontSize: '11px', color: '#1d1d1f', lineHeight: '1.4', margin: 0 }}>
-                                        Fixed code (433.92 MHz) only. Not compatible with rolling code motors. Battery not included.
-                                    </p>
-                                </div>
                             </div>
                             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '15px' }}>
                                 <div style={{ height: '140px', background: '#fff', borderRadius: '15px', overflow: 'hidden', border: '1px solid #eee' }}>
