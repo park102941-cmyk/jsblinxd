@@ -146,21 +146,11 @@ const Gallery = () => {
     const fetchGallery = async () => {
       try {
         const querySnapshot = await getDocs(collection(db, "gallery_items"));
-        let itemsList = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        
-        if (itemsList.length === 0) {
-          // Initialize gallery collection
-          const promises = INITIAL_GALLERY_ITEMS.map(item => 
-            setDoc(doc(db, "gallery_items", item.id), item)
-          );
-          await Promise.all(promises);
-          itemsList = [...INITIAL_GALLERY_ITEMS];
-        }
-        
+        const itemsList = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         setGalleryItems(itemsList);
       } catch (error) {
         console.error("Error loading lookbook gallery:", error);
-        setGalleryItems(INITIAL_GALLERY_ITEMS);
+        setGalleryItems([]);
       } finally {
         setLoading(false);
       }
