@@ -10,7 +10,7 @@ export class JSBlindOrderEngine {
     this.BASE_PRICE = 189.99;
     this.BASE_WIDTH = 23;
     this.BASE_HEIGHT = 29;
-    this.WIDTH_SURCHARGE_PER_INCH = 0.70; // 가로 초과 1인치당 $0.70
+    this.WIDTH_SURCHARGE_PER_INCH = 0.50; // 가로 초과 1인치당 $0.50
     this.HEIGHT_SURCHARGE_PER_INCH = 0.50; // 세로 초과 1인치당 $0.50
   }
 
