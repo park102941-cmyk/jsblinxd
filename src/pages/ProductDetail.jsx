@@ -3,7 +3,7 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { db } from '../lib/firebase';
-import { doc, updateDoc, arrayUnion, getDoc, setDoc } from 'firebase/firestore';
+import { doc, updateDoc, arrayUnion, getDoc, setDoc, collection, getDocs } from 'firebase/firestore';
 import { Star, MessageCircle, Heart, Share2, ChevronLeft, ChevronRight, Check, AlertCircle, ChevronDown, ChevronUp, Loader2, Sparkles, ShieldCheck, Truck, ShieldAlert, Cpu, Rss, Sun, Info, X, Ruler, Maximize2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { orderEngine } from '../lib/orderEngine';
@@ -20,6 +20,7 @@ const ProductDetail = () => {
     const [product, setProduct] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [galleryItems, setGalleryItems] = useState([]);
 
     const fractions = [
         { value: '0', label: '0"' },
@@ -134,6 +135,20 @@ const ProductDetail = () => {
             }
         }
     }, [id]);
+
+    // Load lookbook gallery items dynamically
+    useEffect(() => {
+        const fetchGalleryItems = async () => {
+            try {
+                const querySnapshot = await getDocs(collection(db, "gallery_items"));
+                const itemsList = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                setGalleryItems(itemsList);
+            } catch (err) {
+                console.error("Error fetching lookbook gallery items inside ProductDetail:", err);
+            }
+        };
+        fetchGalleryItems();
+    }, []);
 
     // Save options when they change
     useEffect(() => {
@@ -1381,48 +1396,31 @@ const ProductDetail = () => {
                 
                 const isBlackout = tags.includes('blackout') || titleLower.includes('blackout') || descLower.includes('blackout');
                 
-                let selectedRefs = [];
                 let categoryLabel = "";
+                let targetCategory = "";
                 
                 if (isMotor) {
                     categoryLabel = "Smart Devices & Accessories";
-                    selectedRefs = [
-                        { title: 'Bond Bridge Home Smart Hub', image: '/images/bond_bridge.png', desc: 'Smart wings hub integrated perfectly in home office.' },
-                        { title: 'Smart Automation Remote Hub', image: '/images/smart-tech.png', desc: 'Low-power multi-channel remote wand control panel.' },
-                        { title: 'Rechargeable Smart Motor Wand', image: '/images/lift_motorized.png', desc: 'Heavy duty rechargeable wand concealed nicely behind headrail.' }
-                    ];
+                    targetCategory = "smart-device";
                 } else if (isZebra) {
                     if (isBlackout) {
                         categoryLabel = "Blackout Zebra Shades";
-                        selectedRefs = [
-                            { title: 'Modern Living Zebra Blackout', image: '/images/gallery/media_c2491bc7-c990-420c-a66b-cfde0360a96d_1779116619667.png', desc: 'Installed in dynamic 50% opacity block mode in modern white cozy living rooms.' },
-                            { title: 'High-Ceiling Living Room Zebra Blackout', image: '/images/gallery/media_c2491bc7-c990-420c-a66b-cfde0360a96d_1779116622344.png', desc: 'Installed on double height vertical glass frame architectural sections.' },
-                            { title: 'Elegant Bay Windows Zebra Blackout', image: '/images/gallery/media_c2491bc7-c990-420c-a66b-cfde0360a96d_1779116624739.png', desc: 'Beautiful beige blackout zebra shades with high alignment precision in bedroom.' },
-                            { title: 'Luxury Double-Height Zebra Blackout', image: '/images/gallery/media_c2491bc7-c990-420c-a66b-cfde0360a96d_1779116630201.png', desc: 'Dark woven blackout shades blocking severe heat and UV rays perfectly.' }
-                        ];
+                        targetCategory = "blackout-zebra";
                     } else {
                         categoryLabel = "Light Filtering Zebra Shades";
-                        selectedRefs = [
-                            { title: 'Bright Living Room Zebra Installation', image: '/images/gallery/media_c2491bc7-c990-420c-a66b-cfde0360a96d_1779115035915.png', desc: 'Golden-toned light filtering zebra shades installed in a modern open-plan living room.' },
-                            { title: 'Cream Zebra in Bedroom Suite', image: '/images/gallery/media_c2491bc7-c990-420c-a66b-cfde0360a96d_1779115040321.png', desc: 'Warm white light-filtering zebra shades creating a tranquil sun-kissed ambiance.' },
-                            { title: 'Modern Grey Zebra Office Look', image: '/images/gallery/media_c2491bc7-c990-420c-a66b-cfde0360a96d_1779115045759.png', desc: 'Chic charcoal stripe zebra shades installed in a sleek executive workspace.' }
-                        ];
+                        targetCategory = "light-zebra";
                     }
                 } else if (isRoller) {
                     if (isBlackout) {
                         categoryLabel = "Blackout Roller Shades";
-                        selectedRefs = [
-                            { title: 'Midnight Blackout Roller — Master Suite', image: '/images/gallery/media_c2491bc7-c990-420c-a66b-cfde0360a96d_1779115060243.png', desc: 'Premium dark-charcoal blackout roller shades blocking 100% of light for uninterrupted sleep.' },
-                            { title: 'Slate Grey Blackout Bay Windows', image: '/images/gallery/media_c2491bc7-c990-420c-a66b-cfde0360a96d_1779115061426.png', desc: 'High-density slate grey blackout roller shades fitted across wide bay windows.' }
-                        ];
+                        targetCategory = "blackout-roller";
                     } else {
                         categoryLabel = "Light Filtering Roller Shades";
-                        selectedRefs = [
-                            { title: 'Cream Roller in Open Kitchen', image: '/images/gallery/media_c2491bc7-c990-420c-a66b-cfde0360a96d_1779115050708.png', desc: 'Premium cream light-filtering roller shades softening midday sunlight in a bright kitchen.' },
-                            { title: 'Neutral Roller in Dining Area', image: '/images/gallery/media_c2491bc7-c990-420c-a66b-cfde0360a96d_1779115057260.png', desc: 'Elegant translucent roller fabric diffusing morning glare in a contemporary dining area.' }
-                        ];
+                        targetCategory = "light-roller";
                     }
                 }
+
+                const selectedRefs = galleryItems.filter(item => item.category === targetCategory);
                 
                 if (selectedRefs.length === 0) return null;
                 
