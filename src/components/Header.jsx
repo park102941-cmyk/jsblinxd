@@ -122,6 +122,7 @@ const Header = () => {
                             </li>
 
                             <li><Link to="/swatches" style={{ color: 'var(--text-main)', fontWeight: '600', fontSize: '0.85rem', textTransform: 'uppercase' }}>Swatches</Link></li>
+                            <li><Link to="/gallery" style={{ color: 'var(--text-main)', fontWeight: '600', fontSize: '0.85rem', textTransform: 'uppercase' }}>Gallery</Link></li>
                             <li><Link to="/help" style={{ color: 'var(--text-main)', fontWeight: '600', fontSize: '0.85rem', textTransform: 'uppercase' }}>Help Center</Link></li>
                         </ul>
                     </nav>
@@ -234,6 +235,7 @@ const Header = () => {
                                 </div>
                             </div>
                             <Link to="/swatches" onClick={() => setMobileMenuOpen(false)} style={{ color: 'var(--text-main)', fontSize: '1.1rem', fontWeight: '600', textTransform: 'uppercase' }}>Swatches</Link>
+                            <Link to="/gallery" onClick={() => setMobileMenuOpen(false)} style={{ color: 'var(--text-main)', fontSize: '1.1rem', fontWeight: '600', textTransform: 'uppercase' }}>Gallery</Link>
                             <Link to="/help" onClick={() => setMobileMenuOpen(false)} style={{ color: 'var(--text-main)', fontSize: '1.1rem', fontWeight: '600', textTransform: 'uppercase' }}>Help Center</Link>
                             {!currentUser && (
                                 <Link to="/login" onClick={() => setMobileMenuOpen(false)} style={{ color: 'var(--primary-blue)', fontSize: '1.1rem', fontWeight: '600', textTransform: 'uppercase', marginTop: '20px' }}>Login</Link>

@@ -60,6 +60,7 @@ const Cart = lazy(() => import('./pages/Cart'));
 const Login = lazy(() => import('./pages/Login'));
 const MyAccount = lazy(() => import('./pages/MyAccount'));
 const Checkout = lazy(() => import('./pages/Checkout'));
+const Gallery = lazy(() => import('./pages/Gallery'));
 
 // Admin pages (lazy loaded - only admins need these)
 const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'));
@@ -186,6 +187,7 @@ function App() {
                     <Route path="/login" element={<Login />} />
                     <Route path="/account" element={<MyAccount />} />
                     <Route path="/checkout" element={<Checkout />} />
+                    <Route path="/gallery" element={<Gallery />} />
 
                     {/* Admin Routes */}
                     <Route path="/admin" element={
