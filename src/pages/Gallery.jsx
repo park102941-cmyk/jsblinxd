@@ -1,6 +1,8 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Maximize2, X, ChevronLeft, ChevronRight, ShoppingBag } from 'lucide-react';
+import { Maximize2, X, ChevronLeft, ChevronRight, ShoppingBag, Loader2 } from 'lucide-react';
+import { db } from '../lib/firebase';
+import { collection, getDocs, doc, setDoc } from 'firebase/firestore';
 
 const CATEGORIES = [
   { id: 'light-zebra', name: 'Light Filtering Zebra', label: 'Zebra (Light Filter)' },
@@ -10,7 +12,7 @@ const CATEGORIES = [
   { id: 'smart-device', name: 'Smart Device & Accessories', label: 'Smart Device' }
 ];
 
-const GALLERY_ITEMS = [
+const INITIAL_GALLERY_ITEMS = [
   // 1. Blackout Zebra (Using the exact beautiful high-res uploaded files)
   {
     id: 'bz1',
@@ -49,25 +51,25 @@ const GALLERY_ITEMS = [
   {
     id: 'lz1',
     category: 'light-zebra',
-    title: 'Apache Light-diffusing Zebra',
-    desc: 'Soft golden bands filter incoming glare into a gentle, beautiful interior glow suitable for executive workspaces.',
-    image: '/images/products/jdx-zebra-apache-1.png',
+    title: 'Bright Living Room Zebra Installation',
+    desc: 'Soft golden-toned light filtering zebra shades installed in a modern open-plan living room, diffusing sunlight beautifully.',
+    image: '/images/gallery/media_c2491bc7-c990-420c-a66b-cfde0360a96d_1779115035915.png',
     link: '/products?category=zebra&opacity=light-filtering'
   },
   {
     id: 'lz2',
     category: 'light-zebra',
-    title: 'Las Colinas Cream Zebra',
-    desc: 'Clean, warm white filtering bands providing maximum daylight while maintaining excellent day-to-night privacy.',
-    image: '/images/products/jdx-zebra-las-colinas-1.png',
+    title: 'Cream Zebra in Bedroom Suite',
+    desc: 'Warm white light-filtering zebra shades creating a tranquil, sun-kissed ambiance in a luxurious master bedroom.',
+    image: '/images/gallery/media_c2491bc7-c990-420c-a66b-cfde0360a96d_1779115040321.png',
     link: '/products?category=zebra&opacity=light-filtering'
   },
   {
     id: 'lz3',
     category: 'light-zebra',
-    title: 'Legacy Modern Grey Zebra',
-    desc: 'Chic modern charcoal stripes with premium light-filtering woven mesh, giving urban apartments an expansive feel.',
-    image: '/images/products/jdx-zebra-legacy-1.png',
+    title: 'Modern Grey Zebra Office Look',
+    desc: 'Chic charcoal stripe light-filtering zebra shades installed in a sleek executive workspace with floor-to-ceiling windows.',
+    image: '/images/gallery/media_c2491bc7-c990-420c-a66b-cfde0360a96d_1779115045759.png',
     link: '/products?category=zebra&opacity=light-filtering'
   },
 
@@ -75,17 +77,17 @@ const GALLERY_ITEMS = [
   {
     id: 'lr1',
     category: 'light-roller',
-    title: 'Eldorado Minimalist Roller',
-    desc: 'Diffusion style light-filtering roller shades in premium cream, perfectly aligning with modern open kitchens.',
-    image: '/images/products/jdx-roller-eldorado-1.png',
+    title: 'Cream Roller in Open Kitchen',
+    desc: 'Premium cream light-filtering roller shades installed in a bright modern open kitchen, softening midday sunlight.',
+    image: '/images/gallery/media_c2491bc7-c990-420c-a66b-cfde0360a96d_1779115050708.png',
     link: '/products?category=roller&opacity=light-filtering'
   },
   {
     id: 'lr2',
     category: 'light-roller',
-    title: 'Pure White Light-Filtering Roller',
-    desc: 'Elegant translucent white roller fabric providing subtle privacy while bathing the dining area in natural brightness.',
-    image: '/images/products/jdx-roller-light-filtering.png',
+    title: 'Neutral Roller in Dining Area',
+    desc: 'Elegant translucent roller fabric diffusing morning glare in a contemporary dining area with neutral tones.',
+    image: '/images/gallery/media_c2491bc7-c990-420c-a66b-cfde0360a96d_1779115057260.png',
     link: '/products?category=roller&opacity=light-filtering'
   },
 
@@ -93,17 +95,17 @@ const GALLERY_ITEMS = [
   {
     id: 'br1',
     category: 'blackout-roller',
-    title: 'Midnight Blackout Roller',
-    desc: '100% impervious dark-charcoal premium vinyl blackout backing, guaranteeing peaceful sleep and ultimate isolation.',
-    image: '/images/products/jdx-roller-blackout.png',
+    title: 'Midnight Blackout Roller — Master Suite',
+    desc: 'Premium dark-charcoal blackout roller shades blocking 100% of light for uninterrupted sleep in a luxury bedroom.',
+    image: '/images/gallery/media_c2491bc7-c990-420c-a66b-cfde0360a96d_1779115060243.png',
     link: '/products?category=roller&opacity=blackout'
   },
   {
     id: 'br2',
     category: 'blackout-roller',
-    title: 'Eldorado Slate Blackout Roller',
-    desc: 'High-density slate grey weave blocking extreme heat, glare, and shadows for bedroom bay windows.',
-    image: '/images/products/jdx-roller-eldorado-2.png',
+    title: 'Slate Grey Blackout Bay Windows',
+    desc: 'High-density slate grey blackout roller shades perfectly fitted across wide bay windows to eliminate external glare.',
+    image: '/images/gallery/media_c2491bc7-c990-420c-a66b-cfde0360a96d_1779115061426.png',
     link: '/products?category=roller&opacity=blackout'
   },
 
@@ -111,37 +113,65 @@ const GALLERY_ITEMS = [
   {
     id: 'sd1',
     category: 'smart-device',
-    title: 'Bond Bridge Home Smart Hub',
-    desc: 'State-of-the-art smart home RF transmitter hub connecting your motorized blinds instantly with Alexa and Google Home.',
-    image: '/images/bond_bridge.png',
+    title: 'Smart Hub Integration — Home Office',
+    desc: 'Smart RF bridge hub seamlessly installed in a minimalist home office, enabling full voice and app control of motorized shades.',
+    image: '/images/gallery/media_c2491bc7-c990-420c-a66b-cfde0360a96d_1779115064756.png',
     link: '/products?category=motor'
   },
   {
     id: 'sd2',
     category: 'smart-device',
-    title: 'Smart Automation Remote Hub',
-    desc: 'Ultra-low battery consumption smart wireless hub allowing advanced custom schedule routines on our mobile app.',
-    image: '/images/smart-tech.png',
+    title: 'Motorized Smart Shades — Living Room',
+    desc: 'Motorized roller shades controlled via smart hub, scheduled automatically to protect furniture from afternoon UV exposure.',
+    image: '/images/gallery/media_c2491bc7-c990-420c-a66b-cfde0360a96d_1779115070112.png',
     link: '/products?category=motor'
   },
   {
     id: 'sd3',
     category: 'smart-device',
-    title: 'Rechargeable Smart Motor Wand',
-    desc: 'Slim heavy-duty lithium rechargeable motor wand with dynamic speed settings and near-silent operation.',
-    image: '/images/lift_motorized.png',
+    title: 'Alexa-Integrated Motorized Blinds',
+    desc: 'Rechargeable motorized blind system integrated with Alexa and Google Home for hands-free smart home automation.',
+    image: '/images/gallery/media_c2491bc7-c990-420c-a66b-cfde0360a96d_1779115075033.png',
     link: '/products?category=motor'
   }
 ];
 
 const Gallery = () => {
   const [activeTab, setActiveTab] = useState('blackout-zebra');
+  const [galleryItems, setGalleryItems] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [lightboxIndex, setLightboxIndex] = useState(null);
+
+  useEffect(() => {
+    const fetchGallery = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, "gallery_items"));
+        let itemsList = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        
+        if (itemsList.length === 0) {
+          // Initialize gallery collection
+          const promises = INITIAL_GALLERY_ITEMS.map(item => 
+            setDoc(doc(db, "gallery_items", item.id), item)
+          );
+          await Promise.all(promises);
+          itemsList = [...INITIAL_GALLERY_ITEMS];
+        }
+        
+        setGalleryItems(itemsList);
+      } catch (error) {
+        console.error("Error loading lookbook gallery:", error);
+        setGalleryItems(INITIAL_GALLERY_ITEMS);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchGallery();
+  }, []);
 
   // Filter items based on active tab
   const filteredItems = useMemo(() => {
-    return GALLERY_ITEMS.filter(item => item.category === activeTab);
-  }, [activeTab]);
+    return galleryItems.filter(item => item.category === activeTab);
+  }, [galleryItems, activeTab]);
 
   const openLightbox = (index) => {
     setLightboxIndex(index);
@@ -240,121 +270,132 @@ const Gallery = () => {
       </div>
 
       {/* Grid Container */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-        gap: '24px',
-        animation: 'fadeIn 0.5s ease-in-out'
-      }}>
-        {filteredItems.map((item, index) => (
-          <div
-            key={item.id}
-            onClick={() => openLightbox(index)}
-            style={{
-              background: '#ffffff',
-              borderRadius: '16px',
-              overflow: 'hidden',
-              boxShadow: '0 4px 20px rgba(0, 0, 0, 0.04)',
-              cursor: 'pointer',
-              display: 'flex',
-              flexDirection: 'column',
-              transition: 'transform 0.3s ease, box-shadow 0.3s ease',
-              position: 'relative'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = 'translateY(-6px)';
-              e.currentTarget.style.boxShadow = '0 12px 30px rgba(0, 0, 0, 0.08)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = 'translateY(0)';
-              e.currentTarget.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.04)';
-            }}
-          >
-            {/* Image Wrap */}
-            <div style={{
-              width: '100%',
-              paddingTop: '100%', // 1:1 Aspect Ratio
-              position: 'relative',
-              background: '#f5f5f7',
-              overflow: 'hidden'
-            }}>
-              <img
-                src={item.image}
-                alt={item.title}
-                loading="lazy"
-                style={{
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  width: '100%',
-                  height: '100%',
-                  objectFit: 'cover',
-                  transition: 'transform 0.5s ease'
-                }}
-              />
-              <div style={{
-                position: 'absolute',
-                top: '12px',
-                right: '12px',
-                background: 'rgba(255, 255, 255, 0.85)',
-                backdropFilter: 'blur(4px)',
-                borderRadius: '50%',
-                width: '32px',
-                height: '32px',
+      {loading ? (
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '300px', gap: '15px' }}>
+          <Loader2 className="spin" size={40} color="var(--primary-green)" />
+          <p style={{ color: '#86868b', fontSize: '0.95rem' }}>Loading inspired spaces...</p>
+        </div>
+      ) : filteredItems.length === 0 ? (
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '300px', background: '#f5f5f7', borderRadius: '16px', padding: '40px' }}>
+          <p style={{ color: '#86868b', fontSize: '1rem', fontWeight: '500', margin: 0 }}>No showcase items in this category yet.</p>
+        </div>
+      ) : (
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+          gap: '24px',
+          animation: 'fadeIn 0.5s ease-in-out'
+        }}>
+          {filteredItems.map((item, index) => (
+            <div
+              key={item.id}
+              onClick={() => openLightbox(index)}
+              style={{
+                background: '#ffffff',
+                borderRadius: '16px',
+                overflow: 'hidden',
+                boxShadow: '0 4px 20px rgba(0, 0, 0, 0.04)',
+                cursor: 'pointer',
                 display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+                flexDirection: 'column',
+                transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+                position: 'relative'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-6px)';
+                e.currentTarget.style.boxShadow = '0 12px 30px rgba(0, 0, 0, 0.08)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.04)';
+              }}
+            >
+              {/* Image Wrap */}
+              <div style={{
+                width: '100%',
+                paddingTop: '100%', // 1:1 Aspect Ratio
+                position: 'relative',
+                background: '#f5f5f7',
+                overflow: 'hidden'
               }}>
-                <Maximize2 size={14} color="#1d1d1f" />
-              </div>
-            </div>
-
-            {/* Content info block */}
-            <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', flex: 1 }}>
-              <h3 style={{
-                fontSize: '1.05rem',
-                fontWeight: '600',
-                color: '#1d1d1f',
-                margin: '0 0 8px 0',
-                lineHeight: '1.4'
-              }}>
-                {item.title}
-              </h3>
-              <p style={{
-                fontSize: '0.85rem',
-                color: '#6e6e73',
-                lineHeight: '1.5',
-                margin: '0 0 16px 0',
-                flex: 1
-              }}>
-                {item.desc}
-              </p>
-              
-              <Link
-                to={item.link}
-                onClick={(e) => e.stopPropagation()}
-                style={{
+                <img
+                  src={item.image}
+                  alt={item.title}
+                  loading="lazy"
+                  style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
+                    transition: 'transform 0.5s ease'
+                  }}
+                />
+                <div style={{
+                  position: 'absolute',
+                  top: '12px',
+                  right: '12px',
+                  background: 'rgba(255, 255, 255, 0.85)',
+                  backdropFilter: 'blur(4px)',
+                  borderRadius: '50%',
+                  width: '32px',
+                  height: '32px',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '6px',
-                  color: 'var(--primary-green)',
-                  textDecoration: 'none',
-                  fontSize: '0.85rem',
+                  justifyContent: 'center',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+                }}>
+                  <Maximize2 size={14} color="#1d1d1f" />
+                </div>
+              </div>
+
+              {/* Content info block */}
+              <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', flex: 1 }}>
+                <h3 style={{
+                  fontSize: '1.05rem',
                   fontWeight: '600',
-                  marginTop: 'auto',
-                  transition: 'opacity 0.2s'
-                }}
-                onMouseEnter={(e) => e.currentTarget.style.opacity = '0.8'}
-                onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
-              >
-                <ShoppingBag size={14} />
-                Shop Collection →
-              </Link>
+                  color: '#1d1d1f',
+                  margin: '0 0 8px 0',
+                  lineHeight: '1.4'
+                }}>
+                  {item.title}
+                </h3>
+                <p style={{
+                  fontSize: '0.85rem',
+                  color: '#6e6e73',
+                  lineHeight: '1.5',
+                  margin: '0 0 16px 0',
+                  flex: 1
+                }}>
+                  {item.desc}
+                </p>
+                
+                <Link
+                  to={item.link || '#'}
+                  onClick={(e) => e.stopPropagation()}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    color: 'var(--primary-green)',
+                    textDecoration: 'none',
+                    fontSize: '0.85rem',
+                    fontWeight: '600',
+                    marginTop: 'auto',
+                    transition: 'opacity 0.2s'
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.opacity = '0.8'}
+                  onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
+                >
+                  <ShoppingBag size={14} />
+                  Shop Collection →
+                </Link>
+              </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
 
       {/* Lightbox Modal Box */}
       {lightboxIndex !== null && (

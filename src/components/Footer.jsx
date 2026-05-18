@@ -101,6 +101,7 @@ const Footer = () => {
                         <h3>Customer Care</h3>
                         <ul className="footer-links">
                             <li><Link to="/help">Help Center</Link></li>
+                            <li><Link to="/gallery">Lookbook Gallery</Link></li>
                             <li><Link to="/track-order">Track Your Order</Link></li>
                             <li><Link to="/support">Shipping & Delivery</Link></li>
                             <li><Link to="/support#returns">Returns & Refunds</Link></li>

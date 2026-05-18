@@ -1100,6 +1100,37 @@ const ProductDetail = () => {
                             Add to Cart
                         </button>
                     </div>
+
+                    {/* Order Swatch Button — only for zebra / roller shade products */}
+                    {!isStandalone && (
+                        (product?.category?.toLowerCase().includes('zebra') || product?.title?.toLowerCase().includes('zebra') ||
+                         product?.category?.toLowerCase().includes('roller') || product?.title?.toLowerCase().includes('roller'))
+                    ) && (() => {
+                        const isZebraProduct = product?.category?.toLowerCase().includes('zebra') || product?.title?.toLowerCase().includes('zebra');
+                        const swatchCategory = isZebraProduct ? 'swatch-zebra' : 'swatch-roller';
+                        return (
+                            <button
+                                onClick={() => navigate(`/swatches?productName=${encodeURIComponent(product.title)}&category=${swatchCategory}`)}
+                                style={{
+                                    marginTop: '12px',
+                                    width: '100%',
+                                    padding: '14px',
+                                    fontSize: '0.95rem',
+                                    fontWeight: '600',
+                                    border: '2px solid var(--primary-green)',
+                                    color: 'var(--primary-green)',
+                                    background: 'transparent',
+                                    borderRadius: '8px',
+                                    cursor: 'pointer',
+                                    transition: 'all 0.2s ease'
+                                }}
+                                onMouseEnter={e => { e.currentTarget.style.background = 'var(--primary-green)'; e.currentTarget.style.color = '#fff'; }}
+                                onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--primary-green)'; }}
+                            >
+                                Order a Swatch — Try the Fabric First ($9.99)
+                            </button>
+                        );
+                    })()}
                 </div>
             </div>
 
@@ -1206,12 +1237,28 @@ const ProductDetail = () => {
                     <div style={{ fontSize: '0.7rem', color: '#888' }}>Total Price</div>
                     <div style={{ fontSize: '1.3rem', fontWeight: '800' }}>${calculatePrice()}</div>
                 </div>
-                <button 
-                    onClick={handleAddToCart}
-                    style={{ background: '#333', color: '#fff', border: 'none', padding: '12px 24px', borderRadius: '6px', fontWeight: '700' }}
-                >
-                    Add to Cart
-                </button>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', alignItems: 'flex-end' }}>
+                    <button
+                        onClick={handleAddToCart}
+                        style={{ background: '#333', color: '#fff', border: 'none', padding: '12px 24px', borderRadius: '6px', fontWeight: '700' }}
+                    >
+                        Add to Cart
+                    </button>
+                    {!isStandalone && (
+                        product?.category?.toLowerCase().includes('zebra') || product?.title?.toLowerCase().includes('zebra') ||
+                        product?.category?.toLowerCase().includes('roller') || product?.title?.toLowerCase().includes('roller')
+                    ) && (
+                        <button
+                            onClick={() => {
+                                const isZebraProduct = product?.category?.toLowerCase().includes('zebra') || product?.title?.toLowerCase().includes('zebra');
+                                navigate(`/swatches?productName=${encodeURIComponent(product.title)}&category=${isZebraProduct ? 'swatch-zebra' : 'swatch-roller'}`);
+                            }}
+                            style={{ background: 'transparent', color: 'var(--primary-green)', border: '1px solid var(--primary-green)', padding: '8px 16px', borderRadius: '6px', fontWeight: '600', fontSize: '0.78rem' }}
+                        >
+                            Order Swatch
+                        </button>
+                    )}
+                </div>
             </div>
 
             <OrderingGuide isOpen={isGuideOpen} onClose={() => setIsGuideOpen(false)} />
@@ -1356,23 +1403,23 @@ const ProductDetail = () => {
                     } else {
                         categoryLabel = "Light Filtering Zebra Shades";
                         selectedRefs = [
-                            { title: 'Apache Golden Zebra', image: '/images/products/jdx-zebra-apache-1.png', desc: 'Rich golden stripes filtering daylight into a luxurious workspace.' },
-                            { title: 'Las Colinas Cream Zebra', image: '/images/products/jdx-zebra-las-colinas-1.png', desc: 'Diffusing daylight while offering complete structural privacy.' },
-                            { title: 'Legacy Silver Zebra', image: '/images/products/jdx-zebra-legacy-1.png', desc: 'Modern silver grey stripe pattern for urban apartment glass frameworks.' }
+                            { title: 'Bright Living Room Zebra Installation', image: '/images/gallery/media_c2491bc7-c990-420c-a66b-cfde0360a96d_1779115035915.png', desc: 'Golden-toned light filtering zebra shades installed in a modern open-plan living room.' },
+                            { title: 'Cream Zebra in Bedroom Suite', image: '/images/gallery/media_c2491bc7-c990-420c-a66b-cfde0360a96d_1779115040321.png', desc: 'Warm white light-filtering zebra shades creating a tranquil sun-kissed ambiance.' },
+                            { title: 'Modern Grey Zebra Office Look', image: '/images/gallery/media_c2491bc7-c990-420c-a66b-cfde0360a96d_1779115045759.png', desc: 'Chic charcoal stripe zebra shades installed in a sleek executive workspace.' }
                         ];
                     }
                 } else if (isRoller) {
                     if (isBlackout) {
                         categoryLabel = "Blackout Roller Shades";
                         selectedRefs = [
-                            { title: 'Midnight Premium Blackout Roller', image: '/images/products/jdx-roller-blackout.png', desc: '100% blackout backing installed in master bedrooms.' },
-                            { title: 'Eldorado Slate Blackout Roller', image: '/images/products/jdx-roller-eldorado-2.png', desc: 'Deep grey heavy-duty weave blocking severe external reflections.' }
+                            { title: 'Midnight Blackout Roller — Master Suite', image: '/images/gallery/media_c2491bc7-c990-420c-a66b-cfde0360a96d_1779115060243.png', desc: 'Premium dark-charcoal blackout roller shades blocking 100% of light for uninterrupted sleep.' },
+                            { title: 'Slate Grey Blackout Bay Windows', image: '/images/gallery/media_c2491bc7-c990-420c-a66b-cfde0360a96d_1779115061426.png', desc: 'High-density slate grey blackout roller shades fitted across wide bay windows.' }
                         ];
                     } else {
                         categoryLabel = "Light Filtering Roller Shades";
                         selectedRefs = [
-                            { title: 'Eldorado Soft Cream Roller', image: '/images/products/jdx-roller-eldorado-1.png', desc: 'Translucent material filtering daylight beautifully in dining areas.' },
-                            { title: 'Pure White Light-Filtering Roller', image: '/images/products/jdx-roller-light-filtering.png', desc: 'Clean white roller shading diffusing morning glare in open kitchens.' }
+                            { title: 'Cream Roller in Open Kitchen', image: '/images/gallery/media_c2491bc7-c990-420c-a66b-cfde0360a96d_1779115050708.png', desc: 'Premium cream light-filtering roller shades softening midday sunlight in a bright kitchen.' },
+                            { title: 'Neutral Roller in Dining Area', image: '/images/gallery/media_c2491bc7-c990-420c-a66b-cfde0360a96d_1779115057260.png', desc: 'Elegant translucent roller fabric diffusing morning glare in a contemporary dining area.' }
                         ];
                     }
                 }

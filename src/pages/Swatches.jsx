@@ -8,6 +8,7 @@ import { useSearchParams } from 'react-router-dom';
 
 const Swatches = () => {
     const [searchParams] = useSearchParams();
+    const fromProductName = searchParams.get('productName');
     const activeCategory = searchParams.get('category');
 
     // State for Collapsible Sections
@@ -115,9 +116,31 @@ const Swatches = () => {
                     Collection / SWATCHES
                 </div>
                 <h1 style={{ fontSize: '2rem', marginBottom: '10px' }}>Simpler & Smarter Fabric Swatches</h1>
-                <p style={{ color: '#666', marginBottom: '30px', fontSize: '1rem' }}>
+                <p style={{ color: '#666', marginBottom: fromProductName ? '16px' : '30px', fontSize: '1rem' }}>
                     Experience our premium fabrics in your own home. <strong>$9.99</strong> per kit + Tax & Shipping.
                 </p>
+
+                {fromProductName && (
+                    <div style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '10px',
+                        background: '#f0f7f4',
+                        border: '1px solid var(--primary-green)',
+                        borderRadius: '10px',
+                        padding: '14px 18px',
+                        marginBottom: '28px',
+                        fontSize: '0.92rem',
+                        color: '#1d1d1f'
+                    }}>
+                        <span style={{ fontSize: '1.1rem' }}>🪟</span>
+                        <span>
+                            <strong>스와치 주문 제품:</strong>{' '}
+                            <span style={{ color: 'var(--primary-green)', fontWeight: '600' }}>{fromProductName}</span>
+                            {' '}— 아래에서 원하는 패브릭 샘플을 선택해 주세요.
+                        </span>
+                    </div>
+                )}
 
                 {loading ? <div>Loading swatches...</div> : (
                     <>
