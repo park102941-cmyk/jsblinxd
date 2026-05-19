@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ShoppingCart, User, Search, Menu, X, ArrowRight, Truck, ChevronDown } from 'lucide-react';
+import { ShoppingCart, User, Search, Menu, X, ArrowRight, Truck, ChevronDown, Camera } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import { db } from '../lib/firebase';
@@ -14,6 +14,7 @@ const Header = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [categories, setCategories] = useState([]);
+    const [announcementIndex, setAnnouncementIndex] = useState(0);
 
     useEffect(() => {
         const fetchCategories = async () => {
@@ -26,6 +27,11 @@ const Header = () => {
             }
         };
         fetchCategories();
+        
+        const interval = setInterval(() => {
+            setAnnouncementIndex(prev => (prev + 1) % 2);
+        }, 5000);
+        return () => clearInterval(interval);
     }, []);
 
     const cartCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);
@@ -45,10 +51,22 @@ const Header = () => {
                 display: 'flex',
                 justifyContent: 'center',
                 alignItems: 'center',
-                gap: '10px'
+                gap: '10px',
+                overflow: 'hidden',
+                position: 'relative',
+                height: '40px'
             }}>
-                <Truck size={14} /> FREE SHIPPING WITHIN US ON ALL ORDERS OVER $300
-                <Link to="/products" style={{ textDecoration: 'underline', marginLeft: '10px' }}>Shop Now</Link>
+                {announcementIndex === 0 ? (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', animation: 'fadeInOut 5s infinite' }}>
+                        <Truck size={14} /> FREE SHIPPING WITHIN US ON ALL ORDERS OVER $300
+                        <Link to="/products" style={{ color: 'white', textDecoration: 'underline', marginLeft: '10px' }}>Shop Now</Link>
+                    </div>
+                ) : (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', animation: 'fadeInOut 5s infinite' }}>
+                        <Camera size={14} /> TRY OUR NEW AR PREVIEW - SEE SHADES IN YOUR WINDOW!
+                        <Link to="/products" style={{ color: 'white', textDecoration: 'underline', marginLeft: '10px' }}>Try It</Link>
+                    </div>
+                )}
             </div>
 
             <header style={{
@@ -247,6 +265,12 @@ const Header = () => {
 
             {/* Sub-menu Styles */}
             <style>{`
+                @keyframes fadeInOut {
+                    0% { opacity: 0; transform: translateY(10px); }
+                    10% { opacity: 1; transform: translateY(0); }
+                    90% { opacity: 1; transform: translateY(0); }
+                    100% { opacity: 0; transform: translateY(-10px); }
+                }
                 .nav-item-dropdown:hover .dropdown-menu,
                 .nav-item-dropdown:hover .mega-menu {
                     opacity: 1;
