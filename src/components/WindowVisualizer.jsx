@@ -264,7 +264,7 @@ const WindowVisualizer = ({ isOpen, onClose, productTitle, selectedColor, isZebr
     if (fabricImage) {
         shadeStyle = {
             backgroundImage: `url(${fabricImage})`,
-            backgroundSize: isZebra ? '100% 70px' : 'cover', // Zebra stripes tiling or cover for roller
+            backgroundSize: isZebra ? '100% 36px' : 'cover', // Zebra stripes tiling or cover for roller
             backgroundPosition: 'top center',
             backgroundRepeat: isZebra ? 'repeat-y' : 'no-repeat',
             opacity: opacity
@@ -275,9 +275,9 @@ const WindowVisualizer = ({ isOpen, onClose, productTitle, selectedColor, isZebr
                 background: `repeating-linear-gradient(
                     to bottom,
                     ${shadeColor}cc 0px,
-                    ${shadeColor}cc 12px,
-                    ${shadeColor}22 12px,
-                    ${shadeColor}22 24px
+                    ${shadeColor}cc 8px,
+                    ${shadeColor}22 8px,
+                    ${shadeColor}22 16px
                 )`,
                 opacity
             }
@@ -338,7 +338,6 @@ const WindowVisualizer = ({ isOpen, onClose, productTitle, selectedColor, isZebr
                                         position: 'absolute',
                                         left: shade.x, top: shade.y,
                                         width: shade.w, height: shade.h,
-                                        ...shadeStyle,
                                         cursor: drag?.type === 'move' ? 'grabbing' : 'grab',
                                         borderRadius: '3px',
                                         boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
@@ -346,6 +345,12 @@ const WindowVisualizer = ({ isOpen, onClose, productTitle, selectedColor, isZebr
                                         border: '1px solid rgba(255,255,255,0.4)'
                                     }}
                                 >
+                                    {/* Inner Fabric Background */}
+                                    <div style={{
+                                        position: 'absolute', inset: 0,
+                                        ...shadeStyle,
+                                        borderRadius: '2px'
+                                    }} />
                                     {/* Top Cassette */}
                                     <div style={{
                                         position: 'absolute', top: 0, left: -1, right: -1, height: '16px',
