@@ -16,6 +16,42 @@ const WindowVisualizer = ({ isOpen, onClose, productTitle, selectedColor, isZebr
         if (isOpen) setRoomPhoto(null);
     }, [isOpen]);
 
+    const [fabricDataUrl, setFabricDataUrl] = useState(null);
+
+    useEffect(() => {
+        const url = selectedColor?.fullImage || selectedColor?.image;
+        if (!url) {
+            setFabricDataUrl(null);
+            return;
+        }
+        
+        if (url.startsWith('data:')) {
+            setFabricDataUrl(url);
+            return;
+        }
+
+        const img = new Image();
+        img.crossOrigin = "anonymous";
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            canvas.width = img.width;
+            canvas.height = img.height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0);
+            try {
+                setFabricDataUrl(canvas.toDataURL('image/png'));
+            } catch (e) {
+                console.error("CORS error converting fabric image to base64", e);
+                setFabricDataUrl(null);
+            }
+        };
+        img.onerror = () => {
+            console.error("Error loading fabric image for base64 conversion");
+            setFabricDataUrl(null);
+        };
+        img.src = url;
+    }, [selectedColor]);
+
     const handleUpload = (e) => {
         const file = e.target.files[0];
         if (!file) return;
@@ -179,7 +215,7 @@ const WindowVisualizer = ({ isOpen, onClose, productTitle, selectedColor, isZebr
 
     const resetShade = () => setShade({ x: 120, y: 40, w: 220, h: 340 });
 
-    const fabricImage = selectedColor?.fullImage || selectedColor?.image;
+    const fabricImage = fabricDataUrl || selectedColor?.fullImage || selectedColor?.image;
     const shadeColor = selectedColor?.hex || '#c8b89a';
 
     let shadeStyle = {};
