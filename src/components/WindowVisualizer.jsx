@@ -1,5 +1,5 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
-import { X, Upload, RotateCcw, ZoomIn, ZoomOut, Camera, Wand2 } from 'lucide-react';
+import { X, Upload, RotateCcw, ZoomIn, ZoomOut, Camera, Wand2, Plus } from 'lucide-react';
 import html2canvas from 'html2canvas';
 
 const SHADE_MIN = 60;
@@ -48,13 +48,16 @@ const getMatchedCassetteColor = (hexColor) => {
 const WindowVisualizer = ({ isOpen, onClose, productTitle, selectedColor, isZebra }) => {
     const [roomPhoto, setRoomPhoto] = useState(null);
     const [opacity, setOpacity] = useState(0.82);
-    const [pts, setPts] = useState([
+    
+    const defaultPts = [
         { x: 120, y: 40 }, // nw
         { x: 340, y: 40 }, // ne
         { x: 340, y: 380 }, // se
         { x: 120, y: 380 } // sw
-    ]);
-    const [drag, setDrag] = useState(null); // { type: 'move'|nw|ne|se|sw, startX, startY, origPts }
+    ];
+    
+    const [shades, setShades] = useState([defaultPts]);
+    const [drag, setDrag] = useState(null); // { shadeIndex, type, startX, startY, origPts }
     const containerRef = useRef(null);
     const fileRef = useRef(null);
 
@@ -108,7 +111,26 @@ const WindowVisualizer = ({ isOpen, onClose, productTitle, selectedColor, isZebr
         reader.readAsDataURL(file);
     };
 
-    const resetShade = () => setPts([{ x: 120, y: 40 }, { x: 340, y: 40 }, { x: 340, y: 380 }, { x: 120, y: 380 }]);
+    const resetShade = () => setShades([defaultPts]);
+
+    const handleAddShade = () => {
+        setShades(prev => {
+            const offset = prev.length * 20;
+            return [
+                ...prev,
+                [
+                    { x: 120 + offset, y: 40 + offset },
+                    { x: 340 + offset, y: 40 + offset },
+                    { x: 340 + offset, y: 380 + offset },
+                    { x: 120 + offset, y: 380 + offset }
+                ]
+            ];
+        });
+    };
+
+    const handleDeleteShade = (indexToRemove) => {
+        setShades(prev => prev.filter((_, i) => i !== indexToRemove));
+    };
 
     const handleAutoDetect = () => {
         if (!roomPhoto || !containerRef.current) return;
@@ -182,12 +204,12 @@ const WindowVisualizer = ({ isOpen, onClose, productTitle, selectedColor, isZebr
             const w0 = Math.max(SHADE_MIN, finalW);
             const h0 = Math.max(SHADE_MIN, finalH);
 
-            setPts([
+            setShades([[
                 { x: x0, y: y0 },
                 { x: x0 + w0, y: y0 },
                 { x: x0 + w0, y: y0 + h0 },
                 { x: x0, y: y0 + h0 }
-            ]);
+            ]]);
         };
         img.src = roomPhoto;
     };
@@ -224,12 +246,12 @@ const WindowVisualizer = ({ isOpen, onClose, productTitle, selectedColor, isZebr
         return { x: clientX - rect.left, y: clientY - rect.top };
     }, []);
 
-    const onPointerDown = useCallback((e, type) => {
+    const onPointerDown = useCallback((e, shadeIndex, type) => {
         e.preventDefault();
         e.stopPropagation();
         const pos = getContainerPos(e);
-        setDrag({ type, startX: pos.x, startY: pos.y, origPts: [...pts] });
-    }, [pts, getContainerPos]);
+        setDrag({ shadeIndex, type, startX: pos.x, startY: pos.y, origPts: [...shades[shadeIndex]] });
+    }, [shades, getContainerPos]);
 
     const onPointerMove = useCallback((e) => {
         if (!drag) return;
@@ -238,16 +260,21 @@ const WindowVisualizer = ({ isOpen, onClose, productTitle, selectedColor, isZebr
         const dx = pos.x - drag.startX;
         const dy = pos.y - drag.startY;
 
-        setPts(prev => {
+        setShades(prev => {
+            const newShades = [...prev];
+            const origPts = drag.origPts;
+            let newPts;
             if (drag.type === 'move') {
-                return drag.origPts.map(p => ({ x: p.x + dx, y: p.y + dy }));
+                newPts = origPts.map(p => ({ x: p.x + dx, y: p.y + dy }));
+            } else {
+                newPts = [...origPts];
+                if (drag.type === 'nw') newPts[0] = { x: origPts[0].x + dx, y: origPts[0].y + dy };
+                if (drag.type === 'ne') newPts[1] = { x: origPts[1].x + dx, y: origPts[1].y + dy };
+                if (drag.type === 'se') newPts[2] = { x: origPts[2].x + dx, y: origPts[2].y + dy };
+                if (drag.type === 'sw') newPts[3] = { x: origPts[3].x + dx, y: origPts[3].y + dy };
             }
-            const newPts = [...drag.origPts];
-            if (drag.type === 'nw') newPts[0] = { x: drag.origPts[0].x + dx, y: drag.origPts[0].y + dy };
-            if (drag.type === 'ne') newPts[1] = { x: drag.origPts[1].x + dx, y: drag.origPts[1].y + dy };
-            if (drag.type === 'se') newPts[2] = { x: drag.origPts[2].x + dx, y: drag.origPts[2].y + dy };
-            if (drag.type === 'sw') newPts[3] = { x: drag.origPts[3].x + dx, y: drag.origPts[3].y + dy };
-            return newPts;
+            newShades[drag.shadeIndex] = newPts;
+            return newShades;
         });
     }, [drag, getContainerPos]);
 
@@ -285,21 +312,6 @@ const WindowVisualizer = ({ isOpen, onClose, productTitle, selectedColor, isZebr
     }
 
     if (!isOpen) return null;
-
-    const minX = Math.min(...pts.map(p => p.x));
-    const maxX = Math.max(...pts.map(p => p.x));
-    const minY = Math.min(...pts.map(p => p.y));
-    const maxY = Math.max(...pts.map(p => p.y));
-    const w = Math.max(10, maxX - minX);
-    const h = Math.max(10, maxY - minY);
-
-    const clipPathStr = `polygon(${pts.map(p => `${p.x - minX}px ${p.y - minY}px`).join(', ')})`;
-
-    const topAngle = Math.atan2(pts[1].y - pts[0].y, pts[1].x - pts[0].x);
-    const topWidth = Math.hypot(pts[1].x - pts[0].x, pts[1].y - pts[0].y);
-
-    const bottomAngle = Math.atan2(pts[2].y - pts[3].y, pts[2].x - pts[3].x);
-    const bottomWidth = Math.hypot(pts[2].x - pts[3].x, pts[2].y - pts[3].y);
 
     const iconBtnStyle = {
         background: 'transparent', border: 'none', cursor: 'pointer', padding: '10px', 
@@ -352,83 +364,125 @@ const WindowVisualizer = ({ isOpen, onClose, productTitle, selectedColor, isZebr
                                     style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block', userSelect: 'none' }}
                                     draggable={false}
                                 />
-                                {/* Shade overlay */}
-                                <div
-                                    style={{
-                                        position: 'absolute',
-                                        left: minX, top: minY,
-                                        width: w, height: h,
-                                        userSelect: 'none'
-                                    }}
-                                >
-                                    {/* Inner Fabric Background */}
-                                    <div 
-                                        onMouseDown={(e) => onPointerDown(e, 'move')}
-                                        onTouchStart={(e) => onPointerDown(e, 'move')}
-                                        style={{
-                                            position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
-                                            ...shadeStyle,
-                                            clipPath: clipPathStr,
-                                            WebkitClipPath: clipPathStr,
-                                            cursor: drag?.type === 'move' ? 'grabbing' : 'grab',
-                                            filter: 'drop-shadow(0 4px 10px rgba(0,0,0,0.5))'
-                                        }} 
-                                    />
-                                    
-                                    {/* Top Cassette */}
-                                    <div style={{
-                                        position: 'absolute', 
-                                        left: pts[0].x - minX, 
-                                        top: pts[0].y - minY, 
-                                        width: topWidth, 
-                                        height: '16px',
-                                        transformOrigin: 'top left',
-                                        transform: `rotate(${topAngle}rad)`,
-                                        background: `linear-gradient(to bottom, ${cassetteColors.top}, ${cassetteColors.bottom})`,
-                                        borderBottom: '1px solid rgba(0,0,0,0.2)',
-                                        borderTopLeftRadius: '2px', borderTopRightRadius: '2px',
-                                        zIndex: 2
-                                    }} />
+                                {/* Shade overlays */}
+                                {shades.map((pts, index) => {
+                                    const minX = Math.min(...pts.map(p => p.x));
+                                    const maxX = Math.max(...pts.map(p => p.x));
+                                    const minY = Math.min(...pts.map(p => p.y));
+                                    const maxY = Math.max(...pts.map(p => p.y));
+                                    const w = Math.max(10, maxX - minX);
+                                    const h = Math.max(10, maxY - minY);
 
-                                    {/* Bottom Bar */}
-                                    <div style={{
-                                        position: 'absolute', 
-                                        left: pts[3].x - minX, 
-                                        top: pts[3].y - minY, 
-                                        width: bottomWidth, 
-                                        height: '8px',
-                                        transformOrigin: 'top left',
-                                        transform: `rotate(${bottomAngle}rad) translateY(-100%)`,
-                                        background: `linear-gradient(to bottom, ${cassetteColors.top}, ${cassetteColors.bottom})`,
-                                        borderTop: '1px solid rgba(0,0,0,0.2)',
-                                        borderBottomLeftRadius: '2px', borderBottomRightRadius: '2px',
-                                        zIndex: 2
-                                    }} />
+                                    const clipPathStr = `polygon(${pts.map(p => `${p.x - minX}px ${p.y - minY}px`).join(', ')})`;
 
-                                    {/* 4 Corner Resize handles */}
-                                    {!isTakingPhoto && [
-                                        { type: 'nw', style: { top: pts[0].y - minY - 7, left: pts[0].x - minX - 7, cursor: 'nw-resize' } },
-                                        { type: 'ne', style: { top: pts[1].y - minY - 7, left: pts[1].x - minX - 7, cursor: 'ne-resize' } },
-                                        { type: 'se', style: { top: pts[2].y - minY - 7, left: pts[2].x - minX - 7, cursor: 'se-resize' } },
-                                        { type: 'sw', style: { top: pts[3].y - minY - 7, left: pts[3].x - minX - 7, cursor: 'sw-resize' } },
-                                    ].map(h => (
+                                    const topAngle = Math.atan2(pts[1].y - pts[0].y, pts[1].x - pts[0].x);
+                                    const topWidth = Math.hypot(pts[1].x - pts[0].x, pts[1].y - pts[0].y);
+
+                                    const bottomAngle = Math.atan2(pts[2].y - pts[3].y, pts[2].x - pts[3].x);
+                                    const bottomWidth = Math.hypot(pts[2].x - pts[3].x, pts[2].y - pts[3].y);
+
+                                    return (
                                         <div
-                                            key={h.type}
-                                            onMouseDown={(e) => onPointerDown(e, h.type)}
-                                            onTouchStart={(e) => onPointerDown(e, h.type)}
+                                            key={index}
                                             style={{
                                                 position: 'absolute',
-                                                width: 14, height: 14,
-                                                background: '#fff',
-                                                border: '2px solid var(--primary-green)',
-                                                borderRadius: '50%',
-                                                boxShadow: '0 2px 5px rgba(0,0,0,0.2)',
-                                                zIndex: 10,
-                                                ...h.style
+                                                left: minX, top: minY,
+                                                width: w, height: h,
+                                                userSelect: 'none'
                                             }}
-                                        />
-                                    ))}
-                                </div>
+                                        >
+                                            {/* Inner Fabric Background */}
+                                            <div 
+                                                onMouseDown={(e) => onPointerDown(e, index, 'move')}
+                                                onTouchStart={(e) => onPointerDown(e, index, 'move')}
+                                                style={{
+                                                    position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
+                                                    ...shadeStyle,
+                                                    clipPath: clipPathStr,
+                                                    WebkitClipPath: clipPathStr,
+                                                    cursor: drag?.type === 'move' && drag.shadeIndex === index ? 'grabbing' : 'grab',
+                                                    filter: 'drop-shadow(0 4px 10px rgba(0,0,0,0.5))'
+                                                }} 
+                                            />
+                                            
+                                            {/* Top Cassette */}
+                                            <div style={{
+                                                position: 'absolute', 
+                                                left: pts[0].x - minX, 
+                                                top: pts[0].y - minY, 
+                                                width: topWidth, 
+                                                height: '16px',
+                                                transformOrigin: 'top left',
+                                                transform: `rotate(${topAngle}rad)`,
+                                                background: `linear-gradient(to bottom, ${cassetteColors.top}, ${cassetteColors.bottom})`,
+                                                borderBottom: '1px solid rgba(0,0,0,0.2)',
+                                                borderTopLeftRadius: '2px', borderTopRightRadius: '2px',
+                                                zIndex: 2,
+                                                opacity: isZebra ? 1 : opacity
+                                            }} />
+
+                                            {/* Bottom Bar */}
+                                            <div style={{
+                                                position: 'absolute', 
+                                                left: pts[3].x - minX, 
+                                                top: pts[3].y - minY, 
+                                                width: bottomWidth, 
+                                                height: '8px',
+                                                transformOrigin: 'top left',
+                                                transform: `rotate(${bottomAngle}rad) translateY(-100%)`,
+                                                background: `linear-gradient(to bottom, ${cassetteColors.top}, ${cassetteColors.bottom})`,
+                                                borderTop: '1px solid rgba(0,0,0,0.2)',
+                                                borderBottomLeftRadius: '2px', borderBottomRightRadius: '2px',
+                                                zIndex: 2,
+                                                opacity: isZebra ? 1 : opacity
+                                            }} />
+
+                                            {/* 4 Corner Resize handles */}
+                                            {!isTakingPhoto && [
+                                                { type: 'nw', style: { top: pts[0].y - minY - 7, left: pts[0].x - minX - 7, cursor: 'nw-resize' } },
+                                                { type: 'ne', style: { top: pts[1].y - minY - 7, left: pts[1].x - minX - 7, cursor: 'ne-resize' } },
+                                                { type: 'se', style: { top: pts[2].y - minY - 7, left: pts[2].x - minX - 7, cursor: 'se-resize' } },
+                                                { type: 'sw', style: { top: pts[3].y - minY - 7, left: pts[3].x - minX - 7, cursor: 'sw-resize' } },
+                                            ].map(h => (
+                                                <div
+                                                    key={h.type}
+                                                    onMouseDown={(e) => onPointerDown(e, index, h.type)}
+                                                    onTouchStart={(e) => onPointerDown(e, index, h.type)}
+                                                    style={{
+                                                        position: 'absolute',
+                                                        width: 14, height: 14,
+                                                        background: '#fff',
+                                                        border: '2px solid var(--primary-green)',
+                                                        borderRadius: '50%',
+                                                        boxShadow: '0 2px 5px rgba(0,0,0,0.2)',
+                                                        zIndex: 10,
+                                                        ...h.style
+                                                    }}
+                                                />
+                                            ))}
+
+                                            {/* Delete Button (Only if there are multiple shades) */}
+                                            {!isTakingPhoto && shades.length > 1 && (
+                                                <div
+                                                    onMouseDown={(e) => { e.stopPropagation(); handleDeleteShade(index); }}
+                                                    onTouchStart={(e) => { e.stopPropagation(); handleDeleteShade(index); }}
+                                                    style={{
+                                                        position: 'absolute',
+                                                        top: pts[1].y - minY - 15,
+                                                        left: pts[1].x - minX + 5,
+                                                        width: 20, height: 20,
+                                                        background: '#ff4d4f', color: '#fff',
+                                                        borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                                        cursor: 'pointer', zIndex: 11,
+                                                        boxShadow: '0 2px 5px rgba(0,0,0,0.3)'
+                                                    }}
+                                                >
+                                                    <X size={12} />
+                                                </div>
+                                            )}
+                                        </div>
+                                    );
+                                })}
                             </>
                         ) : (
                             <div
@@ -462,6 +516,9 @@ const WindowVisualizer = ({ isOpen, onClose, productTitle, selectedColor, isZebr
                             }}>
                                 <button title="Upload Photo" onClick={() => fileRef.current?.click()} style={iconBtnStyle} onMouseOver={(e) => e.currentTarget.style.background = '#f0f0f0'} onMouseOut={(e) => e.currentTarget.style.background = 'transparent'}>
                                     <Upload size={20} />
+                                </button>
+                                <button title="Add Window" onClick={handleAddShade} style={iconBtnStyle} onMouseOver={(e) => e.currentTarget.style.background = '#f0f0f0'} onMouseOut={(e) => e.currentTarget.style.background = 'transparent'}>
+                                    <Plus size={20} />
                                 </button>
                                 <button title="Auto-Detect Window" onClick={handleAutoDetect} style={iconBtnStyle} onMouseOver={(e) => e.currentTarget.style.background = '#f0f0f0'} onMouseOut={(e) => e.currentTarget.style.background = 'transparent'}>
                                     <Wand2 size={20} />
