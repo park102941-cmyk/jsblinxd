@@ -48,8 +48,13 @@ const getMatchedCassetteColor = (hexColor) => {
 const WindowVisualizer = ({ isOpen, onClose, productTitle, selectedColor, isZebra }) => {
     const [roomPhoto, setRoomPhoto] = useState(null);
     const [opacity, setOpacity] = useState(0.82);
-    const [shade, setShade] = useState({ x: 120, y: 40, w: 220, h: 340 });
-    const [drag, setDrag] = useState(null); // { type: 'move'|corner, startX, startY, origShade }
+    const [pts, setPts] = useState([
+        { x: 120, y: 40 }, // nw
+        { x: 340, y: 40 }, // ne
+        { x: 340, y: 380 }, // se
+        { x: 120, y: 380 } // sw
+    ]);
+    const [drag, setDrag] = useState(null); // { type: 'move'|nw|ne|se|sw, startX, startY, origPts }
     const containerRef = useRef(null);
     const fileRef = useRef(null);
 
@@ -103,6 +108,8 @@ const WindowVisualizer = ({ isOpen, onClose, productTitle, selectedColor, isZebr
         reader.readAsDataURL(file);
     };
 
+    const resetShade = () => setPts([{ x: 120, y: 40 }, { x: 340, y: 40 }, { x: 340, y: 380 }, { x: 120, y: 380 }]);
+
     const handleAutoDetect = () => {
         if (!roomPhoto || !containerRef.current) return;
         
@@ -126,7 +133,7 @@ const WindowVisualizer = ({ isOpen, onClose, productTitle, selectedColor, isZebr
                 totalBrightness += (data[i] + data[i+1] + data[i+2]) / 3;
             }
             const avgBrightness = totalBrightness / (w * h);
-            const threshold = Math.max(avgBrightness * 1.5, 200); // 1.5x brighter than avg, or at least 200
+            const threshold = Math.max(avgBrightness * 1.5, 200);
             
             for (let y = 0; y < h; y++) {
                 for (let x = 0; x < w; x++) {
@@ -170,12 +177,17 @@ const WindowVisualizer = ({ isOpen, onClose, productTitle, selectedColor, isZebr
             const finalW = (((maxX - minX) * scaleX) / img.naturalWidth) * renderW;
             const finalH = (((maxY - minY) * scaleY) / img.naturalHeight) * renderH;
             
-            setShade({ 
-                x: Math.max(0, finalX), 
-                y: Math.max(0, finalY), 
-                w: Math.max(SHADE_MIN, finalW), 
-                h: Math.max(SHADE_MIN, finalH) 
-            });
+            const x0 = Math.max(0, finalX);
+            const y0 = Math.max(0, finalY);
+            const w0 = Math.max(SHADE_MIN, finalW);
+            const h0 = Math.max(SHADE_MIN, finalH);
+
+            setPts([
+                { x: x0, y: y0 },
+                { x: x0 + w0, y: y0 },
+                { x: x0 + w0, y: y0 + h0 },
+                { x: x0, y: y0 + h0 }
+            ]);
         };
         img.src = roomPhoto;
     };
@@ -185,7 +197,6 @@ const WindowVisualizer = ({ isOpen, onClose, productTitle, selectedColor, isZebr
         if (!containerRef.current) return;
         setIsTakingPhoto(true);
         try {
-            // wait for state update to hide handles
             await new Promise(resolve => setTimeout(resolve, 100));
             const canvas = await html2canvas(containerRef.current, {
                 useCORS: true,
@@ -217,8 +228,8 @@ const WindowVisualizer = ({ isOpen, onClose, productTitle, selectedColor, isZebr
         e.preventDefault();
         e.stopPropagation();
         const pos = getContainerPos(e);
-        setDrag({ type, startX: pos.x, startY: pos.y, origShade: { ...shade } });
-    }, [shade, getContainerPos]);
+        setDrag({ type, startX: pos.x, startY: pos.y, origPts: [...pts] });
+    }, [pts, getContainerPos]);
 
     const onPointerMove = useCallback((e) => {
         if (!drag) return;
@@ -226,35 +237,21 @@ const WindowVisualizer = ({ isOpen, onClose, productTitle, selectedColor, isZebr
         const pos = getContainerPos(e);
         const dx = pos.x - drag.startX;
         const dy = pos.y - drag.startY;
-        const orig = drag.origShade;
 
-        setShade(prev => {
+        setPts(prev => {
             if (drag.type === 'move') {
-                return { ...prev, x: orig.x + dx, y: orig.y + dy };
+                return drag.origPts.map(p => ({ x: p.x + dx, y: p.y + dy }));
             }
-            if (drag.type === 'se') {
-                return { ...prev, w: Math.max(SHADE_MIN, orig.w + dx), h: Math.max(SHADE_MIN, orig.h + dy) };
-            }
-            if (drag.type === 'sw') {
-                const newW = Math.max(SHADE_MIN, orig.w - dx);
-                return { ...prev, x: orig.x + orig.w - newW, w: newW, h: Math.max(SHADE_MIN, orig.h + dy) };
-            }
-            if (drag.type === 'ne') {
-                const newH = Math.max(SHADE_MIN, orig.h - dy);
-                return { ...prev, y: orig.y + orig.h - newH, w: Math.max(SHADE_MIN, orig.w + dx), h: newH };
-            }
-            if (drag.type === 'nw') {
-                const newW = Math.max(SHADE_MIN, orig.w - dx);
-                const newH = Math.max(SHADE_MIN, orig.h - dy);
-                return { ...prev, x: orig.x + orig.w - newW, y: orig.y + orig.h - newH, w: newW, h: newH };
-            }
-            return prev;
+            const newPts = [...drag.origPts];
+            if (drag.type === 'nw') newPts[0] = { x: drag.origPts[0].x + dx, y: drag.origPts[0].y + dy };
+            if (drag.type === 'ne') newPts[1] = { x: drag.origPts[1].x + dx, y: drag.origPts[1].y + dy };
+            if (drag.type === 'se') newPts[2] = { x: drag.origPts[2].x + dx, y: drag.origPts[2].y + dy };
+            if (drag.type === 'sw') newPts[3] = { x: drag.origPts[3].x + dx, y: drag.origPts[3].y + dy };
+            return newPts;
         });
     }, [drag, getContainerPos]);
 
     const onPointerUp = useCallback(() => setDrag(null), []);
-
-    const resetShade = () => setShade({ x: 120, y: 40, w: 220, h: 340 });
 
     const fabricImage = fabricDataUrl || selectedColor?.fullImage || selectedColor?.image;
     const shadeColor = selectedColor?.hex || '#c8b89a';
@@ -289,6 +286,27 @@ const WindowVisualizer = ({ isOpen, onClose, productTitle, selectedColor, isZebr
 
     if (!isOpen) return null;
 
+    const minX = Math.min(...pts.map(p => p.x));
+    const maxX = Math.max(...pts.map(p => p.x));
+    const minY = Math.min(...pts.map(p => p.y));
+    const maxY = Math.max(...pts.map(p => p.y));
+    const w = Math.max(10, maxX - minX);
+    const h = Math.max(10, maxY - minY);
+
+    const clipPathStr = `polygon(${pts.map(p => `${p.x - minX}px ${p.y - minY}px`).join(', ')})`;
+
+    const topAngle = Math.atan2(pts[1].y - pts[0].y, pts[1].x - pts[0].x);
+    const topWidth = Math.hypot(pts[1].x - pts[0].x, pts[1].y - pts[0].y);
+
+    const bottomAngle = Math.atan2(pts[2].y - pts[3].y, pts[2].x - pts[3].x);
+    const bottomWidth = Math.hypot(pts[2].x - pts[3].x, pts[2].y - pts[3].y);
+
+    const iconBtnStyle = {
+        background: 'transparent', border: 'none', cursor: 'pointer', padding: '10px', 
+        borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', 
+        color: '#444', transition: 'background 0.2s'
+    };
+
     return (
         <div style={{
             position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)',
@@ -297,24 +315,28 @@ const WindowVisualizer = ({ isOpen, onClose, productTitle, selectedColor, isZebr
         }}>
             <div style={{
                 background: '#fff', borderRadius: '16px', width: '100%', maxWidth: '900px',
-                maxHeight: '90vh', display: 'flex', flexDirection: 'column', overflow: 'hidden'
+                maxHeight: '90vh', display: 'flex', flexDirection: 'column', overflow: 'hidden',
+                boxShadow: '0 20px 40px rgba(0,0,0,0.3)'
             }}>
                 {/* Header */}
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '20px 24px', borderBottom: '1px solid #eee' }}>
-                    <div>
-                        <h2 style={{ margin: 0, fontSize: '1.2rem', fontWeight: '700' }}>Try in My Window</h2>
-                        <p style={{ margin: '2px 0 0', fontSize: '0.82rem', color: '#888' }}>
-                            {productTitle}{selectedColor ? ` — ${selectedColor.name}` : ''}
-                        </p>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 24px', borderBottom: '1px solid #eee' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        <div style={{ width: 32, height: 32, borderRadius: '6px', background: fabricImage ? `url(${fabricImage}) center/cover` : shadeColor, border: '1px solid #ddd', flexShrink: 0 }} />
+                        <div>
+                            <h2 style={{ margin: 0, fontSize: '1.1rem', fontWeight: '700', color: '#222' }}>Try in My Window</h2>
+                            <p style={{ margin: '2px 0 0', fontSize: '0.8rem', color: '#777' }}>
+                                {productTitle}{selectedColor ? ` — ${selectedColor.name}` : ''}
+                            </p>
+                        </div>
                     </div>
-                    <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px' }}>
-                        <X size={22} color="#555" />
+                    <button onClick={onClose} style={{ background: '#f5f5f5', border: 'none', cursor: 'pointer', padding: '6px', borderRadius: '50%' }}>
+                        <X size={20} color="#555" />
                     </button>
                 </div>
 
-                <div style={{ display: 'flex', flex: 1, overflow: 'hidden', minHeight: 0 }}>
-                    {/* Canvas area */}
-                    <div style={{ flex: 1, position: 'relative', background: '#1a1a1a', overflow: 'hidden', minHeight: '400px' }}
+                {/* Main Content Area */}
+                <div style={{ position: 'relative', flex: 1, display: 'flex', flexDirection: 'column', minHeight: '400px', background: '#1a1a1a' }}>
+                    <div style={{ flex: 1, position: 'relative', overflow: 'hidden' }}
                         ref={containerRef}
                         onMouseMove={onPointerMove}
                         onMouseUp={onPointerUp}
@@ -332,49 +354,63 @@ const WindowVisualizer = ({ isOpen, onClose, productTitle, selectedColor, isZebr
                                 />
                                 {/* Shade overlay */}
                                 <div
-                                    onMouseDown={(e) => onPointerDown(e, 'move')}
-                                    onTouchStart={(e) => onPointerDown(e, 'move')}
                                     style={{
                                         position: 'absolute',
-                                        left: shade.x, top: shade.y,
-                                        width: shade.w, height: shade.h,
-                                        cursor: drag?.type === 'move' ? 'grabbing' : 'grab',
-                                        borderRadius: '3px',
-                                        boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
-                                        userSelect: 'none',
-                                        border: '1px solid rgba(255,255,255,0.4)'
+                                        left: minX, top: minY,
+                                        width: w, height: h,
+                                        userSelect: 'none'
                                     }}
                                 >
                                     {/* Inner Fabric Background */}
-                                    <div style={{
-                                        position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
-                                        ...shadeStyle,
-                                        borderRadius: '2px'
-                                    }} />
+                                    <div 
+                                        onMouseDown={(e) => onPointerDown(e, 'move')}
+                                        onTouchStart={(e) => onPointerDown(e, 'move')}
+                                        style={{
+                                            position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
+                                            ...shadeStyle,
+                                            clipPath: clipPathStr,
+                                            WebkitClipPath: clipPathStr,
+                                            cursor: drag?.type === 'move' ? 'grabbing' : 'grab',
+                                            filter: 'drop-shadow(0 4px 10px rgba(0,0,0,0.5))'
+                                        }} 
+                                    />
+                                    
                                     {/* Top Cassette */}
                                     <div style={{
-                                        position: 'absolute', top: 0, left: -1, right: -1, height: '16px',
+                                        position: 'absolute', 
+                                        left: pts[0].x - minX, 
+                                        top: pts[0].y - minY, 
+                                        width: topWidth, 
+                                        height: '16px',
+                                        transformOrigin: 'top left',
+                                        transform: `rotate(${topAngle}rad)`,
                                         background: `linear-gradient(to bottom, ${cassetteColors.top}, ${cassetteColors.bottom})`,
-                                        borderBottom: '1px solid rgba(0,0,0,0.1)',
-                                        borderTopLeftRadius: '3px', borderTopRightRadius: '3px',
-                                        boxShadow: '0 2px 4px rgba(0,0,0,0.15)'
+                                        borderBottom: '1px solid rgba(0,0,0,0.2)',
+                                        borderTopLeftRadius: '2px', borderTopRightRadius: '2px',
+                                        zIndex: 2
                                     }} />
 
                                     {/* Bottom Bar */}
                                     <div style={{
-                                        position: 'absolute', bottom: 0, left: -1, right: -1, height: '8px',
+                                        position: 'absolute', 
+                                        left: pts[3].x - minX, 
+                                        top: pts[3].y - minY, 
+                                        width: bottomWidth, 
+                                        height: '8px',
+                                        transformOrigin: 'top left',
+                                        transform: `rotate(${bottomAngle}rad) translateY(-100%)`,
                                         background: `linear-gradient(to bottom, ${cassetteColors.top}, ${cassetteColors.bottom})`,
-                                        borderTop: '1px solid rgba(0,0,0,0.1)',
-                                        borderBottomLeftRadius: '3px', borderBottomRightRadius: '3px',
-                                        boxShadow: '0 -2px 4px rgba(0,0,0,0.1)'
+                                        borderTop: '1px solid rgba(0,0,0,0.2)',
+                                        borderBottomLeftRadius: '2px', borderBottomRightRadius: '2px',
+                                        zIndex: 2
                                     }} />
 
-                                    {/* Resize handles */}
+                                    {/* 4 Corner Resize handles */}
                                     {!isTakingPhoto && [
-                                        { type: 'nw', style: { top: -5, left: -5, cursor: 'nw-resize' } },
-                                        { type: 'ne', style: { top: -5, right: -5, cursor: 'ne-resize' } },
-                                        { type: 'sw', style: { bottom: -5, left: -5, cursor: 'sw-resize' } },
-                                        { type: 'se', style: { bottom: -5, right: -5, cursor: 'se-resize' } },
+                                        { type: 'nw', style: { top: pts[0].y - minY - 7, left: pts[0].x - minX - 7, cursor: 'nw-resize' } },
+                                        { type: 'ne', style: { top: pts[1].y - minY - 7, left: pts[1].x - minX - 7, cursor: 'ne-resize' } },
+                                        { type: 'se', style: { top: pts[2].y - minY - 7, left: pts[2].x - minX - 7, cursor: 'se-resize' } },
+                                        { type: 'sw', style: { top: pts[3].y - minY - 7, left: pts[3].x - minX - 7, cursor: 'sw-resize' } },
                                     ].map(h => (
                                         <div
                                             key={h.type}
@@ -382,27 +418,16 @@ const WindowVisualizer = ({ isOpen, onClose, productTitle, selectedColor, isZebr
                                             onTouchStart={(e) => onPointerDown(e, h.type)}
                                             style={{
                                                 position: 'absolute',
-                                                width: 12, height: 12,
+                                                width: 14, height: 14,
                                                 background: '#fff',
-                                                border: '2px solid #555',
-                                                borderRadius: '2px',
+                                                border: '2px solid var(--primary-green)',
+                                                borderRadius: '50%',
+                                                boxShadow: '0 2px 5px rgba(0,0,0,0.2)',
+                                                zIndex: 10,
                                                 ...h.style
                                             }}
                                         />
                                     ))}
-
-                                    {/* Move indicator */}
-                                    {!isTakingPhoto && (
-                                        <div style={{
-                                            position: 'absolute', top: '50%', left: '50%',
-                                            transform: 'translate(-50%, -50%)',
-                                            background: 'rgba(0,0,0,0.35)', borderRadius: '6px',
-                                            padding: '4px 10px', color: '#fff', fontSize: '0.7rem',
-                                            fontWeight: '600', pointerEvents: 'none', whiteSpace: 'nowrap'
-                                        }}>
-                                            Drag to Move · Edges to Resize
-                                        </div>
-                                    )}
                                 </div>
                             </>
                         ) : (
@@ -412,103 +437,74 @@ const WindowVisualizer = ({ isOpen, onClose, productTitle, selectedColor, isZebr
                                     position: 'absolute', inset: 0,
                                     display: 'flex', flexDirection: 'column',
                                     alignItems: 'center', justifyContent: 'center',
-                                    cursor: 'pointer', gap: '12px'
+                                    cursor: 'pointer', gap: '16px'
                                 }}
                             >
-                                <div style={{ background: 'rgba(255,255,255,0.08)', borderRadius: '50%', width: 72, height: 72, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                    <Upload size={28} color="#fff" />
+                                <div style={{ background: 'rgba(255,255,255,0.08)', borderRadius: '50%', width: 80, height: 80, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                    <Upload size={32} color="#fff" />
                                 </div>
-                                <p style={{ color: '#bbb', fontSize: '0.95rem', textAlign: 'center', margin: 0 }}>
+                                <p style={{ color: '#bbb', fontSize: '1.05rem', textAlign: 'center', margin: 0, fontWeight: '500' }}>
                                     Upload a photo of your window or room<br />
-                                    <span style={{ fontSize: '0.78rem', color: '#777' }}>Click here or browse your files</span>
+                                    <span style={{ fontSize: '0.85rem', color: '#777', fontWeight: 'normal', marginTop: '8px', display: 'inline-block' }}>Click here or browse your files</span>
                                 </p>
+                            </div>
+                        )}
+
+                        <input ref={fileRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={handleUpload} />
+
+                        {/* Floating Icon Toolbar */}
+                        {roomPhoto && !isTakingPhoto && (
+                            <div style={{
+                                position: 'absolute', right: 20, top: '50%', transform: 'translateY(-50%)',
+                                display: 'flex', flexDirection: 'column', gap: 10,
+                                background: 'rgba(255,255,255,0.95)', padding: '10px 8px',
+                                borderRadius: 30, boxShadow: '0 4px 20px rgba(0,0,0,0.2)', zIndex: 10
+                            }}>
+                                <button title="Upload Photo" onClick={() => fileRef.current?.click()} style={iconBtnStyle} onMouseOver={(e) => e.currentTarget.style.background = '#f0f0f0'} onMouseOut={(e) => e.currentTarget.style.background = 'transparent'}>
+                                    <Upload size={20} />
+                                </button>
+                                <button title="Auto-Detect Window" onClick={handleAutoDetect} style={iconBtnStyle} onMouseOver={(e) => e.currentTarget.style.background = '#f0f0f0'} onMouseOut={(e) => e.currentTarget.style.background = 'transparent'}>
+                                    <Wand2 size={20} />
+                                </button>
+                                <button title="Reset Position" onClick={resetShade} style={iconBtnStyle} onMouseOver={(e) => e.currentTarget.style.background = '#f0f0f0'} onMouseOut={(e) => e.currentTarget.style.background = 'transparent'}>
+                                    <RotateCcw size={20} />
+                                </button>
+                                <div style={{ width: '100%', height: '1px', background: '#eee', margin: '4px 0' }} />
+                                <button title="Save Photo" onClick={handleTakePhoto} disabled={isTakingPhoto} style={{ ...iconBtnStyle, background: 'var(--primary-green)', color: '#fff', borderRadius: '50%', padding: '12px' }}>
+                                    <Camera size={20} />
+                                </button>
+                            </div>
+                        )}
+                        
+                        {/* Instructional Tooltip */}
+                        {roomPhoto && !isTakingPhoto && (
+                            <div style={{
+                                position: 'absolute', top: 20, left: '50%', transform: 'translateX(-50%)',
+                                background: 'rgba(0,0,0,0.6)', color: '#fff', padding: '6px 16px',
+                                borderRadius: '20px', fontSize: '0.8rem', fontWeight: '500', pointerEvents: 'none',
+                                backdropFilter: 'blur(4px)'
+                            }}>
+                                Drag the 4 corner points to fit your window exactly
                             </div>
                         )}
                     </div>
 
-                    {/* Controls */}
-                    <div style={{ width: '220px', padding: '20px', borderLeft: '1px solid #eee', display: 'flex', flexDirection: 'column', gap: '20px', overflowY: 'auto' }}>
-                        <div>
-                            <div style={{ fontSize: '0.78rem', fontWeight: '700', color: '#444', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                                Upload Photo
-                            </div>
-                            <button
-                                onClick={() => fileRef.current?.click()}
-                                style={{ width: '100%', padding: '10px', border: '1.5px dashed #ccc', borderRadius: '8px', background: '#fafafa', cursor: 'pointer', fontSize: '0.85rem', color: '#555', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}
-                            >
-                                <Upload size={14} /> Select Photo
-                            </button>
-                            <input ref={fileRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={handleUpload} />
+                    {/* Disclaimer and Opacity Footer */}
+                    <div style={{ padding: '16px 24px', background: '#fff', borderTop: '1px solid #eee', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '20px' }}>
+                        <div style={{ flex: 1, fontSize: '0.8rem', color: '#888', fontStyle: 'italic', lineHeight: '1.4' }}>
+                            <span style={{ fontWeight: '600', color: '#666', fontStyle: 'normal' }}>Disclaimer:</span> This is a simulation for visualization purposes. The actual product appearance, fit, color, and texture may differ from this generated image.
                         </div>
-
-                        <div>
-                            <div style={{ fontSize: '0.78rem', fontWeight: '700', color: '#444', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                                Shade Color
-                            </div>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                <div style={{ width: 28, height: 28, borderRadius: '6px', background: fabricImage ? `url(${fabricImage}) center/cover` : shadeColor, border: '1px solid #ddd', flexShrink: 0 }} />
-                                <span style={{ fontSize: '0.82rem', color: '#555' }}>{selectedColor?.name || 'Default Color'}</span>
-                            </div>
-                        </div>
-
-                        <div>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                                <div style={{ fontSize: '0.78rem', fontWeight: '700', color: '#444', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Opacity</div>
-                                <span style={{ fontSize: '0.78rem', color: '#888' }}>{Math.round(opacity * 100)}%</span>
-                            </div>
-                            <input
-                                type="range" min="0.2" max="1" step="0.05"
-                                value={opacity}
-                                onChange={(e) => setOpacity(parseFloat(e.target.value))}
-                                style={{ width: '100%', accentColor: 'var(--primary-green)' }}
-                            />
-                            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.7rem', color: '#aaa', marginTop: '2px' }}>
-                                <ZoomOut size={10} />
-                                <ZoomIn size={10} />
-                            </div>
-                        </div>
-
-                        <div>
-                            <div style={{ fontSize: '0.78rem', fontWeight: '700', color: '#444', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                                Size & Position
-                            </div>
-                            <div style={{ fontSize: '0.78rem', color: '#888', lineHeight: '1.5', marginBottom: '10px' }}>
-                                W: {Math.round(shade.w)}px · H: {Math.round(shade.h)}px
-                            </div>
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                <button
-                                    onClick={handleAutoDetect}
-                                    disabled={!roomPhoto}
-                                    style={{ width: '100%', padding: '8px', border: '1px solid var(--primary-green)', borderRadius: '6px', background: 'var(--primary-green)', cursor: roomPhoto ? 'pointer' : 'not-allowed', opacity: roomPhoto ? 1 : 0.5, fontSize: '0.82rem', color: '#fff', fontWeight: '600', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}
-                                >
-                                    <Wand2 size={14} /> Auto-Detect Window
-                                </button>
-                                <button
-                                    onClick={resetShade}
-                                    style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '6px', background: '#fff', cursor: 'pointer', fontSize: '0.82rem', color: '#555', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px' }}
-                                >
-                                    <RotateCcw size={12} /> Reset Position
-                                </button>
-                            </div>
-                        </div>
-
                         {roomPhoto && (
-                            <div>
-                                <button
-                                    onClick={handleTakePhoto}
-                                    disabled={isTakingPhoto}
-                                    style={{ width: '100%', padding: '12px', border: 'none', borderRadius: '8px', background: '#333', cursor: isTakingPhoto ? 'not-allowed' : 'pointer', fontSize: '0.9rem', color: '#fff', fontWeight: '700', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', transition: 'all 0.2s' }}
-                                >
-                                    <Camera size={16} /> {isTakingPhoto ? 'Saving...' : 'Save Photo'}
-                                </button>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: '180px', background: '#f9f9f9', padding: '8px 16px', borderRadius: '30px' }}>
+                                <span style={{ fontSize: '0.75rem', fontWeight: '700', color: '#444', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Opacity</span>
+                                <input 
+                                    type="range" min="0.2" max="1" step="0.05" 
+                                    value={opacity} 
+                                    onChange={(e) => setOpacity(parseFloat(e.target.value))} 
+                                    style={{ flex: 1, accentColor: 'var(--primary-green)' }} 
+                                />
                             </div>
                         )}
-
-                        <div style={{ marginTop: 'auto' }}>
-                            <div style={{ fontSize: '0.72rem', color: '#aaa', lineHeight: '1.5', padding: '10px', background: '#f9f9f9', borderRadius: '8px' }}>
-                                💡 Photos are processed locally in your browser and are not saved to our servers.
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>
