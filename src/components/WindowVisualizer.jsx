@@ -264,7 +264,7 @@ const WindowVisualizer = ({ isOpen, onClose, productTitle, selectedColor, isZebr
     if (fabricImage) {
         shadeStyle = {
             backgroundImage: `url(${fabricImage})`,
-            backgroundSize: isZebra ? '100% 180px' : 'cover', // Zebra stripes tiling or cover for roller
+            backgroundSize: isZebra ? '100% 70px' : 'cover', // Zebra stripes tiling or cover for roller
             backgroundPosition: 'top center',
             backgroundRepeat: isZebra ? 'repeat-y' : 'no-repeat',
             opacity: opacity
@@ -275,9 +275,9 @@ const WindowVisualizer = ({ isOpen, onClose, productTitle, selectedColor, isZebr
                 background: `repeating-linear-gradient(
                     to bottom,
                     ${shadeColor}cc 0px,
-                    ${shadeColor}cc 18px,
-                    ${shadeColor}22 18px,
-                    ${shadeColor}22 36px
+                    ${shadeColor}cc 12px,
+                    ${shadeColor}22 12px,
+                    ${shadeColor}22 24px
                 )`,
                 opacity
             }
@@ -348,7 +348,7 @@ const WindowVisualizer = ({ isOpen, onClose, productTitle, selectedColor, isZebr
                                 >
                                     {/* Top Cassette */}
                                     <div style={{
-                                        position: 'absolute', top: 0, left: -1, right: -1, height: '24px',
+                                        position: 'absolute', top: 0, left: -1, right: -1, height: '16px',
                                         background: `linear-gradient(to bottom, ${cassetteColors.top}, ${cassetteColors.bottom})`,
                                         borderBottom: '1px solid rgba(0,0,0,0.1)',
                                         borderTopLeftRadius: '3px', borderTopRightRadius: '3px',
@@ -357,7 +357,7 @@ const WindowVisualizer = ({ isOpen, onClose, productTitle, selectedColor, isZebr
 
                                     {/* Bottom Bar */}
                                     <div style={{
-                                        position: 'absolute', bottom: 0, left: -1, right: -1, height: '14px',
+                                        position: 'absolute', bottom: 0, left: -1, right: -1, height: '8px',
                                         background: `linear-gradient(to bottom, ${cassetteColors.top}, ${cassetteColors.bottom})`,
                                         borderTop: '1px solid rgba(0,0,0,0.1)',
                                         borderBottomLeftRadius: '3px', borderBottomRightRadius: '3px',
