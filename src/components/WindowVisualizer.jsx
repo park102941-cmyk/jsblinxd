@@ -87,8 +87,10 @@ const ToolbarButton = ({ icon: Icon, label, onClick, isActive, disabled, hovered
 };
 
 const WindowVisualizer = ({ isOpen, onClose, productTitle, selectedColor, isZebra }) => {
+    const isBlackout = productTitle?.toLowerCase().includes('blackout');
+    
     const [roomPhoto, setRoomPhoto] = useState(null);
-    const [opacity, setOpacity] = useState(0.82);
+    const [opacity, setOpacity] = useState(isBlackout ? 1.0 : 0.82);
     
     const [editMode, setEditMode] = useState('scale'); // 'scale' or 'perspective'
     const [hoveredIcon, setHoveredIcon] = useState(null);
@@ -106,8 +108,11 @@ const WindowVisualizer = ({ isOpen, onClose, productTitle, selectedColor, isZebr
     const fileRef = useRef(null);
 
     useEffect(() => {
-        if (isOpen) setRoomPhoto(null);
-    }, [isOpen]);
+        if (isOpen) {
+            setRoomPhoto(null);
+            setOpacity(isBlackout ? 1.0 : 0.82);
+        }
+    }, [isOpen, isBlackout]);
 
     const [fabricDataUrl, setFabricDataUrl] = useState(null);
 
@@ -276,12 +281,13 @@ const WindowVisualizer = ({ isOpen, onClose, productTitle, selectedColor, isZebr
             opacity: opacity
         };
     } else {
+        const solidAlpha = isBlackout ? 'ff' : 'cc';
         shadeStyle = isZebra
             ? {
                 background: `repeating-linear-gradient(
                     to bottom,
-                    ${shadeColor}cc 0px,
-                    ${shadeColor}cc 8px,
+                    ${shadeColor}${solidAlpha} 0px,
+                    ${shadeColor}${solidAlpha} 8px,
                     ${shadeColor}22 8px,
                     ${shadeColor}22 16px
                 )`,
@@ -289,7 +295,7 @@ const WindowVisualizer = ({ isOpen, onClose, productTitle, selectedColor, isZebr
             }
             : {
                 background: shadeColor,
-                opacity: opacity * 0.7
+                opacity: isBlackout ? opacity : opacity * 0.7
             };
     }
 
