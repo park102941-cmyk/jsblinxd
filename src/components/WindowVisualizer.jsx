@@ -1,5 +1,5 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
-import { X, Upload, RotateCcw, ZoomIn, ZoomOut, Camera, Wand2, Plus } from 'lucide-react';
+import { X, Upload, RotateCcw, Camera, Plus, Maximize, Focus } from 'lucide-react';
 import html2canvas from 'html2canvas';
 
 const SHADE_MIN = 60;
@@ -45,9 +45,53 @@ const getMatchedCassetteColor = (hexColor) => {
     }
 };
 
+const ToolbarButton = ({ icon: Icon, label, onClick, isActive, disabled, hoveredIcon, setHoveredIcon, customStyle }) => {
+    return (
+        <div style={{ position: 'relative' }} onMouseEnter={() => setHoveredIcon(label)} onMouseLeave={() => setHoveredIcon(null)}>
+            <button
+                type="button"
+                onClick={onClick}
+                disabled={disabled}
+                style={customStyle || {
+                    background: isActive ? 'rgba(0,0,0,0.08)' : 'transparent',
+                    border: 'none', cursor: 'pointer', padding: '10px',
+                    borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    color: isActive ? 'var(--primary-green)' : '#444',
+                    transition: 'background 0.2s',
+                    opacity: disabled ? 0.5 : 1
+                }}
+                onMouseOver={(e) => !customStyle && !isActive && !disabled && (e.currentTarget.style.background = '#f0f0f0')}
+                onMouseOut={(e) => !customStyle && !isActive && !disabled && (e.currentTarget.style.background = 'transparent')}
+            >
+                <Icon size={20} />
+            </button>
+            {hoveredIcon === label && !disabled && (
+                <div style={{
+                    position: 'absolute', right: '100%', top: '50%', transform: 'translateY(-50%)',
+                    marginRight: '12px', background: 'rgba(0,0,0,0.75)', color: '#fff',
+                    padding: '6px 10px', borderRadius: '6px', fontSize: '0.75rem', fontWeight: '500',
+                    whiteSpace: 'nowrap', pointerEvents: 'none',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+                    zIndex: 100
+                }}>
+                    {label}
+                    <div style={{
+                        position: 'absolute', right: '-4px', top: '50%', transform: 'translateY(-50%)',
+                        width: 0, height: 0, borderTop: '4px solid transparent', borderBottom: '4px solid transparent',
+                        borderLeft: '4px solid rgba(0,0,0,0.75)'
+                    }} />
+                </div>
+            )}
+        </div>
+    );
+};
+
 const WindowVisualizer = ({ isOpen, onClose, productTitle, selectedColor, isZebra }) => {
     const [roomPhoto, setRoomPhoto] = useState(null);
     const [opacity, setOpacity] = useState(0.82);
+    
+    const [editMode, setEditMode] = useState('scale'); // 'scale' or 'perspective'
+    const [hoveredIcon, setHoveredIcon] = useState(null);
     
     const defaultPts = [
         { x: 120, y: 40 }, // nw
@@ -132,88 +176,6 @@ const WindowVisualizer = ({ isOpen, onClose, productTitle, selectedColor, isZebr
         setShades(prev => prev.filter((_, i) => i !== indexToRemove));
     };
 
-    const handleAutoDetect = () => {
-        if (!roomPhoto || !containerRef.current) return;
-        
-        const img = new Image();
-        img.onload = () => {
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
-            const w = 100;
-            const h = Math.floor(100 * (img.naturalHeight / img.naturalWidth));
-            canvas.width = w;
-            canvas.height = h;
-            ctx.drawImage(img, 0, 0, w, h);
-            const imageData = ctx.getImageData(0, 0, w, h);
-            const data = imageData.data;
-            
-            let minX = w, minY = h, maxX = 0, maxY = 0;
-            let brightPixels = 0;
-            let totalBrightness = 0;
-            
-            for (let i = 0; i < data.length; i += 4) {
-                totalBrightness += (data[i] + data[i+1] + data[i+2]) / 3;
-            }
-            const avgBrightness = totalBrightness / (w * h);
-            const threshold = Math.max(avgBrightness * 1.5, 200);
-            
-            for (let y = 0; y < h; y++) {
-                for (let x = 0; x < w; x++) {
-                    const i = (y * w + x) * 4;
-                    const brightness = (data[i] + data[i+1] + data[i+2]) / 3;
-                    if (brightness > threshold) {
-                        if (x < minX) minX = x;
-                        if (x > maxX) maxX = x;
-                        if (y < minY) minY = y;
-                        if (y > maxY) maxY = y;
-                        brightPixels++;
-                    }
-                }
-            }
-            
-            if (brightPixels < 10 || maxX <= minX || maxY <= minY) {
-                resetShade(); // fallback to default
-                return;
-            }
-            
-            const containerRect = containerRef.current.getBoundingClientRect();
-            const imgRatio = img.naturalWidth / img.naturalHeight;
-            const containerRatio = containerRect.width / containerRect.height;
-            
-            let renderW, renderH, offsetX = 0, offsetY = 0;
-            if (imgRatio > containerRatio) {
-                renderW = containerRect.width;
-                renderH = containerRect.width / imgRatio;
-                offsetY = (containerRect.height - renderH) / 2;
-            } else {
-                renderH = containerRect.height;
-                renderW = containerRect.height * imgRatio;
-                offsetX = (containerRect.width - renderW) / 2;
-            }
-            
-            const scaleX = img.naturalWidth / w;
-            const scaleY = img.naturalHeight / h;
-            
-            const finalX = offsetX + ((minX * scaleX) / img.naturalWidth) * renderW;
-            const finalY = offsetY + ((minY * scaleY) / img.naturalHeight) * renderH;
-            const finalW = (((maxX - minX) * scaleX) / img.naturalWidth) * renderW;
-            const finalH = (((maxY - minY) * scaleY) / img.naturalHeight) * renderH;
-            
-            const x0 = Math.max(0, finalX);
-            const y0 = Math.max(0, finalY);
-            const w0 = Math.max(SHADE_MIN, finalW);
-            const h0 = Math.max(SHADE_MIN, finalH);
-
-            setShades([[
-                { x: x0, y: y0 },
-                { x: x0 + w0, y: y0 },
-                { x: x0 + w0, y: y0 + h0 },
-                { x: x0, y: y0 + h0 }
-            ]]);
-        };
-        img.src = roomPhoto;
-    };
-
     const [isTakingPhoto, setIsTakingPhoto] = useState(false);
     const handleTakePhoto = async () => {
         if (!containerRef.current) return;
@@ -263,20 +225,40 @@ const WindowVisualizer = ({ isOpen, onClose, productTitle, selectedColor, isZebr
         setShades(prev => {
             const newShades = [...prev];
             const origPts = drag.origPts;
-            let newPts;
+            let newPts = [...origPts];
+            
             if (drag.type === 'move') {
                 newPts = origPts.map(p => ({ x: p.x + dx, y: p.y + dy }));
             } else {
-                newPts = [...origPts];
-                if (drag.type === 'nw') newPts[0] = { x: origPts[0].x + dx, y: origPts[0].y + dy };
-                if (drag.type === 'ne') newPts[1] = { x: origPts[1].x + dx, y: origPts[1].y + dy };
-                if (drag.type === 'se') newPts[2] = { x: origPts[2].x + dx, y: origPts[2].y + dy };
-                if (drag.type === 'sw') newPts[3] = { x: origPts[3].x + dx, y: origPts[3].y + dy };
+                const cornerMap = { 'nw': 0, 'ne': 1, 'se': 2, 'sw': 3 };
+                const dragIndex = cornerMap[drag.type];
+                
+                if (editMode === 'perspective') {
+                    newPts[dragIndex] = { x: origPts[dragIndex].x + dx, y: origPts[dragIndex].y + dy };
+                } else if (editMode === 'scale') {
+                    const oppIndex = (dragIndex + 2) % 4;
+                    const origin = origPts[oppIndex];
+                    const origW = origPts[dragIndex].x - origin.x;
+                    const origH = origPts[dragIndex].y - origin.y;
+                    
+                    let scaleX = Math.abs(origW) > 0.1 ? (origW + dx) / origW : 1;
+                    let scaleY = Math.abs(origH) > 0.1 ? (origH + dy) / origH : 1;
+                    
+                    if (scaleX * Math.abs(origW) < 20) scaleX = 20 / Math.abs(origW);
+                    if (scaleY * Math.abs(origH) < 20) scaleY = 20 / Math.abs(origH);
+
+                    for (let i = 0; i < 4; i++) {
+                        newPts[i] = {
+                            x: origin.x + (origPts[i].x - origin.x) * scaleX,
+                            y: origin.y + (origPts[i].y - origin.y) * scaleY
+                        };
+                    }
+                }
             }
             newShades[drag.shadeIndex] = newPts;
             return newShades;
         });
-    }, [drag, getContainerPos]);
+    }, [drag, editMode, getContainerPos]);
 
     const onPointerUp = useCallback(() => setDrag(null), []);
 
@@ -312,12 +294,6 @@ const WindowVisualizer = ({ isOpen, onClose, productTitle, selectedColor, isZebr
     }
 
     if (!isOpen) return null;
-
-    const iconBtnStyle = {
-        background: 'transparent', border: 'none', cursor: 'pointer', padding: '10px', 
-        borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', 
-        color: '#444', transition: 'background 0.2s'
-    };
 
     return (
         <div style={{
@@ -439,10 +415,10 @@ const WindowVisualizer = ({ isOpen, onClose, productTitle, selectedColor, isZebr
 
                                             {/* 4 Corner Resize handles */}
                                             {!isTakingPhoto && [
-                                                { type: 'nw', style: { top: pts[0].y - minY - 7, left: pts[0].x - minX - 7, cursor: 'nw-resize' } },
-                                                { type: 'ne', style: { top: pts[1].y - minY - 7, left: pts[1].x - minX - 7, cursor: 'ne-resize' } },
-                                                { type: 'se', style: { top: pts[2].y - minY - 7, left: pts[2].x - minX - 7, cursor: 'se-resize' } },
-                                                { type: 'sw', style: { top: pts[3].y - minY - 7, left: pts[3].x - minX - 7, cursor: 'sw-resize' } },
+                                                { type: 'nw', style: { top: pts[0].y - minY - 7, left: pts[0].x - minX - 7, cursor: editMode === 'scale' ? 'nw-resize' : 'pointer' } },
+                                                { type: 'ne', style: { top: pts[1].y - minY - 7, left: pts[1].x - minX - 7, cursor: editMode === 'scale' ? 'ne-resize' : 'pointer' } },
+                                                { type: 'se', style: { top: pts[2].y - minY - 7, left: pts[2].x - minX - 7, cursor: editMode === 'scale' ? 'se-resize' : 'pointer' } },
+                                                { type: 'sw', style: { top: pts[3].y - minY - 7, left: pts[3].x - minX - 7, cursor: editMode === 'scale' ? 'sw-resize' : 'pointer' } },
                                             ].map(h => (
                                                 <div
                                                     key={h.type}
@@ -452,7 +428,7 @@ const WindowVisualizer = ({ isOpen, onClose, productTitle, selectedColor, isZebr
                                                         position: 'absolute',
                                                         width: 14, height: 14,
                                                         background: '#fff',
-                                                        border: '2px solid var(--primary-green)',
+                                                        border: `2px solid ${editMode === 'scale' ? 'var(--primary-green)' : '#ff9800'}`,
                                                         borderRadius: '50%',
                                                         boxShadow: '0 2px 5px rgba(0,0,0,0.2)',
                                                         zIndex: 10,
@@ -514,22 +490,31 @@ const WindowVisualizer = ({ isOpen, onClose, productTitle, selectedColor, isZebr
                                 background: 'rgba(255,255,255,0.95)', padding: '10px 8px',
                                 borderRadius: 30, boxShadow: '0 4px 20px rgba(0,0,0,0.2)', zIndex: 10
                             }}>
-                                <button title="Upload Photo" onClick={() => fileRef.current?.click()} style={iconBtnStyle} onMouseOver={(e) => e.currentTarget.style.background = '#f0f0f0'} onMouseOut={(e) => e.currentTarget.style.background = 'transparent'}>
-                                    <Upload size={20} />
-                                </button>
-                                <button title="Add Window" onClick={handleAddShade} style={iconBtnStyle} onMouseOver={(e) => e.currentTarget.style.background = '#f0f0f0'} onMouseOut={(e) => e.currentTarget.style.background = 'transparent'}>
-                                    <Plus size={20} />
-                                </button>
-                                <button title="Auto-Detect Window" onClick={handleAutoDetect} style={iconBtnStyle} onMouseOver={(e) => e.currentTarget.style.background = '#f0f0f0'} onMouseOut={(e) => e.currentTarget.style.background = 'transparent'}>
-                                    <Wand2 size={20} />
-                                </button>
-                                <button title="Reset Position" onClick={resetShade} style={iconBtnStyle} onMouseOver={(e) => e.currentTarget.style.background = '#f0f0f0'} onMouseOut={(e) => e.currentTarget.style.background = 'transparent'}>
-                                    <RotateCcw size={20} />
-                                </button>
+                                <ToolbarButton icon={Upload} label="Upload Photo" onClick={() => fileRef.current?.click()} hoveredIcon={hoveredIcon} setHoveredIcon={setHoveredIcon} />
+                                <ToolbarButton icon={Plus} label="Add Window" onClick={handleAddShade} hoveredIcon={hoveredIcon} setHoveredIcon={setHoveredIcon} />
+                                
                                 <div style={{ width: '100%', height: '1px', background: '#eee', margin: '4px 0' }} />
-                                <button title="Save Photo" onClick={handleTakePhoto} disabled={isTakingPhoto} style={{ ...iconBtnStyle, background: 'var(--primary-green)', color: '#fff', borderRadius: '50%', padding: '12px' }}>
-                                    <Camera size={20} />
-                                </button>
+                                
+                                <ToolbarButton icon={Maximize} label="Resize Window" onClick={() => setEditMode('scale')} isActive={editMode === 'scale'} hoveredIcon={hoveredIcon} setHoveredIcon={setHoveredIcon} />
+                                <ToolbarButton icon={Focus} label="Adjust Corners" onClick={() => setEditMode('perspective')} isActive={editMode === 'perspective'} hoveredIcon={hoveredIcon} setHoveredIcon={setHoveredIcon} />
+                                
+                                <div style={{ width: '100%', height: '1px', background: '#eee', margin: '4px 0' }} />
+
+                                <ToolbarButton icon={RotateCcw} label="Reset Position" onClick={resetShade} hoveredIcon={hoveredIcon} setHoveredIcon={setHoveredIcon} />
+                                
+                                <ToolbarButton 
+                                    icon={Camera} 
+                                    label="Save Photo" 
+                                    onClick={handleTakePhoto} 
+                                    disabled={isTakingPhoto} 
+                                    hoveredIcon={hoveredIcon} 
+                                    setHoveredIcon={setHoveredIcon}
+                                    customStyle={{
+                                        background: 'var(--primary-green)', border: 'none', cursor: 'pointer', padding: '12px',
+                                        borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                        color: '#fff', transition: 'background 0.2s', opacity: isTakingPhoto ? 0.5 : 1
+                                    }}
+                                />
                             </div>
                         )}
                         
@@ -541,7 +526,7 @@ const WindowVisualizer = ({ isOpen, onClose, productTitle, selectedColor, isZebr
                                 borderRadius: '20px', fontSize: '0.8rem', fontWeight: '500', pointerEvents: 'none',
                                 backdropFilter: 'blur(4px)'
                             }}>
-                                Drag the 4 corner points to fit your window exactly
+                                {editMode === 'scale' ? "Drag corners to resize the window uniformly" : "Drag corners to adjust window perspective"}
                             </div>
                         )}
                     </div>
