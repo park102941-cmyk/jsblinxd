@@ -67,6 +67,14 @@ const ProductDetail = () => {
     const [cassetteColor, setCassetteColor] = useState('');
 
     const CASSETTE_COLORS = ['White', 'Ivory', 'Beige', 'Grey', 'Brown', 'Black'];
+    const CASSETTE_COLORS_MAP = {
+        'White': '#ffffff',
+        'Ivory': '#ffffe6',
+        'Beige': '#e2d3be',
+        'Grey': '#a8a8a8',
+        'Brown': '#7d5635',
+        'Black': '#3c3c3c'
+    };
 
     const getMatchedCassetteName = (hexColor) => {
         if (!hexColor) return 'White';
@@ -770,12 +778,10 @@ const ProductDetail = () => {
                                 {CASSETTE_COLORS.map((opt) => (
                                     <div
                                         key={opt}
-                                        onMouseEnter={() => setHoveredOption({ name: opt, image: `/images/details/cassette_${opt.toLowerCase()}.png`, price: 0 })}
-                                        onMouseLeave={() => setHoveredOption(null)}
                                         onClick={() => setCassetteColor(opt)}
                                         style={{ border: cassetteColor === opt ? '2px solid #333' : '1px solid #ddd', background: cassetteColor === opt ? '#fcfcfc' : '#fff', borderRadius: '6px', padding: '10px', textAlign: 'center', cursor: 'pointer', position: 'relative' }}
                                     >
-                                        <div style={{ height: '50px', background: `linear-gradient(to bottom, #f0f0f0, #e0e0e0)`, marginBottom: '5px', borderRadius: '4px', border: '1px solid #ccc' }}></div>
+                                        <div style={{ height: '50px', background: CASSETTE_COLORS_MAP[opt] || '#f0f0f0', marginBottom: '5px', borderRadius: '4px', border: '1px solid #ccc' }}></div>
                                         <div style={{ fontSize: '0.8rem', fontWeight: cassetteColor === opt ? '600' : '400' }}>{opt}</div>
                                         {cassetteColor === opt && <Check size={14} style={{ position: 'absolute', top: '5px', right: '5px', color: '#333' }} />}
                                     </div>
