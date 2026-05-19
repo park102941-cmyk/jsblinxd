@@ -4,6 +4,47 @@ import html2canvas from 'html2canvas';
 
 const SHADE_MIN = 60;
 
+const hexToRgb = (hex) => {
+    let c = hex.replace('#', '');
+    if (c.length === 3) c = c.split('').map(x => x + x).join('');
+    const num = parseInt(c, 16);
+    return [num >> 16, (num >> 8) & 255, num & 255];
+};
+
+const getMatchedCassetteColor = (hexColor) => {
+    if (!hexColor) return { top: '#fcfcfc', bottom: '#d0d0d0' };
+    
+    try {
+        const target = hexToRgb(hexColor);
+        const cassettes = [
+            { name: 'White', rgb: [255, 255, 255], top: '#ffffff', bottom: '#e0e0e0' },
+            { name: 'Ivory', rgb: [255, 253, 230], top: '#ffffe6', bottom: '#e6e6c8' },
+            { name: 'Beige', rgb: [222, 203, 174], top: '#e2d3be', bottom: '#c8b49b' },
+            { name: 'Grey', rgb: [160, 160, 160], top: '#a8a8a8', bottom: '#787878' },
+            { name: 'Brown', rgb: [101, 67, 33], top: '#7d5635', bottom: '#4d321c' },
+            { name: 'Black', rgb: [40, 40, 40], top: '#3c3c3c', bottom: '#1a1a1a' }
+        ];
+
+        let bestMatch = cassettes[0];
+        let minDistance = Infinity;
+
+        for (const c of cassettes) {
+            const dist = Math.sqrt(
+                Math.pow(target[0] - c.rgb[0], 2) +
+                Math.pow(target[1] - c.rgb[1], 2) +
+                Math.pow(target[2] - c.rgb[2], 2)
+            );
+            if (dist < minDistance) {
+                minDistance = dist;
+                bestMatch = c;
+            }
+        }
+        return bestMatch;
+    } catch (e) {
+        return { top: '#fcfcfc', bottom: '#d0d0d0' };
+    }
+};
+
 const WindowVisualizer = ({ isOpen, onClose, productTitle, selectedColor, isZebra }) => {
     const [roomPhoto, setRoomPhoto] = useState(null);
     const [opacity, setOpacity] = useState(0.82);
@@ -217,6 +258,7 @@ const WindowVisualizer = ({ isOpen, onClose, productTitle, selectedColor, isZebr
 
     const fabricImage = fabricDataUrl || selectedColor?.fullImage || selectedColor?.image;
     const shadeColor = selectedColor?.hex || '#c8b89a';
+    const cassetteColors = getMatchedCassetteColor(shadeColor);
 
     let shadeStyle = {};
     if (fabricImage) {
@@ -307,7 +349,7 @@ const WindowVisualizer = ({ isOpen, onClose, productTitle, selectedColor, isZebr
                                     {/* Top Cassette */}
                                     <div style={{
                                         position: 'absolute', top: 0, left: -1, right: -1, height: '24px',
-                                        background: 'linear-gradient(to bottom, #fcfcfc, #d0d0d0)',
+                                        background: `linear-gradient(to bottom, ${cassetteColors.top}, ${cassetteColors.bottom})`,
                                         borderBottom: '1px solid rgba(0,0,0,0.1)',
                                         borderTopLeftRadius: '3px', borderTopRightRadius: '3px',
                                         boxShadow: '0 2px 4px rgba(0,0,0,0.15)'
@@ -316,7 +358,7 @@ const WindowVisualizer = ({ isOpen, onClose, productTitle, selectedColor, isZebr
                                     {/* Bottom Bar */}
                                     <div style={{
                                         position: 'absolute', bottom: 0, left: -1, right: -1, height: '14px',
-                                        background: 'linear-gradient(to bottom, #fcfcfc, #d0d0d0)',
+                                        background: `linear-gradient(to bottom, ${cassetteColors.top}, ${cassetteColors.bottom})`,
                                         borderTop: '1px solid rgba(0,0,0,0.1)',
                                         borderBottomLeftRadius: '3px', borderBottomRightRadius: '3px',
                                         boxShadow: '0 -2px 4px rgba(0,0,0,0.1)'
