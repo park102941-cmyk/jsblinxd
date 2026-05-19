@@ -347,7 +347,7 @@ const WindowVisualizer = ({ isOpen, onClose, productTitle, selectedColor, isZebr
                                 >
                                     {/* Inner Fabric Background */}
                                     <div style={{
-                                        position: 'absolute', inset: 0,
+                                        position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
                                         ...shadeStyle,
                                         borderRadius: '2px'
                                     }} />
