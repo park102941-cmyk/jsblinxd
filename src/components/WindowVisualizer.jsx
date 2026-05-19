@@ -1,5 +1,6 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
-import { X, Upload, RotateCcw, ZoomIn, ZoomOut } from 'lucide-react';
+import { X, Upload, RotateCcw, ZoomIn, ZoomOut, Camera, Wand2 } from 'lucide-react';
+import html2canvas from 'html2canvas';
 
 const SHADE_MIN = 60;
 
@@ -19,8 +20,112 @@ const WindowVisualizer = ({ isOpen, onClose, productTitle, selectedColor, isZebr
         const file = e.target.files[0];
         if (!file) return;
         const reader = new FileReader();
-        reader.onload = (ev) => setRoomPhoto(ev.target.result);
+        reader.onload = (ev) => {
+            setRoomPhoto(ev.target.result);
+        };
         reader.readAsDataURL(file);
+    };
+
+    const handleAutoDetect = () => {
+        if (!roomPhoto || !containerRef.current) return;
+        
+        const img = new Image();
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const w = 100;
+            const h = Math.floor(100 * (img.naturalHeight / img.naturalWidth));
+            canvas.width = w;
+            canvas.height = h;
+            ctx.drawImage(img, 0, 0, w, h);
+            const imageData = ctx.getImageData(0, 0, w, h);
+            const data = imageData.data;
+            
+            let minX = w, minY = h, maxX = 0, maxY = 0;
+            let brightPixels = 0;
+            let totalBrightness = 0;
+            
+            for (let i = 0; i < data.length; i += 4) {
+                totalBrightness += (data[i] + data[i+1] + data[i+2]) / 3;
+            }
+            const avgBrightness = totalBrightness / (w * h);
+            const threshold = Math.max(avgBrightness * 1.5, 200); // 1.5x brighter than avg, or at least 200
+            
+            for (let y = 0; y < h; y++) {
+                for (let x = 0; x < w; x++) {
+                    const i = (y * w + x) * 4;
+                    const brightness = (data[i] + data[i+1] + data[i+2]) / 3;
+                    if (brightness > threshold) {
+                        if (x < minX) minX = x;
+                        if (x > maxX) maxX = x;
+                        if (y < minY) minY = y;
+                        if (y > maxY) maxY = y;
+                        brightPixels++;
+                    }
+                }
+            }
+            
+            if (brightPixels < 10 || maxX <= minX || maxY <= minY) {
+                resetShade(); // fallback to default
+                return;
+            }
+            
+            const containerRect = containerRef.current.getBoundingClientRect();
+            const imgRatio = img.naturalWidth / img.naturalHeight;
+            const containerRatio = containerRect.width / containerRect.height;
+            
+            let renderW, renderH, offsetX = 0, offsetY = 0;
+            if (imgRatio > containerRatio) {
+                renderW = containerRect.width;
+                renderH = containerRect.width / imgRatio;
+                offsetY = (containerRect.height - renderH) / 2;
+            } else {
+                renderH = containerRect.height;
+                renderW = containerRect.height * imgRatio;
+                offsetX = (containerRect.width - renderW) / 2;
+            }
+            
+            const scaleX = img.naturalWidth / w;
+            const scaleY = img.naturalHeight / h;
+            
+            const finalX = offsetX + ((minX * scaleX) / img.naturalWidth) * renderW;
+            const finalY = offsetY + ((minY * scaleY) / img.naturalHeight) * renderH;
+            const finalW = (((maxX - minX) * scaleX) / img.naturalWidth) * renderW;
+            const finalH = (((maxY - minY) * scaleY) / img.naturalHeight) * renderH;
+            
+            setShade({ 
+                x: Math.max(0, finalX), 
+                y: Math.max(0, finalY), 
+                w: Math.max(SHADE_MIN, finalW), 
+                h: Math.max(SHADE_MIN, finalH) 
+            });
+        };
+        img.src = roomPhoto;
+    };
+
+    const [isTakingPhoto, setIsTakingPhoto] = useState(false);
+    const handleTakePhoto = async () => {
+        if (!containerRef.current) return;
+        setIsTakingPhoto(true);
+        try {
+            // wait for state update to hide handles
+            await new Promise(resolve => setTimeout(resolve, 100));
+            const canvas = await html2canvas(containerRef.current, {
+                useCORS: true,
+                allowTaint: true,
+                backgroundColor: '#1a1a1a'
+            });
+            const image = canvas.toDataURL("image/png");
+            const link = document.createElement('a');
+            link.href = image;
+            link.download = `jsblind-preview-${new Date().getTime()}.png`;
+            link.click();
+        } catch (err) {
+            console.error("Failed to capture photo", err);
+            alert("Failed to capture photo. Please check your image format or try again.");
+        } finally {
+            setIsTakingPhoto(false);
+        }
     };
 
     const getContainerPos = useCallback((e) => {
@@ -164,7 +269,7 @@ const WindowVisualizer = ({ isOpen, onClose, productTitle, selectedColor, isZebr
                                     }}
                                 >
                                     {/* Resize handles */}
-                                    {[
+                                    {!isTakingPhoto && [
                                         { type: 'nw', style: { top: -5, left: -5, cursor: 'nw-resize' } },
                                         { type: 'ne', style: { top: -5, right: -5, cursor: 'ne-resize' } },
                                         { type: 'sw', style: { bottom: -5, left: -5, cursor: 'sw-resize' } },
@@ -186,15 +291,17 @@ const WindowVisualizer = ({ isOpen, onClose, productTitle, selectedColor, isZebr
                                     ))}
 
                                     {/* Move indicator */}
-                                    <div style={{
-                                        position: 'absolute', top: '50%', left: '50%',
-                                        transform: 'translate(-50%, -50%)',
-                                        background: 'rgba(0,0,0,0.35)', borderRadius: '6px',
-                                        padding: '4px 10px', color: '#fff', fontSize: '0.7rem',
-                                        fontWeight: '600', pointerEvents: 'none', whiteSpace: 'nowrap'
-                                    }}>
-                                        Drag to Move · Edges to Resize
-                                    </div>
+                                    {!isTakingPhoto && (
+                                        <div style={{
+                                            position: 'absolute', top: '50%', left: '50%',
+                                            transform: 'translate(-50%, -50%)',
+                                            background: 'rgba(0,0,0,0.35)', borderRadius: '6px',
+                                            padding: '4px 10px', color: '#fff', fontSize: '0.7rem',
+                                            fontWeight: '600', pointerEvents: 'none', whiteSpace: 'nowrap'
+                                        }}>
+                                            Drag to Move · Edges to Resize
+                                        </div>
+                                    )}
                                 </div>
                             </>
                         ) : (
@@ -267,13 +374,34 @@ const WindowVisualizer = ({ isOpen, onClose, productTitle, selectedColor, isZebr
                             <div style={{ fontSize: '0.78rem', color: '#888', lineHeight: '1.5', marginBottom: '10px' }}>
                                 W: {Math.round(shade.w)}px · H: {Math.round(shade.h)}px
                             </div>
-                            <button
-                                onClick={resetShade}
-                                style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '6px', background: '#fff', cursor: 'pointer', fontSize: '0.82rem', color: '#555', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px' }}
-                            >
-                                <RotateCcw size={12} /> Reset Position
-                            </button>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                <button
+                                    onClick={handleAutoDetect}
+                                    disabled={!roomPhoto}
+                                    style={{ width: '100%', padding: '8px', border: '1px solid var(--primary-green)', borderRadius: '6px', background: 'var(--primary-green)', cursor: roomPhoto ? 'pointer' : 'not-allowed', opacity: roomPhoto ? 1 : 0.5, fontSize: '0.82rem', color: '#fff', fontWeight: '600', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}
+                                >
+                                    <Wand2 size={14} /> Auto-Detect Window
+                                </button>
+                                <button
+                                    onClick={resetShade}
+                                    style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '6px', background: '#fff', cursor: 'pointer', fontSize: '0.82rem', color: '#555', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px' }}
+                                >
+                                    <RotateCcw size={12} /> Reset Position
+                                </button>
+                            </div>
                         </div>
+
+                        {roomPhoto && (
+                            <div>
+                                <button
+                                    onClick={handleTakePhoto}
+                                    disabled={isTakingPhoto}
+                                    style={{ width: '100%', padding: '12px', border: 'none', borderRadius: '8px', background: '#333', cursor: isTakingPhoto ? 'not-allowed' : 'pointer', fontSize: '0.9rem', color: '#fff', fontWeight: '700', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', transition: 'all 0.2s' }}
+                                >
+                                    <Camera size={16} /> {isTakingPhoto ? 'Saving...' : 'Save Photo'}
+                                </button>
+                            </div>
+                        )}
 
                         <div style={{ marginTop: 'auto' }}>
                             <div style={{ fontSize: '0.72rem', color: '#aaa', lineHeight: '1.5', padding: '10px', background: '#f9f9f9', borderRadius: '8px' }}>
