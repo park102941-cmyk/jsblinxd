@@ -298,12 +298,30 @@ const WindowVisualizer = ({ isOpen, onClose, productTitle, selectedColor, isZebr
                                         width: shade.w, height: shade.h,
                                         ...shadeStyle,
                                         cursor: drag?.type === 'move' ? 'grabbing' : 'grab',
-                                        borderRadius: '2px',
+                                        borderRadius: '3px',
                                         boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
                                         userSelect: 'none',
-                                        border: '2px solid rgba(255,255,255,0.4)'
+                                        border: '1px solid rgba(255,255,255,0.4)'
                                     }}
                                 >
+                                    {/* Top Cassette */}
+                                    <div style={{
+                                        position: 'absolute', top: 0, left: -1, right: -1, height: '24px',
+                                        background: 'linear-gradient(to bottom, #fcfcfc, #d0d0d0)',
+                                        borderBottom: '1px solid rgba(0,0,0,0.1)',
+                                        borderTopLeftRadius: '3px', borderTopRightRadius: '3px',
+                                        boxShadow: '0 2px 4px rgba(0,0,0,0.15)'
+                                    }} />
+
+                                    {/* Bottom Bar */}
+                                    <div style={{
+                                        position: 'absolute', bottom: 0, left: -1, right: -1, height: '14px',
+                                        background: 'linear-gradient(to bottom, #fcfcfc, #d0d0d0)',
+                                        borderTop: '1px solid rgba(0,0,0,0.1)',
+                                        borderBottomLeftRadius: '3px', borderBottomRightRadius: '3px',
+                                        boxShadow: '0 -2px 4px rgba(0,0,0,0.1)'
+                                    }} />
+
                                     {/* Resize handles */}
                                     {!isTakingPhoto && [
                                         { type: 'nw', style: { top: -5, left: -5, cursor: 'nw-resize' } },
