@@ -6,6 +6,8 @@ import { db } from '../lib/firebase';
 import { doc, getDoc, updateDoc, deleteDoc, arrayRemove, collection, query, where, getDocs } from 'firebase/firestore';
 import { updateProfile, deleteUser } from 'firebase/auth';
 import { getUserPoints } from '../lib/points';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
 
 const statusConfig = {
     'Order Received':   { bg: '#e0f2fe', color: '#0369a1', dot: '#0ea5e9' },
@@ -57,7 +59,8 @@ const MyAccount = () => {
                         price: data.totals?.total,
                         status: data.status,
                         trackingNumber: data.trackingNumber,
-                        email: data.userInfo?.email || data.shippingInfo?.email || currentUser.email
+                        email: data.userInfo?.email || data.shippingInfo?.email || currentUser.email,
+                        fullData: data
                     };
                 }).sort((a, b) => new Date(b.date) - new Date(a.date));
                 setOrders(myOrders);
@@ -104,6 +107,102 @@ const MyAccount = () => {
             await updateDoc(doc(db, 'users', currentUser.uid), { favorites: arrayRemove(fav) });
             setUserData(prev => ({ ...prev, favorites: prev.favorites.filter(f => f.id !== fav.id) }));
         } catch (e) { console.error(e); }
+    };
+
+    const generateInvoice = (order) => {
+        const doc = new jsPDF();
+        const data = order.fullData;
+        
+        // Header
+        doc.setFontSize(22);
+        doc.setTextColor(40);
+        doc.text('INVOICE', 14, 22);
+        
+        doc.setFontSize(10);
+        doc.setTextColor(100);
+        doc.text(`Order Number: ${data.orderId || order.id}`, 14, 30);
+        doc.text(`Date: ${order.date}`, 14, 35);
+        
+        // Company Info (Right)
+        doc.text('JS Blinds', 150, 22);
+        doc.text('support@jsblinds.com', 150, 27);
+        
+        // Customer Info
+        doc.setFontSize(12);
+        doc.setTextColor(40);
+        doc.text('Bill To:', 14, 50);
+        doc.setFontSize(10);
+        doc.setTextColor(100);
+        const billingInfo = data.shippingInfo || data.userInfo || {};
+        doc.text(`${billingInfo.firstName || ''} ${billingInfo.lastName || ''}`, 14, 56);
+        doc.text(`${billingInfo.address || ''}`, 14, 61);
+        doc.text(`${billingInfo.city || ''}, ${billingInfo.state || ''} ${billingInfo.zipCode || ''}`, 14, 66);
+        doc.text(`${billingInfo.email || ''}`, 14, 71);
+        
+        // Items table
+        const tableColumn = ["Item", "Details", "Qty", "Price", "Total"];
+        const tableRows = [];
+        
+        if (data.items && Array.isArray(data.items)) {
+            data.items.forEach(item => {
+                const productTitle = item.product?.title || 'Unknown Product';
+                const qty = item.quantity || 1;
+                const price = item.price || 0;
+                const total = qty * price;
+                
+                let details = [];
+                if (item.options) {
+                    if (item.options.measurements) {
+                        details.push(`W: ${item.options.measurements.width}" x H: ${item.options.measurements.height}"`);
+                    }
+                    if (item.options.mount) details.push(`Mount: ${item.options.mount}`);
+                    if (item.options.control) details.push(`Control: ${item.options.control}`);
+                    if (item.options.fabric?.name || item.selectedColor) {
+                         details.push(`Color: ${item.options.fabric?.name || item.selectedColor}`);
+                    }
+                }
+                const detailsStr = details.join('\\n');
+                
+                tableRows.push([
+                    productTitle,
+                    detailsStr,
+                    qty.toString(),
+                    `$${price.toFixed(2)}`,
+                    `$${total.toFixed(2)}`
+                ]);
+            });
+        }
+        
+        doc.autoTable({
+            startY: 80,
+            head: [tableColumn],
+            body: tableRows,
+            theme: 'striped',
+            styles: { fontSize: 9 },
+            headStyles: { fillColor: [0, 113, 227] },
+            columnStyles: {
+                0: { cellWidth: 40 },
+                1: { cellWidth: 70 },
+                2: { cellWidth: 15, halign: 'center' },
+                3: { cellWidth: 30, halign: 'right' },
+                4: { cellWidth: 30, halign: 'right' }
+            }
+        });
+        
+        const finalY = doc.lastAutoTable.finalY || 80;
+        
+        // Totals
+        const totals = data.totals || {};
+        doc.setFontSize(10);
+        doc.setTextColor(40);
+        doc.text(`Subtotal: $${(totals.subtotal || 0).toFixed(2)}`, 140, finalY + 15);
+        if (totals.discount > 0) doc.text(`Discount: -$${totals.discount.toFixed(2)}`, 140, finalY + 20);
+        if (totals.tax > 0) doc.text(`Tax: $${totals.tax.toFixed(2)}`, 140, finalY + 25);
+        doc.setFontSize(12);
+        doc.setFont("helvetica", "bold");
+        doc.text(`Total: $${(totals.total || 0).toFixed(2)}`, 140, finalY + 32);
+        
+        doc.save(`Invoice_${data.orderId || order.id}.pdf`);
     };
 
     if (loading) return (
@@ -359,11 +458,21 @@ const MyAccount = () => {
                                                             {order.status || 'Pending'}
                                                         </span>
                                                     </td>
-                                                    <td style={{ padding: '16px 20px' }}>
+                                                    <td style={{ padding: '16px 20px', display: 'flex', gap: '10px', alignItems: 'center' }}>
                                                         <Link to={`/track-order?id=${order.orderId}&email=${order.email}`}
                                                             style={{ color: '#0071e3', textDecoration: 'none', fontSize: '0.875rem', fontWeight: '600', whiteSpace: 'nowrap' }}>
                                                             {order.trackingNumber ? 'Track ↗' : 'View ↗'}
                                                         </Link>
+                                                        <button 
+                                                            onClick={() => generateInvoice(order)}
+                                                            style={{ 
+                                                                background: 'none', border: '1px solid #ccc', borderRadius: '4px', 
+                                                                padding: '4px 8px', fontSize: '0.75rem', cursor: 'pointer',
+                                                                color: '#333', fontWeight: '600'
+                                                            }}
+                                                        >
+                                                            PDF
+                                                        </button>
                                                     </td>
                                                 </tr>
                                             );

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { db } from '../../lib/firebase';
 import { collection, addDoc, getDocs, doc, deleteDoc, updateDoc } from 'firebase/firestore';
-import { Plus, X, Image as ImageIcon, ExternalLink, Sparkles, Loader2, Trash2, Pencil, Eye, EyeOff } from 'lucide-react';
+import { Plus, X, Image as ImageIcon, ExternalLink, Sparkles, Loader2, Trash2, Pencil, Eye, EyeOff, ChevronLeft, ChevronRight } from 'lucide-react';
 import { GOOGLE_SCRIPT_URL, GEMINI_API_KEY } from '../../lib/config';
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import ImageUploader from '../../components/ImageUploader';
@@ -860,6 +860,44 @@ const ProductManagement = () => {
                                         >
                                             <X size={14} />
                                         </button>
+                                        {/* Move Left */}
+                                        {index > 0 && (
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    const newImages = [...newProduct.images];
+                                                    const temp = newImages[index - 1];
+                                                    newImages[index - 1] = newImages[index];
+                                                    newImages[index] = temp;
+                                                    setNewProduct(prev => ({ ...prev, images: newImages, imageUrl: newImages[0] }));
+                                                }}
+                                                style={{
+                                                    position: 'absolute', bottom: '25px', left: '5px', background: 'rgba(255,255,255,0.9)', color: '#333',
+                                                    border: '1px solid #ccc', borderRadius: '4px', width: '24px', height: '24px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center'
+                                                }}
+                                            >
+                                                <ChevronLeft size={14} />
+                                            </button>
+                                        )}
+                                        {/* Move Right */}
+                                        {index < newProduct.images.length - 1 && (
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    const newImages = [...newProduct.images];
+                                                    const temp = newImages[index + 1];
+                                                    newImages[index + 1] = newImages[index];
+                                                    newImages[index] = temp;
+                                                    setNewProduct(prev => ({ ...prev, images: newImages, imageUrl: newImages[0] }));
+                                                }}
+                                                style={{
+                                                    position: 'absolute', bottom: '25px', right: '5px', background: 'rgba(255,255,255,0.9)', color: '#333',
+                                                    border: '1px solid #ccc', borderRadius: '4px', width: '24px', height: '24px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center'
+                                                }}
+                                            >
+                                                <ChevronRight size={14} />
+                                            </button>
+                                        )}
                                         {index === 0 && (
                                             <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, background: 'rgba(0,0,0,0.6)', color: 'white', fontSize: '10px', textAlign: 'center', padding: '2px' }}>
                                                 Main Preview
