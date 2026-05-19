@@ -21,10 +21,10 @@ export const jdxProducts = [
     ],
     description: 'Premium light filtering zebra shades from JS COIT collection. Features antibacterial fabric and high UV protection.',
     colors: [
-      { name: 'White', code: 'WHITE', hex: '#FFFFFF' },
-      { name: 'Light Grey', code: 'L_GREY', hex: '#D3D3D3' },
-      { name: 'Grey', code: 'GREY', hex: '#808080' },
-      { name: 'Wine', code: 'WINE', hex: '#722F37' }
+      { name: 'White', code: 'WHITE', hex: '#F4F4F6' },
+      { name: 'Light Grey', code: 'L_GREY', hex: '#C1C4C7' },
+      { name: 'Grey', code: 'GREY', hex: '#8B8C8E' },
+      { name: 'Wine', code: 'WINE', hex: '#653035' }
     ],
     features: ['100% Polyester', 'Antibacterial', 'UV Blocking (99.1%)', 'UPF 50+', 'Light Filtering'],
     tags: ['jdx', 'zebra', 'light-filtering', 'antibacterial', 'coit'],
@@ -46,10 +46,10 @@ export const jdxProducts = [
     ],
     description: 'Elegant textured zebra shades from the Las Colinas collection. Perfect for modern interiors.',
     colors: [
-      { name: 'Mushroom', code: 'MUSHROOM', hex: '#E1D9D1' },
-      { name: 'Light Grey', code: 'L_GREY', hex: '#D3D3D3' },
-      { name: 'Charcoal', code: 'CHARCOAL', hex: '#36454F' },
-      { name: 'Wood', code: 'WOOD', hex: '#A0522D' }
+      { name: 'Mushroom', code: 'MUSHROOM', hex: '#C5BDB2' },
+      { name: 'Light Grey', code: 'L_GREY', hex: '#C1C4C7' },
+      { name: 'Charcoal', code: 'CHARCOAL', hex: '#45474B' },
+      { name: 'Wood', code: 'WOOD', hex: '#7C543A' }
     ],
     features: ['Textured Fabric', 'Antibacterial', 'UV Blocking', 'UPF 50+'],
     tags: ['jdx', 'zebra', 'textured', 'premium', 'las-colinas'],
@@ -71,10 +71,10 @@ export const jdxProducts = [
       '/images/products/jdx-zebra-legacy-3.png'
     ],
     colors: [
-      { name: 'Ivory', code: 'IVORY', hex: '#FFFFF0' },
-      { name: 'Mushroom', code: 'MUSHROOM', hex: '#E1D9D1' },
-      { name: 'Beige', code: 'BEIGE', hex: '#F5F5DC' },
-      { name: 'Charcoal', code: 'CHARCOAL', hex: '#36454F' }
+      { name: 'Ivory', code: 'IVORY', hex: '#EBE3D8' },
+      { name: 'Mushroom', code: 'MUSHROOM', hex: '#C5BDB2' },
+      { name: 'Beige', code: 'BEIGE', hex: '#D4C9BA' },
+      { name: 'Charcoal', code: 'CHARCOAL', hex: '#45474B' }
     ],
     features: ['Antibacterial', 'UV Protection', 'Premium Quality'],
     tags: ['jdx', 'zebra', 'legacy', 'classic'],
@@ -91,10 +91,10 @@ export const jdxProducts = [
     sizeRatio: 0.16,
     imageUrl: '/images/products/jdx-zebra-coit.png',
     colors: [
-      { name: 'White', code: 'WHITE', hex: '#FFFFFF' },
-      { name: 'Ivory', code: 'IVORY', hex: '#FFFFF0' },
-      { name: 'Light Grey', code: 'L_GREY', hex: '#D3D3D3' },
-      { name: 'Ink Black', code: 'INK_BLACK', hex: '#0F0F0F' }
+      { name: 'White', code: 'WHITE', hex: '#F4F4F6' },
+      { name: 'Ivory', code: 'IVORY', hex: '#EBE3D8' },
+      { name: 'Light Grey', code: 'L_GREY', hex: '#C1C4C7' },
+      { name: 'Ink Black', code: 'INK_BLACK', hex: '#222325' }
     ],
     features: ['Antibacterial', 'UV Protection', 'Light Filtering'],
     tags: ['jdx', 'zebra', 'lebanon', 'new'],
@@ -111,10 +111,10 @@ export const jdxProducts = [
     sizeRatio: 0.17,
     imageUrl: '/images/products/jdx-zebra-las-colinas-1.png',
     colors: [
-      { name: 'Ivory', code: 'IVORY', hex: '#FFFFF0' },
-      { name: 'Light Grey', code: 'L_GREY', hex: '#D3D3D3' },
-      { name: 'Chocolate', code: 'CHOCOLATE', hex: '#3D2B1F' },
-      { name: 'Black', code: 'BLACK', hex: '#000000' }
+      { name: 'Ivory', code: 'IVORY', hex: '#EBE3D8' },
+      { name: 'Light Grey', code: 'L_GREY', hex: '#C1C4C7' },
+      { name: 'Chocolate', code: 'CHOCOLATE', hex: '#4A3528' },
+      { name: 'Black', code: 'BLACK', hex: '#2C2C2C' }
     ],
     features: ['Textured Design', 'Antibacterial', 'High Quality'],
     tags: ['jdx', 'zebra', 'campbell', 'new'],
@@ -139,10 +139,10 @@ export const jdxProducts = [
     ],
     description: 'High-performance blackout zebra shades from the Apache collection.',
     colors: [
-      { name: 'Ivory', code: 'IVORY', hex: '#FFFFF0' },
-      { name: 'Oat', code: 'OAT', hex: '#E6D9B8' },
-      { name: 'Grey', code: 'GREY', hex: '#808080' },
-      { name: 'Charcoal', code: 'CHARCOAL', hex: '#36454F' }
+      { name: 'Ivory', code: 'IVORY', hex: '#EBE3D8' },
+      { name: 'Oat', code: 'OAT', hex: '#D6C9AD' },
+      { name: 'Grey', code: 'GREY', hex: '#8B8C8E' },
+      { name: 'Charcoal', code: 'CHARCOAL', hex: '#45474B' }
     ],
     features: ['100% Blackout', 'Antibacterial', 'UV Blocking (99.9%)'],
     tags: ['jdx', 'zebra', 'blackout', 'apache'],
@@ -159,10 +159,10 @@ export const jdxProducts = [
     sizeRatio: 0.21,
     imageUrl: '/images/products/jdx-zebra-apache-1.png',
     colors: [
-      { name: 'Beige', code: 'BEIGE', hex: '#F5F5DC' },
-      { name: 'Light Grey', code: 'L_GREY', hex: '#D3D3D3' },
-      { name: 'Dark Grey', code: 'D_GREY', hex: '#555555' },
-      { name: 'Wood', code: 'WOOD', hex: '#A0522D' }
+      { name: 'Beige', code: 'BEIGE', hex: '#D4C9BA' },
+      { name: 'Light Grey', code: 'L_GREY', hex: '#C1C4C7' },
+      { name: 'Dark Grey', code: 'D_GREY', hex: '#595A5C' },
+      { name: 'Wood', code: 'WOOD', hex: '#7C543A' }
     ],
     features: ['Premium Blackout', 'Antibacterial', 'Thermal Insulation'],
     tags: ['jdx', 'zebra', 'blackout', 'josey'],
@@ -179,10 +179,10 @@ export const jdxProducts = [
     sizeRatio: 0.22,
     imageUrl: '/images/products/jdx-zebra-apache-2.png',
     colors: [
-      { name: 'Beige', code: 'BEIGE', hex: '#F5F5DC' },
-      { name: 'Light Grey', code: 'L_GREY', hex: '#D3D3D3' },
-      { name: 'Dark Grey', code: 'D_GREY', hex: '#555555' },
-      { name: 'Ink Black', code: 'INK_BLACK', hex: '#0F0F0F' }
+      { name: 'Beige', code: 'BEIGE', hex: '#D4C9BA' },
+      { name: 'Light Grey', code: 'L_GREY', hex: '#C1C4C7' },
+      { name: 'Dark Grey', code: 'D_GREY', hex: '#595A5C' },
+      { name: 'Ink Black', code: 'INK_BLACK', hex: '#222325' }
     ],
     features: ['Superior Blackout', 'Antibacterial', 'Modern Look'],
     tags: ['jdx', 'zebra', 'blackout', 'hebron'],
@@ -199,10 +199,10 @@ export const jdxProducts = [
     sizeRatio: 0.23,
     imageUrl: '/images/products/jdx-zebra-apache-3.png',
     colors: [
-      { name: 'Beige', code: 'BEIGE', hex: '#F5F5DC' },
-      { name: 'Green', code: 'GREEN', hex: '#2E8B57' },
-      { name: 'Navy Blue', code: 'NAVY', hex: '#000080' },
-      { name: 'Wood', code: 'WOOD', hex: '#A0522D' }
+      { name: 'Beige', code: 'BEIGE', hex: '#D4C9BA' },
+      { name: 'Green', code: 'GREEN', hex: '#425A4B' },
+      { name: 'Navy Blue', code: 'NAVY', hex: '#232B40' },
+      { name: 'Wood', code: 'WOOD', hex: '#7C543A' }
     ],
     features: ['Fashion Blackout', 'Antibacterial', 'Unique Colors'],
     tags: ['jdx', 'zebra', 'blackout', 'independence'],
@@ -219,10 +219,10 @@ export const jdxProducts = [
     sizeRatio: 0.24,
     imageUrl: '/images/products/jdx-zebra-apache-1.png',
     colors: [
-      { name: 'WLB02', code: 'WLB02', hex: '#E5E4E2' },
-      { name: 'WLB03', code: 'WLB03', hex: '#C0C0C0' },
-      { name: 'WLB04', code: 'WLB04', hex: '#A9A9A9' },
-      { name: 'WLB05', code: 'WLB05', hex: '#808080' }
+      { name: 'WLB02', code: 'WLB02', hex: '#DCDCD8' },
+      { name: 'WLB03', code: 'WLB03', hex: '#B4B4B2' },
+      { name: 'WLB04', code: 'WLB04', hex: '#9D9D9B' },
+      { name: 'WLB05', code: 'WLB05', hex: '#8B8C8E' }
     ],
     features: ['Industrial Grade Blackout', 'Antibacterial', 'Textured'],
     tags: ['jdx', 'zebra', 'blackout', 'maumee'],
@@ -241,10 +241,10 @@ export const jdxProducts = [
     sizeRatio: 0.12,
     imageUrl: '/images/products/jdx-roller-light-filtering.png',
     colors: [
-      { name: 'White', code: 'WHITE', hex: '#FFFFFF' },
-      { name: 'Ivory', code: 'IVORY', hex: '#FFFFF0' },
-      { name: 'Beige', code: 'BEIGE', hex: '#F5F5DC' },
-      { name: 'Grey', code: 'GREY', hex: '#808080' }
+      { name: 'White', code: 'WHITE', hex: '#F4F4F6' },
+      { name: 'Ivory', code: 'IVORY', hex: '#EBE3D8' },
+      { name: 'Beige', code: 'BEIGE', hex: '#D4C9BA' },
+      { name: 'Grey', code: 'GREY', hex: '#8B8C8E' }
     ],
     features: ['Antibacterial', 'UV Blocking', 'Smooth Operation'],
     tags: ['jdx', 'roller', 'light-filtering', 'alamo'],
@@ -261,9 +261,9 @@ export const jdxProducts = [
     sizeRatio: 0.13,
     imageUrl: '/images/products/jdx-roller-light-filtering.png',
     colors: [
-      { name: 'White', code: 'WHITE', hex: '#FFFFFF' },
-      { name: 'Ivory', code: 'IVORY', hex: '#FFFFF0' },
-      { name: 'Beige', code: 'BEIGE', hex: '#F5F5DC' },
+      { name: 'White', code: 'WHITE', hex: '#F4F4F6' },
+      { name: 'Ivory', code: 'IVORY', hex: '#EBE3D8' },
+      { name: 'Beige', code: 'BEIGE', hex: '#D4C9BA' },
       { name: 'Brown', code: 'BROWN', hex: '#5D4037' }
     ],
     features: ['Antibacterial', 'Soft Light', 'Durable'],
@@ -281,10 +281,10 @@ export const jdxProducts = [
     sizeRatio: 0.14,
     imageUrl: '/images/products/jdx-roller-light-filtering.png',
     colors: [
-      { name: 'White', code: 'WHITE', hex: '#FFFFFF' },
-      { name: 'Beige', code: 'BEIGE', hex: '#F5F5DC' },
-      { name: 'Blue', code: 'BLUE', hex: '#0000FF' },
-      { name: 'Charcoal', code: 'CHARCOAL', hex: '#36454F' }
+      { name: 'White', code: 'WHITE', hex: '#F4F4F6' },
+      { name: 'Beige', code: 'BEIGE', hex: '#D4C9BA' },
+      { name: 'Blue', code: 'BLUE', hex: '#2B4365' },
+      { name: 'Charcoal', code: 'CHARCOAL', hex: '#45474B' }
     ],
     features: ['Dimpled Texture', 'Antibacterial', 'Privacy'],
     tags: ['jdx', 'roller', 'light-filtering', 'dimple'],
@@ -301,10 +301,10 @@ export const jdxProducts = [
     sizeRatio: 0.14,
     imageUrl: '/images/products/jdx-roller-light-filtering.png',
     colors: [
-      { name: 'White', code: 'WHITE', hex: '#FFFFFF' },
-      { name: 'Ivory', code: 'IVORY', hex: '#FFFFF0' },
-      { name: 'Grey', code: 'GREY', hex: '#808080' },
-      { name: 'Black', code: 'BLACK', hex: '#000000' }
+      { name: 'White', code: 'WHITE', hex: '#F4F4F6' },
+      { name: 'Ivory', code: 'IVORY', hex: '#EBE3D8' },
+      { name: 'Grey', code: 'GREY', hex: '#8B8C8E' },
+      { name: 'Black', code: 'BLACK', hex: '#2C2C2C' }
     ],
     features: ['3% Openness Factor', 'Heat Reduction', 'Glare Control'],
     tags: ['jdx', 'roller', 'sunscreen', 'commercial'],
@@ -328,10 +328,10 @@ export const jdxProducts = [
       '/images/products/jdx-roller-eldorado-3.png'
     ],
     colors: [
-      { name: 'Ivory', code: 'IVORY', hex: '#FFFFF0' },
-      { name: 'Beige', code: 'BEIGE', hex: '#F5F5DC' },
+      { name: 'Ivory', code: 'IVORY', hex: '#EBE3D8' },
+      { name: 'Beige', code: 'BEIGE', hex: '#D4C9BA' },
       { name: 'Brown', code: 'BROWN', hex: '#5D4037' },
-      { name: 'Grey', code: 'GREY', hex: '#808080' }
+      { name: 'Grey', code: 'GREY', hex: '#8B8C8E' }
     ],
     features: ['100% Blackout', 'Antibacterial', 'Easy Maintenance'],
     tags: ['jdx', 'roller', 'blackout', 'eldorado'],
@@ -348,10 +348,10 @@ export const jdxProducts = [
     sizeRatio: 0.16,
     imageUrl: '/images/products/jdx-roller-blackout.png',
     colors: [
-      { name: 'LNB01', code: 'LNB01', hex: '#F0EAD6' },
-      { name: 'LNB02', code: 'LNB02', hex: '#D2B48C' },
-      { name: 'LNB03', code: 'LNB03', hex: '#8B4513' },
-      { name: 'LNB04', code: 'LNB04', hex: '#555555' }
+      { name: 'LNB01', code: 'LNB01', hex: '#DCD4C0' },
+      { name: 'LNB02', code: 'LNB02', hex: '#C2A478' },
+      { name: 'LNB03', code: 'LNB03', hex: '#79431E' },
+      { name: 'LNB04', code: 'LNB04', hex: '#595A5C' }
     ],
     features: ['Textured Blackout', 'Antibacterial', 'Thermal'],
     tags: ['jdx', 'roller', 'blackout', 'greenville'],
@@ -368,10 +368,10 @@ export const jdxProducts = [
     sizeRatio: 0.16,
     imageUrl: '/images/products/jdx-roller-eldorado-1.png',
     colors: [
-      { name: 'Sand', code: 'SAND', hex: '#C2B280' },
-      { name: 'Light Grey', code: 'L_GREY', hex: '#D3D3D3' },
-      { name: 'Ash', code: 'ASH', hex: '#B2BEB5' },
-      { name: 'Mocha', code: 'MOCHA', hex: '#A38068' }
+      { name: 'Sand', code: 'SAND', hex: '#C4B49C' },
+      { name: 'Light Grey', code: 'L_GREY', hex: '#C1C4C7' },
+      { name: 'Ash', code: 'ASH', hex: '#A5B0A8' },
+      { name: 'Mocha', code: 'MOCHA', hex: '#967B69' }
     ],
     features: ['Natural Look', 'Antibacterial', '100% Blackout'],
     tags: ['jdx', 'roller', 'blackout', 'arbor-hills'],
@@ -388,10 +388,10 @@ export const jdxProducts = [
     sizeRatio: 0.17,
     imageUrl: '/images/products/jdx-roller-blackout.png',
     colors: [
-      { name: 'SDB01', code: 'SDB01', hex: '#E1D9D1' },
-      { name: 'SDB05', code: 'SDB05', hex: '#808080' },
-      { name: 'SDB07', code: 'SDB07', hex: '#36454F' },
-      { name: 'SDB06', code: 'SDB06', hex: '#0F0F0F' }
+      { name: 'SDB01', code: 'SDB01', hex: '#C5BDB2' },
+      { name: 'SDB05', code: 'SDB05', hex: '#8B8C8E' },
+      { name: 'SDB07', code: 'SDB07', hex: '#45474B' },
+      { name: 'SDB06', code: 'SDB06', hex: '#222325' }
     ],
     features: ['Linen Texture', 'Antibacterial', 'Privacy'],
     tags: ['jdx', 'roller', 'blackout', 'kaufman'],
@@ -408,10 +408,10 @@ export const jdxProducts = [
     sizeRatio: 0.18,
     imageUrl: '/images/products/jdx-roller-blackout.png',
     colors: [
-      { name: 'LPB01', code: 'LPB01', hex: '#F5F5DC' },
-      { name: 'LPB03', code: 'LPB03', hex: '#D3D3D3' },
-      { name: 'LPB05', code: 'LPB05', hex: '#808080' },
-      { name: 'LPB06', code: 'LPB06', hex: '#000000' }
+      { name: 'LPB01', code: 'LPB01', hex: '#D4C9BA' },
+      { name: 'LPB03', code: 'LPB03', hex: '#C1C4C7' },
+      { name: 'LPB05', code: 'LPB05', hex: '#8B8C8E' },
+      { name: 'LPB06', code: 'LPB06', hex: '#2C2C2C' }
     ],
     features: ['Premium Blackout', 'Antibacterial', 'Long Lasting'],
     tags: ['jdx', 'roller', 'blackout', 'haltom-city'],
@@ -428,10 +428,10 @@ export const jdxProducts = [
     sizeRatio: 0.19,
     imageUrl: '/images/products/jdx-roller-blackout.png',
     colors: [
-      { name: 'WLB02', code: 'WLB02', hex: '#E5E4E2' },
-      { name: 'LWB03', code: 'LWB03', hex: '#C0C0C0' },
-      { name: 'WLB04', code: 'WLB04', hex: '#A9A9A9' },
-      { name: 'WLB05', code: 'WLB05', hex: '#808080' }
+      { name: 'WLB02', code: 'WLB02', hex: '#DCDCD8' },
+      { name: 'LWB03', code: 'LWB03', hex: '#B4B4B2' },
+      { name: 'WLB04', code: 'WLB04', hex: '#9D9D9B' },
+      { name: 'WLB05', code: 'WLB05', hex: '#8B8C8E' }
     ],
     features: ['Modern Blackout', 'Antibacterial', 'Textured'],
     tags: ['jdx', 'roller', 'blackout', 'krugerville'],
@@ -458,8 +458,8 @@ export const jdxProducts = [
     ],
     description: 'Luxury smart curtain system from Unislat Living.',
     colors: [
-      { name: 'Blue & White', code: 'BLUE_WHITE', hex: '#0000FF' },
-      { name: 'Pure White', code: 'WHITE', hex: '#FFFFFF' }
+      { name: 'Blue & White', code: 'BLUE_WHITE', hex: '#2B4365' },
+      { name: 'Pure White', code: 'WHITE', hex: '#F4F4F6' }
     ],
     features: ['Smart Motorized Control', 'Unique Vertical Slat Design'],
     tags: ['jdx', 'unislat', 'smart-curtain', 'luxury'],

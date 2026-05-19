@@ -20,12 +20,12 @@ const rollerProducts = [
     imageUrl: '/images/ai/roller_shade_white_1777429322768.png',
     description: 'Premium blackout roller shades that block 100% of light. Perfect for bedrooms, media rooms, and any space requiring complete darkness. Durable fabric with thermal insulation properties.',
     colors: [
-      { name: 'Pure White', code: 'WHITE', hex: '#FFFFFF' },
-      { name: 'Ivory', code: 'IVORY', hex: '#FFFFF0' },
-      { name: 'Beige', code: 'BEIGE', hex: '#F5F5DC' },
-      { name: 'Grey', code: 'GREY', hex: '#808080' },
-      { name: 'Charcoal', code: 'CHARCOAL', hex: '#36454F' },
-      { name: 'Black', code: 'BLACK', hex: '#000000' }
+      { name: 'Pure White', code: 'WHITE', hex: '#F4F4F6' },
+      { name: 'Ivory', code: 'IVORY', hex: '#EBE3D8' },
+      { name: 'Beige', code: 'BEIGE', hex: '#D4C9BA' },
+      { name: 'Grey', code: 'GREY', hex: '#8B8C8E' },
+      { name: 'Charcoal', code: 'CHARCOAL', hex: '#45474B' },
+      { name: 'Black', code: 'BLACK', hex: '#2C2C2C' }
     ],
     features: [
       '100% blackout fabric',
@@ -64,12 +64,12 @@ const rollerProducts = [
     imageUrl: '/images/ai/roller_shade_grey_1777429334824.png',
     description: 'Elegant light filtering roller shades that diffuse natural light while maintaining privacy. Perfect for living rooms, dining areas, and offices. Soft, translucent fabric creates a warm ambiance.',
     colors: [
-      { name: 'White', code: 'WHITE', hex: '#FFFFFF' },
-      { name: 'Cream', code: 'CREAM', hex: '#FFFDD0' },
-      { name: 'Beige', code: 'BEIGE', hex: '#F5F5DC' },
-      { name: 'Light Grey', code: 'LIGHT_GREY', hex: '#D3D3D3' },
-      { name: 'Taupe', code: 'TAUPE', hex: '#B38B6D' },
-      { name: 'Linen', code: 'LINEN', hex: '#FAF0E6' }
+      { name: 'White', code: 'WHITE', hex: '#F4F4F6' },
+      { name: 'Cream', code: 'CREAM', hex: '#F1E9D2' },
+      { name: 'Beige', code: 'BEIGE', hex: '#D4C9BA' },
+      { name: 'Light Grey', code: 'LIGHT_GREY', hex: '#C1C4C7' },
+      { name: 'Taupe', code: 'TAUPE', hex: '#A48772' },
+      { name: 'Linen', code: 'LINEN', hex: '#E6DCCF' }
     ],
     features: [
       'Light filtering fabric',
@@ -107,12 +107,12 @@ const rollerProducts = [
     imageUrl: '/images/ai/roller_shade_black_1777429348345.png',
     description: 'Premium motorized blackout roller shades with smart home integration. Complete light control at your fingertips with remote or app operation. Perfect for modern homes seeking convenience and style.',
     colors: [
-      { name: 'Pure White', code: 'WHITE', hex: '#FFFFFF' },
-      { name: 'Ivory', code: 'IVORY', hex: '#FFFFF0' },
-      { name: 'Beige', code: 'BEIGE', hex: '#F5F5DC' },
-      { name: 'Grey', code: 'GREY', hex: '#808080' },
-      { name: 'Charcoal', code: 'CHARCOAL', hex: '#36454F' },
-      { name: 'Black', code: 'BLACK', hex: '#000000' }
+      { name: 'Pure White', code: 'WHITE', hex: '#F4F4F6' },
+      { name: 'Ivory', code: 'IVORY', hex: '#EBE3D8' },
+      { name: 'Beige', code: 'BEIGE', hex: '#D4C9BA' },
+      { name: 'Grey', code: 'GREY', hex: '#8B8C8E' },
+      { name: 'Charcoal', code: 'CHARCOAL', hex: '#45474B' },
+      { name: 'Black', code: 'BLACK', hex: '#2C2C2C' }
     ],
     features: [
       '100% blackout fabric',
@@ -162,12 +162,12 @@ const rollerProducts = [
     imageUrl: '/images/products/roller-motorized-light-filtering.jpg',
     description: 'Smart motorized light filtering roller shades for effortless light control. Schedule your shades to open and close automatically, creating the perfect ambiance throughout the day.',
     colors: [
-      { name: 'White', code: 'WHITE', hex: '#FFFFFF' },
-      { name: 'Cream', code: 'CREAM', hex: '#FFFDD0' },
-      { name: 'Beige', code: 'BEIGE', hex: '#F5F5DC' },
-      { name: 'Light Grey', code: 'LIGHT_GREY', hex: '#D3D3D3' },
-      { name: 'Taupe', code: 'TAUPE', hex: '#B38B6D' },
-      { name: 'Linen', code: 'LINEN', hex: '#FAF0E6' }
+      { name: 'White', code: 'WHITE', hex: '#F4F4F6' },
+      { name: 'Cream', code: 'CREAM', hex: '#F1E9D2' },
+      { name: 'Beige', code: 'BEIGE', hex: '#D4C9BA' },
+      { name: 'Light Grey', code: 'LIGHT_GREY', hex: '#C1C4C7' },
+      { name: 'Taupe', code: 'TAUPE', hex: '#A48772' },
+      { name: 'Linen', code: 'LINEN', hex: '#E6DCCF' }
     ],
     features: [
       'Light filtering fabric',
@@ -216,10 +216,10 @@ const rollerProducts = [
     imageUrl: '/images/products/roller-sheer.jpg',
     description: 'Elegant sheer roller shades that allow natural light while providing daytime privacy. Perfect for creating a bright, airy atmosphere in any room. Lightweight and easy to operate.',
     colors: [
-      { name: 'White', code: 'WHITE', hex: '#FFFFFF' },
-      { name: 'Ivory', code: 'IVORY', hex: '#FFFFF0' },
-      { name: 'Cream', code: 'CREAM', hex: '#FFFDD0' },
-      { name: 'Light Grey', code: 'LIGHT_GREY', hex: '#D3D3D3' }
+      { name: 'White', code: 'WHITE', hex: '#F4F4F6' },
+      { name: 'Ivory', code: 'IVORY', hex: '#EBE3D8' },
+      { name: 'Cream', code: 'CREAM', hex: '#F1E9D2' },
+      { name: 'Light Grey', code: 'LIGHT_GREY', hex: '#C1C4C7' }
     ],
     features: [
       'Sheer translucent fabric',

@@ -20,9 +20,9 @@ const zshineZebraProducts = [
     imageUrl: '/images/ai/zebra_shade_white_1777429360324.png',
     description: 'Light filtering zebra shades with manual operation. Perfect for controlling light and privacy with alternating sheer and solid fabric bands. Easy to install and operate with a simple pull cord or push-pull rod system.',
     colors: [
-      { name: 'White', code: 'WHITE', hex: '#FFFFFF' },
-      { name: 'Beige', code: 'BEIGE', hex: '#F5F5DC' },
-      { name: 'Grey', code: 'GREY', hex: '#808080' },
+      { name: 'White', code: 'WHITE', hex: '#F4F4F6' },
+      { name: 'Beige', code: 'BEIGE', hex: '#D4C9BA' },
+      { name: 'Grey', code: 'GREY', hex: '#8B8C8E' },
       { name: 'Light Coffee', code: 'LIGHT_COFFEE', hex: '#C8AD7F' }
     ],
     features: [
@@ -60,9 +60,9 @@ const zshineZebraProducts = [
     imageUrl: '/images/ai/zebra_shade_white_1777429360324.png',
     description: 'Premium motorized zebra shades with remote control operation. Features rechargeable battery or wired power options. Compatible with smart home systems for automated light control throughout the day.',
     colors: [
-      { name: 'White', code: 'WHITE', hex: '#FFFFFF' },
-      { name: 'Beige', code: 'BEIGE', hex: '#F5F5DC' },
-      { name: 'Grey', code: 'GREY', hex: '#808080' },
+      { name: 'White', code: 'WHITE', hex: '#F4F4F6' },
+      { name: 'Beige', code: 'BEIGE', hex: '#D4C9BA' },
+      { name: 'Grey', code: 'GREY', hex: '#8B8C8E' },
       { name: 'Light Coffee', code: 'LIGHT_COFFEE', hex: '#C8AD7F' },
       { name: 'Coffee', code: 'COFFEE', hex: '#6F4E37' }
     ],
@@ -112,9 +112,9 @@ const zshineZebraProducts = [
     imageUrl: '/images/ai/zebra_shade_white_1777429360324.png',
     description: 'Premium motorized zebra shades featuring luxurious jacquard fabric with textured patterns. Combines elegant design with modern motorized convenience. Thicker, more durable fabric provides enhanced light control and privacy.',
     colors: [
-      { name: 'White Jacquard', code: 'WHITE_JACQUARD', hex: '#FFFFFF', pattern: 'Textured weave' },
-      { name: 'Beige Jacquard', code: 'BEIGE_JACQUARD', hex: '#F5F5DC', pattern: 'Textured weave' },
-      { name: 'Grey Jacquard', code: 'GREY_JACQUARD', hex: '#808080', pattern: 'Textured weave' },
+      { name: 'White Jacquard', code: 'WHITE_JACQUARD', hex: '#F4F4F6', pattern: 'Textured weave' },
+      { name: 'Beige Jacquard', code: 'BEIGE_JACQUARD', hex: '#D4C9BA', pattern: 'Textured weave' },
+      { name: 'Grey Jacquard', code: 'GREY_JACQUARD', hex: '#8B8C8E', pattern: 'Textured weave' },
       { name: 'Light Coffee Jacquard', code: 'LIGHT_COFFEE_JACQUARD', hex: '#C8AD7F', pattern: 'Textured weave' }
     ],
     features: [
