@@ -8,6 +8,7 @@ import { Star, MessageCircle, Heart, Share2, ChevronLeft, ChevronRight, Check, A
 import { Link } from 'react-router-dom';
 import { orderEngine } from '../lib/orderEngine';
 import OrderingGuide from '../components/OrderingGuide';
+import WindowVisualizer from '../components/WindowVisualizer';
 
 
 const ProductDetail = () => {
@@ -62,6 +63,7 @@ const ProductDetail = () => {
     const [hoveredOption, setHoveredOption] = useState(null); // { name, image, price }
     const [itemQuantity, setItemQuantity] = useState(1);
     const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+    const [isVisualizerOpen, setIsVisualizerOpen] = useState(false);
 
     const isStandalone = !!(
         ['smart-remote-1', 'smart-remote-4', 'smart-remote-15', 'smart-hub-1', 'smart-tech-1'].includes(product?.id) ||
@@ -231,9 +233,8 @@ const ProductDetail = () => {
     }, [currentImageIndex, product, images]);
 
     useEffect(() => {
-        if (selectedColor?.fullImage) {
-            setMainImageUrl(selectedColor.fullImage);
-        }
+        const colorImg = selectedColor?.fullImage || selectedColor?.image;
+        if (colorImg) setMainImageUrl(colorImg);
     }, [selectedColor]);
 
     const [validationError, setValidationError] = useState('');
@@ -542,6 +543,37 @@ const ProductDetail = () => {
                             <ChevronRight size={24} />
                         </button>
                     </div>
+                    {/* Try in My Window button */}
+                    {!isStandalone && (
+                        product?.category?.toLowerCase().includes('zebra') || product?.title?.toLowerCase().includes('zebra') ||
+                        product?.category?.toLowerCase().includes('roller') || product?.title?.toLowerCase().includes('roller')
+                    ) && (
+                        <button
+                            onClick={() => setIsVisualizerOpen(true)}
+                            style={{
+                                width: '100%',
+                                marginBottom: '12px',
+                                padding: '11px',
+                                fontSize: '0.88rem',
+                                fontWeight: '600',
+                                border: '1.5px solid #d0d0d0',
+                                borderRadius: '8px',
+                                background: '#fafafa',
+                                cursor: 'pointer',
+                                color: '#333',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: '7px',
+                                transition: 'all 0.2s'
+                            }}
+                            onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--primary-green)'; e.currentTarget.style.color = 'var(--primary-green)'; }}
+                            onMouseLeave={e => { e.currentTarget.style.borderColor = '#d0d0d0'; e.currentTarget.style.color = '#333'; }}
+                        >
+                            🪟 내 창문에 미리 보기
+                        </button>
+                    )}
+
                     {/* Thumbnails */}
                     <div style={{ display: 'flex', gap: '10px', overflowX: 'auto', paddingBottom: '10px' }}>
                         {images.map((img, idx) => (
@@ -1301,6 +1333,14 @@ const ProductDetail = () => {
             </div>
 
             <OrderingGuide isOpen={isGuideOpen} onClose={() => setIsGuideOpen(false)} />
+
+            <WindowVisualizer
+                isOpen={isVisualizerOpen}
+                onClose={() => setIsVisualizerOpen(false)}
+                productTitle={product?.title}
+                selectedColor={selectedColor}
+                isZebra={product?.category?.toLowerCase().includes('zebra') || product?.title?.toLowerCase().includes('zebra')}
+            />
 
             {/* Floating Quick View (Enlarge on Hover) */}
             {hoveredOption && (
