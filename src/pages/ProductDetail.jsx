@@ -570,7 +570,7 @@ const ProductDetail = () => {
                             onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--primary-green)'; e.currentTarget.style.color = 'var(--primary-green)'; }}
                             onMouseLeave={e => { e.currentTarget.style.borderColor = '#d0d0d0'; e.currentTarget.style.color = '#333'; }}
                         >
-                            🪟 내 창문에 미리 보기
+                            🪟 Try in My Window
                         </button>
                     )}
 
