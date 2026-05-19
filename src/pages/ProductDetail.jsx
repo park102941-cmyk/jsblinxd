@@ -64,6 +64,51 @@ const ProductDetail = () => {
     const [itemQuantity, setItemQuantity] = useState(1);
     const [isLightboxOpen, setIsLightboxOpen] = useState(false);
     const [isVisualizerOpen, setIsVisualizerOpen] = useState(false);
+    const [cassetteColor, setCassetteColor] = useState('');
+
+    const CASSETTE_COLORS = ['White', 'Ivory', 'Beige', 'Grey', 'Brown', 'Black'];
+
+    const getMatchedCassetteName = (hexColor) => {
+        if (!hexColor) return 'White';
+        try {
+            let cHex = hexColor.replace('#', '');
+            if (cHex.length === 3) cHex = cHex.split('').map(x => x + x).join('');
+            const num = parseInt(cHex, 16);
+            const target = [num >> 16, (num >> 8) & 255, num & 255];
+            
+            const cassettes = [
+                { name: 'White', rgb: [255, 255, 255] },
+                { name: 'Ivory', rgb: [255, 253, 230] },
+                { name: 'Beige', rgb: [222, 203, 174] },
+                { name: 'Grey', rgb: [160, 160, 160] },
+                { name: 'Brown', rgb: [101, 67, 33] },
+                { name: 'Black', rgb: [40, 40, 40] }
+            ];
+
+            let bestMatch = cassettes[0];
+            let minDistance = Infinity;
+
+            for (const c of cassettes) {
+                const dist = Math.sqrt(
+                    Math.pow(target[0] - c.rgb[0], 2) +
+                    Math.pow(target[1] - c.rgb[1], 2) +
+                    Math.pow(target[2] - c.rgb[2], 2)
+                );
+                if (dist < minDistance) {
+                    minDistance = dist;
+                    bestMatch = c;
+                }
+            }
+            return bestMatch.name;
+        } catch (e) {
+            return 'White';
+        }
+    };
+
+    const handleColorSelection = (c) => {
+        setSelectedColor(c);
+        setCassetteColor(getMatchedCassetteName(c.hex));
+    };
 
     const isStandalone = !!(
         ['smart-remote-1', 'smart-remote-4', 'smart-remote-15', 'smart-hub-1', 'smart-tech-1'].includes(product?.id) ||
@@ -199,6 +244,7 @@ const ProductDetail = () => {
             if (edit.hub !== undefined) setBondBridge(edit.hub);
             if (edit.roomType) setRoomType(edit.roomType);
             if (edit.roomDetail) setRoomDetail(edit.roomDetail);
+            if (edit.cassetteColor) setCassetteColor(edit.cassetteColor);
             if (edit.customSelections) {
                 // Map back custom selections
                 const restoredConfigs = {};
@@ -243,6 +289,7 @@ const ProductDetail = () => {
     // -- Detailed Explanations for each step (SelectBlinds style) --
     const EXPLANATIONS = {
         color: "Choose from our premium fabric collections. Light-filtering fabrics diffuse sunlight gently, while blackout fabrics provide complete privacy and room darkening.",
+        cassette: "Select the color of the top cassette and bottom bar hardware. We automatically suggest the best matching color based on your fabric choice, but you can override it here.",
         mount: "Inside Mount: Fits within the window frame for a custom, built-in look. Requires at least 2\" of depth. Outside Mount: Fits on the wall or trim, offering maximum light blocking and covering the entire window opening.",
         size: "Measurements are in inches. Always measure to the nearest 1/8\". For Inside Mount, we recommend measuring the width at the top, middle, and bottom, then providing the SMALLEST width.",
         motor: "Standard RF: Simple remote control. Zigbee 3.0: Requires a hub for smart home control. Alexa Direct: Connects directly to Echo devices with built-in hubs. Matter: The latest industry standard for cross-platform smart home compatibility.",
@@ -323,6 +370,11 @@ const ProductDetail = () => {
                     setActiveSection('remote');
                     return;
                 }
+                if (!cassetteColor) {
+                    setValidationError('Please select a supply (cassette) color.');
+                    setActiveSection('cassette');
+                    return;
+                }
                 if (!roomType) {
                     setValidationError('Please select a Room Name.');
                     setActiveSection('room');
@@ -363,6 +415,7 @@ const ProductDetail = () => {
                 motorType: motorType,
                 remoteType: remoteType,
                 solarPanel: solarPanel,
+                cassetteColor: cassetteColor,
                 basePrice: product.basePrice || product.price
             });
 
@@ -388,6 +441,7 @@ const ProductDetail = () => {
                 width: w,
                 height: h,
                 mount: mountType,
+                cassetteColor: cassetteColor,
                 control: motorType,
                 remote: remoteType,
                 controlSide: controlSide,
@@ -406,6 +460,7 @@ const ProductDetail = () => {
                     remote: remoteType,
                     solar: solarPanel,
                     hub: bondBridge,
+                    cassetteColor: cassetteColor,
                     room: finalRoomLabel,
                     roomType: roomType,
                     roomDetail: roomDetail,
@@ -637,7 +692,7 @@ const ProductDetail = () => {
                                     {product.colors && product.colors.map((c, i) => (
                                         <div
                                             key={i}
-                                            onClick={() => setSelectedColor(c)}
+                                            onClick={() => handleColorSelection(c)}
                                             style={{
                                                 cursor: 'pointer',
                                                 border: selectedColor === c ? '2px solid #333' : '1px solid #eee',
@@ -704,21 +759,25 @@ const ProductDetail = () => {
 
                         {/* 2. Cassette */}
                         <OptionSection
-                            title="Cassette & Bottom bar Style"
+                            title={`Supply Color: ${cassetteColor || 'Select'}`}
                             isOpen={activeSection === 'cassette'}
                             onToggle={() => setActiveSection(activeSection === 'cassette' ? '' : 'cassette')}
+                            helpText={EXPLANATIONS.cassette}
+                            isComplete={!!cassetteColor}
+                            isRequired={true}
                         >
                             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '10px' }}>
-                                {['White [MX01]', 'Gray [MX02]', 'Coffee [MX03]', 'Black [MX04]'].map((opt) => (
+                                {CASSETTE_COLORS.map((opt) => (
                                     <div
                                         key={opt}
-                                        onMouseEnter={() => setHoveredOption({ name: opt, image: `/images/details/cassette_${opt.split(' ')[0].toLowerCase()}.png`, price: 0 })}
+                                        onMouseEnter={() => setHoveredOption({ name: opt, image: `/images/details/cassette_${opt.toLowerCase()}.png`, price: 0 })}
                                         onMouseLeave={() => setHoveredOption(null)}
-                                        onClick={() => console.log('Cassette selected:', opt)} // Placeholder logic
-                                        style={{ border: '1px solid #ddd', borderRadius: '6px', padding: '10px', textAlign: 'center', cursor: 'pointer' }}
+                                        onClick={() => setCassetteColor(opt)}
+                                        style={{ border: cassetteColor === opt ? '2px solid #333' : '1px solid #ddd', background: cassetteColor === opt ? '#fcfcfc' : '#fff', borderRadius: '6px', padding: '10px', textAlign: 'center', cursor: 'pointer', position: 'relative' }}
                                     >
-                                        <div style={{ height: '50px', background: '#eee', marginBottom: '5px', borderRadius: '4px' }}></div> {/* Placeholder Image */}
-                                        <div style={{ fontSize: '0.8rem' }}>{opt}</div>
+                                        <div style={{ height: '50px', background: `linear-gradient(to bottom, #f0f0f0, #e0e0e0)`, marginBottom: '5px', borderRadius: '4px', border: '1px solid #ccc' }}></div>
+                                        <div style={{ fontSize: '0.8rem', fontWeight: cassetteColor === opt ? '600' : '400' }}>{opt}</div>
+                                        {cassetteColor === opt && <Check size={14} style={{ position: 'absolute', top: '5px', right: '5px', color: '#333' }} />}
                                     </div>
                                 ))}
                             </div>
@@ -1340,6 +1399,7 @@ const ProductDetail = () => {
                 productTitle={product?.title}
                 selectedColor={selectedColor}
                 isZebra={product?.category?.toLowerCase().includes('zebra') || product?.title?.toLowerCase().includes('zebra')}
+                selectedCassetteColor={cassetteColor}
             />
 
             {/* Floating Quick View (Enlarge on Hover) */}

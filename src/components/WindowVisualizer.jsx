@@ -11,20 +11,25 @@ const hexToRgb = (hex) => {
     return [num >> 16, (num >> 8) & 255, num & 255];
 };
 
-const getMatchedCassetteColor = (hexColor) => {
+const getMatchedCassetteColor = (hexColor, explicitCassetteName) => {
+    const cassettes = [
+        { name: 'White', rgb: [255, 255, 255], top: '#ffffff', bottom: '#e0e0e0' },
+        { name: 'Ivory', rgb: [255, 253, 230], top: '#ffffe6', bottom: '#e6e6c8' },
+        { name: 'Beige', rgb: [222, 203, 174], top: '#e2d3be', bottom: '#c8b49b' },
+        { name: 'Grey', rgb: [160, 160, 160], top: '#a8a8a8', bottom: '#787878' },
+        { name: 'Brown', rgb: [101, 67, 33], top: '#7d5635', bottom: '#4d321c' },
+        { name: 'Black', rgb: [40, 40, 40], top: '#3c3c3c', bottom: '#1a1a1a' }
+    ];
+
+    if (explicitCassetteName) {
+        const match = cassettes.find(c => explicitCassetteName.toLowerCase().includes(c.name.toLowerCase()));
+        if (match) return match;
+    }
+
     if (!hexColor) return { top: '#fcfcfc', bottom: '#d0d0d0' };
     
     try {
         const target = hexToRgb(hexColor);
-        const cassettes = [
-            { name: 'White', rgb: [255, 255, 255], top: '#ffffff', bottom: '#e0e0e0' },
-            { name: 'Ivory', rgb: [255, 253, 230], top: '#ffffe6', bottom: '#e6e6c8' },
-            { name: 'Beige', rgb: [222, 203, 174], top: '#e2d3be', bottom: '#c8b49b' },
-            { name: 'Grey', rgb: [160, 160, 160], top: '#a8a8a8', bottom: '#787878' },
-            { name: 'Brown', rgb: [101, 67, 33], top: '#7d5635', bottom: '#4d321c' },
-            { name: 'Black', rgb: [40, 40, 40], top: '#3c3c3c', bottom: '#1a1a1a' }
-        ];
-
         let bestMatch = cassettes[0];
         let minDistance = Infinity;
 
@@ -86,7 +91,7 @@ const ToolbarButton = ({ icon: Icon, label, onClick, isActive, disabled, hovered
     );
 };
 
-const WindowVisualizer = ({ isOpen, onClose, productTitle, selectedColor, isZebra }) => {
+const WindowVisualizer = ({ isOpen, onClose, productTitle, selectedColor, isZebra, selectedCassetteColor }) => {
     const isBlackout = productTitle?.toLowerCase().includes('blackout');
     
     const [roomPhoto, setRoomPhoto] = useState(null);
@@ -269,7 +274,7 @@ const WindowVisualizer = ({ isOpen, onClose, productTitle, selectedColor, isZebr
 
     const fabricImage = fabricDataUrl || selectedColor?.fullImage || selectedColor?.image;
     const shadeColor = selectedColor?.hex || '#c8b89a';
-    const cassetteColors = getMatchedCassetteColor(shadeColor);
+    const cassetteColors = getMatchedCassetteColor(shadeColor, selectedCassetteColor);
 
     let shadeStyle = {};
     if (fabricImage) {
