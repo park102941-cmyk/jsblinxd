@@ -280,7 +280,7 @@ const WindowVisualizer = ({ isOpen, onClose, productTitle, selectedColor, isZebr
     if (fabricImage) {
         shadeStyle = {
             backgroundImage: `url(${fabricImage})`,
-            backgroundSize: isZebra ? '100% 64px' : 'cover', // Zebra stripes tiling or cover for roller
+            backgroundSize: isZebra ? '100% 24px' : 'cover', // Zebra stripes tiling or cover for roller
             backgroundPosition: 'top center',
             backgroundRepeat: isZebra ? 'repeat-y' : 'no-repeat',
             opacity: opacity
@@ -292,9 +292,9 @@ const WindowVisualizer = ({ isOpen, onClose, productTitle, selectedColor, isZebr
                 background: `repeating-linear-gradient(
                     to bottom,
                     ${shadeColor}${solidAlpha} 0px,
-                    ${shadeColor}${solidAlpha} 16px,
-                    ${shadeColor}22 16px,
-                    ${shadeColor}22 32px
+                    ${shadeColor}${solidAlpha} 12px,
+                    ${shadeColor}22 12px,
+                    ${shadeColor}22 24px
                 )`,
                 opacity
             }
