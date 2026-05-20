@@ -52,7 +52,7 @@ const ProductCard = ({ id, title, price, originalPrice, image, badge, reviews, c
                         </div>
                     )}
 
-                    {image ?
+                    {image && !image.includes('unsplash.com') ?
                         <img 
                             src={image} 
                             alt={title} 

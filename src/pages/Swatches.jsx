@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { db } from '../lib/firebase';
 import { collection, getDocs } from 'firebase/firestore';
-import { ChevronDown, ChevronUp, Plus, Minus, Check } from 'lucide-react';
+import { ChevronDown, ChevronUp, Plus, Minus, Check, X } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import SidebarFilter from '../components/SidebarFilter';
@@ -22,6 +22,7 @@ const Swatches = () => {
     const [zebraSwatches, setZebraSwatches] = useState([]);
     const [rollerSwatches, setRollerSwatches] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [lightboxImage, setLightboxImage] = useState(null);
 
     // Selected Color State for each Fabric: { [productId]: colorObject }
     const [selectedColors, setSelectedColors] = useState({});
@@ -164,8 +165,12 @@ const Swatches = () => {
                     const activeColor = selectedColors[product.id] || (product.colors && product.colors[0]);
                     const currentQty = quantities[product.id] || 1;
                     
+                    // Filter out unsplash URLs
+                    let rawImageUrl = product.imageUrl || product.image || '';
+                    if (rawImageUrl.includes('unsplash.com')) rawImageUrl = '';
+
                     // Match active color to product images if it doesn't have an explicit image
-                    let previewImage = activeColor?.image || (product.images && product.images.length > 0 ? product.images[0] : (product.imageUrl || product.image)) || 'https://via.placeholder.com/200';
+                    let previewImage = activeColor?.image || (product.images && product.images.length > 0 ? product.images[0] : rawImageUrl);
                     if (activeColor && !activeColor.image && product.images && product.images.length > 0) {
                         const cName = (activeColor.name || activeColor.value || '').toLowerCase().replace(/[^a-z0-9]/g, '');
                         if (cName) {
@@ -223,14 +228,22 @@ const Swatches = () => {
                             )}
 
                             {/* Fabric Preview Image */}
-                            <div style={{
-                                height: '180px',
-                                borderRadius: '8px',
-                                background: `url(${previewImage}) center/cover`,
-                                border: '1px solid #f0f0f0',
-                                position: 'relative',
-                                overflow: 'hidden'
-                            }}>
+                            <div 
+                                onClick={() => previewImage && setLightboxImage(previewImage)}
+                                style={{
+                                    height: '180px',
+                                    borderRadius: '8px',
+                                    background: previewImage ? `url(${previewImage}) center/cover` : '#f0f0f0',
+                                    border: '1px solid #f0f0f0',
+                                    position: 'relative',
+                                    overflow: 'hidden',
+                                    cursor: previewImage ? 'zoom-in' : 'default',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center'
+                                }}>
+                                {!previewImage && <span style={{ color: '#aaa', fontSize: '0.9rem' }}>No Image</span>}
+
                                 <div style={{
                                     position: 'absolute',
                                     bottom: 0,
@@ -440,6 +453,62 @@ const Swatches = () => {
                     </>
                 )}
             </div>
+
+            {/* Lightbox */}
+            {lightboxImage && (
+                <div 
+                    onClick={() => setLightboxImage(null)}
+                    style={{
+                        position: 'fixed',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        backgroundColor: 'rgba(0,0,0,0.9)',
+                        zIndex: 99999,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        cursor: 'zoom-out'
+                    }}
+                >
+                    <button
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            setLightboxImage(null);
+                        }}
+                        style={{
+                            position: 'absolute',
+                            top: '20px',
+                            right: '20px',
+                            background: 'rgba(255,255,255,0.2)',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '50%',
+                            width: '40px',
+                            height: '40px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            cursor: 'pointer'
+                        }}
+                    >
+                        <X size={24} />
+                    </button>
+                    <img 
+                        src={lightboxImage} 
+                        alt="Expanded Preview" 
+                        style={{ 
+                            maxWidth: '90%', 
+                            maxHeight: '90%', 
+                            objectFit: 'contain',
+                            borderRadius: '8px',
+                            boxShadow: '0 10px 40px rgba(0,0,0,0.5)'
+                        }} 
+                        onClick={(e) => e.stopPropagation()}
+                    />
+                </div>
+            )}
         </div>
     );
 };

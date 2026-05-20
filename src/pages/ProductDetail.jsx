@@ -144,10 +144,13 @@ const ProductDetail = () => {
                     }
 
                     // Pre-calculate images array for effects
+                    const legacyImg = data.imageUrl || data.image;
+                    const cleanLegacyImg = legacyImg && legacyImg.includes('unsplash.com') ? null : legacyImg;
+
                     const prodImages = data.images && data.images.length > 0 
                         ? data.images 
-                        : (data.imageUrl || data.image) 
-                            ? [data.imageUrl || data.image] 
+                        : cleanLegacyImg 
+                            ? [cleanLegacyImg] 
                             : [];
                     
                     if (!mainImageUrl && prodImages.length > 0) {
@@ -274,10 +277,13 @@ const ProductDetail = () => {
         }
     }, [product, location.state, fractions]);
 
+    const legacyImg = product?.imageUrl || product?.image;
+    const cleanLegacyImg = legacyImg && legacyImg.includes('unsplash.com') ? null : legacyImg;
+
     const images = product?.images && product.images.length > 0 
         ? product.images 
-        : (product?.imageUrl || product?.image) 
-            ? [product.imageUrl || product.image] 
+        : cleanLegacyImg 
+            ? [cleanLegacyImg] 
             : [];
 
     // Handle Image Switching logic
