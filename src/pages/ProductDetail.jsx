@@ -9,6 +9,8 @@ import { Link } from 'react-router-dom';
 import { orderEngine } from '../lib/orderEngine';
 import OrderingGuide from '../components/OrderingGuide';
 import WindowVisualizer from '../components/WindowVisualizer';
+import ProductCoverSlide from '../components/ProductCoverSlide';
+import LiftStyleIllustration from '../components/LiftStyleIllustration';
 
 
 const ProductDetail = () => {
@@ -273,16 +275,22 @@ const ProductDetail = () => {
         }
     }, [product, location.state, fractions]);
 
-    const images = product?.images && product.images.length > 0 
-        ? product.images 
-        : (product?.imageUrl || product?.image) 
-            ? [product.imageUrl || product.image] 
-            : ["https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&q=80&w=800"];
+    const isShade = product && !product.category?.toLowerCase().includes('motor') && product.title && !product.title.toLowerCase().includes('motor');
 
-    // Handle Image Switching logic
+    const virtualMockups = [
+        '/images/mockups/living_room.png',
+        '/images/mockups/bedroom.png',
+        '/images/mockups/office.png'
+    ];
+
+    const images = product?.images && product.images.length > 0 
+        ? (isShade ? ['COVER_SLIDE', 'COVER_SLIDE_V1', 'COVER_SLIDE_V2', 'COVER_SLIDE_V3', ...product.images] : product.images)
+        : (isShade ? ['COVER_SLIDE', 'COVER_SLIDE_V1', 'COVER_SLIDE_V2', 'COVER_SLIDE_V3', "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&q=80&w=800"] : ["https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&q=80&w=800"]);
+
+    // Update main image when variants change
     useEffect(() => {
         if (product && images && images.length > 0) {
-            setMainImageUrl(images[currentImageIndex]);
+            setMainImageUrl(typeof images[currentImageIndex] === 'string' && images[currentImageIndex].startsWith('COVER_SLIDE') ? null : images[currentImageIndex]);
         }
     }, [currentImageIndex, product, images]);
 
@@ -567,31 +575,41 @@ const ProductDetail = () => {
 
                 {/* Left: Image Gallery (Sticky) */}
                 <div style={{ flex: '1 1 500px', position: 'sticky', top: '100px', alignSelf: 'start' }}>
-                    <div style={{
-                        position: 'relative',
+                    <div className="main-image-container" style={{
                         width: '100%',
-                        aspectRatio: '1/1',
+                        height: '600px',
                         backgroundColor: '#f5f5f5',
-                        borderRadius: '8px',
+                        borderRadius: '12px',
                         overflow: 'hidden',
-                        marginBottom: '20px'
+                        position: 'relative',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
                     }}>
-                        <img
-                            src={mainImageUrl || images[currentImageIndex]}
-                            alt={product.title}
-                            onClick={() => setIsLightboxOpen(true)}
-                            style={{ 
-                                width: '100%', 
-                                height: '100%', 
-                                objectFit: 'cover', 
-                                transition: 'all 0.4s ease',
-                                cursor: 'zoom-in'
-                            }}
-                            onError={(e) => {
-                                e.target.onerror = null; 
-                                e.target.src = "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&q=80&w=800";
-                            }}
-                        />
+                        {(mainImageUrl?.startsWith('COVER_SLIDE') || (!mainImageUrl && typeof images[currentImageIndex] === 'string' && images[currentImageIndex].startsWith('COVER_SLIDE'))) ? (
+                            <ProductCoverSlide 
+                                product={product} 
+                                overrideMainImage={
+                                    images[currentImageIndex] === 'COVER_SLIDE_V1' ? virtualMockups[0] : 
+                                    images[currentImageIndex] === 'COVER_SLIDE_V2' ? virtualMockups[1] : 
+                                    images[currentImageIndex] === 'COVER_SLIDE_V3' ? virtualMockups[2] : null
+                                }
+                            />
+                        ) : (
+                            <img 
+                                src={mainImageUrl || images[currentImageIndex]} 
+                                alt={product?.title || 'Product view'} 
+                                style={{
+                                    width: '100%',
+                                    height: '100%',
+                                    objectFit: 'cover'
+                                }}
+                                onError={(e) => {
+                                    e.target.onerror = null;
+                                    e.target.src = "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&q=80&w=800";
+                                }}
+                            />
+                        )}
                         {/* Nav Arrows */}
                         <button
                             onClick={() => setCurrentImageIndex(prev => prev > 0 ? prev - 1 : images.length - 1)}
@@ -640,20 +658,54 @@ const ProductDetail = () => {
                     {/* Thumbnails */}
                     <div style={{ display: 'flex', gap: '10px', overflowX: 'auto', paddingBottom: '10px' }}>
                         {images.map((img, idx) => (
-                            <img
+                            <div 
                                 key={idx}
-                                src={img}
-                                alt={`Thumbnail ${idx}`}
-                                onClick={() => setCurrentImageIndex(idx)}
+                                onClick={() => {
+                                    setCurrentImageIndex(idx);
+                                    if (typeof img !== 'string' || !img.startsWith('COVER_SLIDE')) setMainImageUrl(img);
+                                }}
                                 style={{
-                                    width: '80px', height: '80px', objectFit: 'cover', borderRadius: '4px', cursor: 'pointer',
-                                    border: currentImageIndex === idx ? '2px solid #333' : '1px solid #ddd'
+                                    width: '80px',
+                                    height: '80px',
+                                    borderRadius: '8px',
+                                    overflow: 'hidden',
+                                    cursor: 'pointer',
+                                    border: currentImageIndex === idx ? '2px solid var(--primary-blue)' : '2px solid transparent',
+                                    opacity: currentImageIndex === idx ? 1 : 0.6,
+                                    transition: 'all 0.2s',
+                                    flexShrink: 0,
+                                    backgroundColor: '#eee',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    fontSize: '0.6rem',
+                                    fontWeight: 'bold',
+                                    color: '#666'
                                 }}
-                                onError={(e) => {
-                                    e.target.onerror = null; 
-                                    e.target.src = "https://images.unsplash.com/photo-1513694203530-ad3d99967451?auto=format&fit=crop&q=80&w=800";
-                                }}
-                            />
+                            >
+                                {typeof img === 'string' && img.startsWith('COVER_SLIDE') ? (
+                                    <div style={{ width: '100%', height: '100%', overflow: 'hidden', position: 'relative' }}>
+                                        <ProductCoverSlide 
+                                            product={product} 
+                                            overrideMainImage={
+                                                img === 'COVER_SLIDE_V1' ? virtualMockups[0] : 
+                                                img === 'COVER_SLIDE_V2' ? virtualMockups[1] : 
+                                                img === 'COVER_SLIDE_V3' ? virtualMockups[2] : null
+                                            }
+                                        />
+                                    </div>
+                                ) : (
+                                    <img 
+                                        src={img} 
+                                        alt={`Thumbnail ${idx}`} 
+                                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                        onError={(e) => {
+                                            e.target.onerror = null;
+                                            e.target.src = "https://images.unsplash.com/photo-1513694203530-ad3d99967451?auto=format&fit=crop&q=80&w=800";
+                                        }}
+                                    />
+                                )}
+                            </div>
                         ))}
                     </div>
                 </div>
@@ -1016,9 +1068,9 @@ const ProductDetail = () => {
                         >
                             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '15px' }}>
                                 {[
-                                    { id: 'standard', name: 'Continuous Cord Loop', price: 0, img: '/images/lift_cord_loop.png', isKidFriendly: false },
-                                    { id: 'cordless', name: 'Premium Cordless', price: 47, img: '/images/lift_cordless.png', isKidFriendly: true },
-                                    { id: 'motorized', name: 'Motorization', price: 149, img: '/images/lift_motorized.png', isKidFriendly: true }
+                                    { id: 'standard', name: 'Continuous Cord Loop', price: 0, isKidFriendly: false },
+                                    { id: 'cordless', name: 'Premium Cordless', price: 47, isKidFriendly: true },
+                                    { id: 'motorized', name: 'Motorization', price: 149, isKidFriendly: true }
                                 ].map(l => (
                                     <div
                                         key={l.id}
@@ -1033,15 +1085,7 @@ const ProductDetail = () => {
                                             marginBottom: '12px', overflow: 'hidden', border: motorType === l.id ? '2px solid #333' : '1px solid #eee',
                                             display: 'flex', justifyContent: 'center', alignItems: 'center'
                                         }}>
-                                            <img 
-                                                src={l.img} 
-                                                alt={l.name} 
-                                                style={{ 
-                                                    width: '100%', 
-                                                    height: '100%', 
-                                                    objectFit: 'contain'
-                                                }} 
-                                            />
+                                            <LiftStyleIllustration type={l.id} />
                                         </div>
                                         <div style={{ fontWeight: '600', fontSize: '0.85rem', color: '#333', lineHeight: '1.2' }}>{l.name}</div>
                                         <div style={{ fontWeight: '800', fontSize: '0.9rem', color: '#333', margin: '4px 0' }}>
@@ -1068,7 +1112,7 @@ const ProductDetail = () => {
                         {/* 7. Control Side */}
                         {(motorType === 'standard' || motorType === 'motorized') && (
                             <OptionSection
-                                title={`${motorType === 'motorized' ? 'Motor Side (Charging Port)' : 'Handle Side'} (Left/Right): ${controlSide || 'Select'}`}
+                                title={`Motor / Handle Side ${motorType === 'motorized' ? '(Charging Port) ' : ''}(Left/Right): ${controlSide || 'Select'}`}
                                 isOpen={activeSection === 'side'}
                                 onToggle={() => setActiveSection(activeSection === 'side' ? '' : 'side')}
                                 helpText={EXPLANATIONS.side}

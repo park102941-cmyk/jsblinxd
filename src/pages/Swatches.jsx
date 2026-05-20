@@ -5,6 +5,7 @@ import { ChevronDown, ChevronUp, Plus, Minus, Check } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import SidebarFilter from '../components/SidebarFilter';
+import ProductCoverSlide from '../components/ProductCoverSlide';
 
 const Swatches = () => {
     const [searchParams] = useSearchParams();
@@ -215,26 +216,13 @@ const Swatches = () => {
 
                             {/* Fabric Preview Image */}
                             <div style={{
-                                height: '180px',
+                                height: '240px',
                                 borderRadius: '8px',
-                                background: `url(${previewImage}) center/cover`,
                                 border: '1px solid #f0f0f0',
                                 position: 'relative',
                                 overflow: 'hidden'
                             }}>
-                                <div style={{
-                                    position: 'absolute',
-                                    bottom: 0,
-                                    left: 0,
-                                    right: 0,
-                                    background: 'linear-gradient(transparent, rgba(0,0,0,0.4))',
-                                    padding: '10px',
-                                    color: '#fff',
-                                    fontSize: '0.78rem',
-                                    fontWeight: '500'
-                                }}>
-                                    {activeColor?.name || 'Main Preview'}
-                                </div>
+                                <ProductCoverSlide product={product} />
                             </div>
 
                             {/* Info */}
