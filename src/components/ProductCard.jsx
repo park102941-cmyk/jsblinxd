@@ -1,10 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Star } from 'lucide-react';
-import ProductCoverSlide from './ProductCoverSlide';
 
-const ProductCard = ({ id, title, price, originalPrice, image, badge, reviews, colors, product }) => {
-    const isShade = product && !product.category?.toLowerCase().includes('motor') && product.title && !product.title.toLowerCase().includes('motor');
+const ProductCard = ({ id, title, price, originalPrice, image, badge, reviews, colors }) => {
     return (
         <Link to={`/product/${id}`} style={{ display: 'block', textDecoration: 'none', color: 'inherit' }}>
             <div className="product-card" style={{
@@ -54,13 +52,7 @@ const ProductCard = ({ id, title, price, originalPrice, image, badge, reviews, c
                         </div>
                     )}
 
-                    {isShade ? (
-                        <div style={{ width: '100%', height: '100%', transition: 'transform 0.4s ease' }}
-                            onMouseOver={e => e.currentTarget.style.transform = 'scale(1.08)'}
-                            onMouseOut={e => e.currentTarget.style.transform = 'scale(1)'}>
-                            <ProductCoverSlide product={product} />
-                        </div>
-                    ) : image ? (
+                    {image ?
                         <img 
                             src={image} 
                             alt={title} 
@@ -76,10 +68,9 @@ const ProductCard = ({ id, title, price, originalPrice, image, badge, reviews, c
                                 e.target.onerror = null; 
                                 e.target.src = "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&q=80&w=800";
                             }}
-                        />
-                    ) : (
+                        /> :
                         <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#ccc', fontSize: '0.9rem' }}>No Image</div>
-                    )}
+                    }
                 </div>
 
                 {/* Content Area */}

@@ -9,7 +9,6 @@ import { Link } from 'react-router-dom';
 import { orderEngine } from '../lib/orderEngine';
 import OrderingGuide from '../components/OrderingGuide';
 import WindowVisualizer from '../components/WindowVisualizer';
-import ProductCoverSlide from '../components/ProductCoverSlide';
 import LiftStyleIllustration from '../components/LiftStyleIllustration';
 
 
@@ -275,22 +274,16 @@ const ProductDetail = () => {
         }
     }, [product, location.state, fractions]);
 
-    const isShade = product && !product.category?.toLowerCase().includes('motor') && product.title && !product.title.toLowerCase().includes('motor');
-
-    const virtualMockups = [
-        '/images/mockups/living_room.png',
-        '/images/mockups/bedroom.png',
-        '/images/mockups/office.png'
-    ];
-
     const images = product?.images && product.images.length > 0 
-        ? (isShade ? ['COVER_SLIDE', ...virtualMockups, ...product.images] : product.images)
-        : (isShade ? ['COVER_SLIDE', ...virtualMockups, "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&q=80&w=800"] : ["https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&q=80&w=800"]);
+        ? product.images 
+        : (product?.imageUrl || product?.image) 
+            ? [product.imageUrl || product.image] 
+            : ["https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&q=80&w=800"];
 
-    // Update main image when variants change
+    // Handle Image Switching logic
     useEffect(() => {
         if (product && images && images.length > 0) {
-            setMainImageUrl(images[currentImageIndex] === 'COVER_SLIDE' ? null : images[currentImageIndex]);
+            setMainImageUrl(images[currentImageIndex]);
         }
     }, [currentImageIndex, product, images]);
 
@@ -575,34 +568,31 @@ const ProductDetail = () => {
 
                 {/* Left: Image Gallery (Sticky) */}
                 <div style={{ flex: '1 1 500px', position: 'sticky', top: '100px', alignSelf: 'start' }}>
-                    <div className="main-image-container" style={{
-                        width: '100%',
-                        height: '600px',
-                        backgroundColor: '#f5f5f5',
-                        borderRadius: '12px',
-                        overflow: 'hidden',
+                    <div style={{
                         position: 'relative',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center'
+                        width: '100%',
+                        aspectRatio: '1/1',
+                        backgroundColor: '#f5f5f5',
+                        borderRadius: '8px',
+                        overflow: 'hidden',
+                        marginBottom: '20px'
                     }}>
-                        {(mainImageUrl === 'COVER_SLIDE' || (!mainImageUrl && images[currentImageIndex] === 'COVER_SLIDE')) ? (
-                            <ProductCoverSlide product={product} />
-                        ) : (
-                            <img 
-                                src={mainImageUrl || images[currentImageIndex]} 
-                                alt={product?.title || 'Product view'} 
-                                style={{
-                                    width: '100%',
-                                    height: '100%',
-                                    objectFit: 'cover'
-                                }}
-                                onError={(e) => {
-                                    e.target.onerror = null;
-                                    e.target.src = "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&q=80&w=800";
-                                }}
-                            />
-                        )}
+                        <img
+                            src={mainImageUrl || images[currentImageIndex]}
+                            alt={product.title}
+                            onClick={() => setIsLightboxOpen(true)}
+                            style={{ 
+                                width: '100%', 
+                                height: '100%', 
+                                objectFit: 'cover', 
+                                transition: 'all 0.4s ease',
+                                cursor: 'zoom-in'
+                            }}
+                            onError={(e) => {
+                                e.target.onerror = null; 
+                                e.target.src = "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&q=80&w=800";
+                            }}
+                        />
                         {/* Nav Arrows */}
                         <button
                             onClick={() => setCurrentImageIndex(prev => prev > 0 ? prev - 1 : images.length - 1)}
@@ -651,49 +641,20 @@ const ProductDetail = () => {
                     {/* Thumbnails */}
                     <div style={{ display: 'flex', gap: '10px', overflowX: 'auto', paddingBottom: '10px' }}>
                         {images.map((img, idx) => (
-                            <div 
+                            <img
                                 key={idx}
-                                onClick={() => {
-                                    setCurrentImageIndex(idx);
-                                    if (img !== 'COVER_SLIDE') setMainImageUrl(img);
-                                }}
+                                src={img}
+                                alt={`Thumbnail ${idx}`}
+                                onClick={() => setCurrentImageIndex(idx)}
                                 style={{
-                                    width: '80px',
-                                    height: '80px',
-                                    borderRadius: '8px',
-                                    overflow: 'hidden',
-                                    cursor: 'pointer',
-                                    border: currentImageIndex === idx ? '2px solid var(--primary-blue)' : '2px solid transparent',
-                                    opacity: currentImageIndex === idx ? 1 : 0.6,
-                                    transition: 'all 0.2s',
-                                    flexShrink: 0,
-                                    backgroundColor: '#eee',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    fontSize: '0.6rem',
-                                    fontWeight: 'bold',
-                                    color: '#666'
+                                    width: '80px', height: '80px', objectFit: 'cover', borderRadius: '4px', cursor: 'pointer',
+                                    border: currentImageIndex === idx ? '2px solid #333' : '1px solid #ddd'
                                 }}
-                            >
-                                {img === 'COVER_SLIDE' ? (
-                                    <div style={{ width: '100%', height: '100%', overflow: 'hidden', position: 'relative', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                                        <div style={{ height: '100%', aspectRatio: '2/3', pointerEvents: 'none' }}>
-                                            <ProductCoverSlide product={product} />
-                                        </div>
-                                    </div>
-                                ) : (
-                                    <img 
-                                        src={img} 
-                                        alt={`Thumbnail ${idx}`} 
-                                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                                        onError={(e) => {
-                                            e.target.onerror = null;
-                                            e.target.src = "https://images.unsplash.com/photo-1513694203530-ad3d99967451?auto=format&fit=crop&q=80&w=800";
-                                        }}
-                                    />
-                                )}
-                            </div>
+                                onError={(e) => {
+                                    e.target.onerror = null; 
+                                    e.target.src = "https://images.unsplash.com/photo-1513694203530-ad3d99967451?auto=format&fit=crop&q=80&w=800";
+                                }}
+                            />
                         ))}
                     </div>
                 </div>
@@ -737,23 +698,33 @@ const ProductDetail = () => {
                                 isRequired={true}
                             >
                                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(80px, 1fr))', gap: '10px' }}>
-                                    {product.colors && product.colors.map((c, i) => (
-                                        <div
-                                            key={i}
-                                            onClick={() => handleColorSelection(c)}
-                                            style={{
-                                                cursor: 'pointer',
-                                                border: selectedColor === c ? '2px solid #333' : '1px solid #eee',
-                                                borderRadius: '6px',
-                                                padding: '4px',
-                                                position: 'relative'
-                                            }}
-                                        >
-                                            <div style={{ height: '60px', background: c.image ? `url(${c.image}) center/cover` : c.hex, borderRadius: '4px' }}></div>
-                                            <div style={{ fontSize: '0.75rem', textAlign: 'center', marginTop: '4px', overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>{c.name}</div>
-                                            {selectedColor === c && <div style={{ position: 'absolute', top: '5px', right: '5px', background: '#333', color: '#fff', borderRadius: '50%', padding: '2px' }}><Check size={12} /></div>}
-                                        </div>
-                                    ))}
+                                    {product.colors && product.colors.map((c, i) => {
+                                        let swatchBgImg = c.image || c.img;
+                                        if (!swatchBgImg && product.images && product.images.length > 0) {
+                                            const cName = (c.name || c.value || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+                                            if (cName) {
+                                                const matchedImg = product.images.find(img => img.toLowerCase().replace(/[^a-z0-9]/g, '').includes(cName));
+                                                if (matchedImg) swatchBgImg = matchedImg;
+                                            }
+                                        }
+                                        return (
+                                            <div
+                                                key={i}
+                                                onClick={() => handleColorSelection(c)}
+                                                style={{
+                                                    cursor: 'pointer',
+                                                    border: selectedColor === c ? '2px solid #333' : '1px solid #eee',
+                                                    borderRadius: '6px',
+                                                    padding: '4px',
+                                                    position: 'relative'
+                                                }}
+                                            >
+                                                <div style={{ height: '60px', background: swatchBgImg ? `url(${swatchBgImg}) center/cover` : c.hex, borderRadius: '4px' }}></div>
+                                                <div style={{ fontSize: '0.75rem', textAlign: 'center', marginTop: '4px', overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>{c.name}</div>
+                                                {selectedColor === c && <div style={{ position: 'absolute', top: '5px', right: '5px', background: '#333', color: '#fff', borderRadius: '50%', padding: '2px' }}><Check size={12} /></div>}
+                                            </div>
+                                        );
+                                    })}
                                 </div>
                             </OptionSection>
                         )}

@@ -128,7 +128,6 @@ const Products = () => {
                 badge={product.badge || (product.category === 'motor' ? 'Smart' : null)}
                 reviews={product.reviews || 0}
                 colors={product.showColor !== false ? extractColorImages(product.colors) : []}
-                product={product}
             />
         ));
     }, [filteredProducts]);

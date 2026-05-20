@@ -5,7 +5,6 @@ import { ChevronDown, ChevronUp, Plus, Minus, Check } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import SidebarFilter from '../components/SidebarFilter';
-import ProductCoverSlide from '../components/ProductCoverSlide';
 
 const Swatches = () => {
     const [searchParams] = useSearchParams();
@@ -164,7 +163,16 @@ const Swatches = () => {
                 {products.map(product => {
                     const activeColor = selectedColors[product.id] || (product.colors && product.colors[0]);
                     const currentQty = quantities[product.id] || 1;
-                    const previewImage = activeColor?.image || product.imageUrl || product.image || 'https://via.placeholder.com/200';
+                    
+                    // Match active color to product images if it doesn't have an explicit image
+                    let previewImage = activeColor?.image || product.imageUrl || product.image || 'https://via.placeholder.com/200';
+                    if (activeColor && !activeColor.image && product.images && product.images.length > 0) {
+                        const cName = (activeColor.name || activeColor.value || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+                        if (cName) {
+                            const matchedImg = product.images.find(img => img.toLowerCase().replace(/[^a-z0-9]/g, '').includes(cName));
+                            if (matchedImg) previewImage = matchedImg;
+                        }
+                    }
 
                     // Check if this fabric was highlighted by user redirect
                     const isHighlighted = fromProductName && product.title?.toLowerCase() === fromProductName.toLowerCase();
@@ -216,13 +224,26 @@ const Swatches = () => {
 
                             {/* Fabric Preview Image */}
                             <div style={{
-                                height: '240px',
+                                height: '180px',
                                 borderRadius: '8px',
+                                background: `url(${previewImage}) center/cover`,
                                 border: '1px solid #f0f0f0',
                                 position: 'relative',
                                 overflow: 'hidden'
                             }}>
-                                <ProductCoverSlide product={product} />
+                                <div style={{
+                                    position: 'absolute',
+                                    bottom: 0,
+                                    left: 0,
+                                    right: 0,
+                                    background: 'linear-gradient(transparent, rgba(0,0,0,0.4))',
+                                    padding: '10px',
+                                    color: '#fff',
+                                    fontSize: '0.78rem',
+                                    fontWeight: '500'
+                                }}>
+                                    {activeColor?.name || 'Main Preview'}
+                                </div>
                             </div>
 
                             {/* Info */}
@@ -250,6 +271,16 @@ const Swatches = () => {
                                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
                                         {product.colors.map((color, idx) => {
                                             const isSelected = activeColor?.name === color.name;
+                                            // Match color to product images if no explicit image
+                                            let swatchBgImg = color.image || color.img;
+                                            if (!swatchBgImg && product.images && product.images.length > 0) {
+                                                const cName = (color.name || color.value || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+                                                if (cName) {
+                                                    const matchedImg = product.images.find(img => img.toLowerCase().replace(/[^a-z0-9]/g, '').includes(cName));
+                                                    if (matchedImg) swatchBgImg = matchedImg;
+                                                }
+                                            }
+
                                             return (
                                                 <button
                                                     key={idx}
@@ -259,7 +290,7 @@ const Swatches = () => {
                                                         width: '28px',
                                                         height: '28px',
                                                         borderRadius: '50%',
-                                                        background: color.image ? `url(${color.image}) center/cover` : color.hex,
+                                                        background: swatchBgImg ? `url(${swatchBgImg}) center/cover` : color.hex,
                                                         border: isSelected ? '2px solid #1d1d1f' : '1px solid #ddd',
                                                         padding: 0,
                                                         cursor: 'pointer',
