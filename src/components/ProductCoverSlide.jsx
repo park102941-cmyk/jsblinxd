@@ -24,93 +24,103 @@ const ProductCoverSlide = ({ product, overrideMainImage }) => {
 
     return (
         <div style={{
-            containerType: 'inline-size',
             width: '100%',
             height: '100%',
-            backgroundColor: '#ffffff',
             display: 'flex',
-            flexDirection: 'column',
-            padding: '4cqw',
-            boxSizing: 'border-box',
-            position: 'relative'
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: '#fff'
         }}>
-            {/* Header */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '4cqw', zIndex: 2 }}>
-                <div style={{ 
-                    backgroundColor: '#d9d9d9', 
-                    padding: '1.5cqw 4cqw', 
-                    fontWeight: 'bold', 
-                    fontSize: '3cqw',
-                    letterSpacing: '0.2cqw'
-                }}>
-                    {collectionName || 'COLLECTION'}
-                </div>
-                <div style={{ 
-                    textAlign: 'right', 
-                    fontSize: '4.5cqw', 
-                    fontWeight: '300',
-                    lineHeight: '1.1',
-                    letterSpacing: '0.4cqw',
-                    whiteSpace: 'pre-line',
-                    color: '#333'
-                }}>
-                    {productType}
-                </div>
-            </div>
-
-            {/* Body */}
-            <div style={{ display: 'flex', flex: 1, gap: '4cqw', minHeight: 0 }}>
-                {/* Swatches Column */}
-                <div style={{ 
-                    width: '30%', 
-                    display: 'flex', 
-                    flexDirection: 'column', 
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    padding: '2cqw 0'
-                }}>
-                    {displayColors.map((color, idx) => {
-                        let swatchImg = color.image || color.img;
-                        if (!swatchImg && product.images && product.images.length > 0) {
-                            const cName = (color.name || color.value || '').toLowerCase().replace(/[^a-z0-9]/g, '');
-                            if (cName) {
-                                swatchImg = product.images.find(img => img.toLowerCase().replace(/[^a-z0-9]/g, '').includes(cName));
-                            }
-                        }
-                        
-                        return (
-                            <div key={idx} style={{
-                                width: '18cqw',
-                                height: '18cqw',
-                                borderRadius: '50%',
-                                backgroundImage: swatchImg ? `url(${swatchImg})` : 'none',
-                                backgroundColor: color.hex || '#ccc',
-                                backgroundSize: 'cover',
-                                backgroundPosition: 'center',
-                                boxShadow: '0 1cqw 2cqw rgba(0,0,0,0.1)'
-                            }} />
-                        );
-                    })}
-                </div>
-
-                {/* Main Image Column */}
-                <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-                    <div style={{
-                        flex: 1,
-                        backgroundImage: `url(${mainImage})`,
-                        backgroundSize: 'cover',
-                        backgroundPosition: 'center',
-                        borderRadius: '1cqw'
-                    }} />
-                    <div style={{
-                        marginTop: '3cqw',
-                        textAlign: 'right',
-                        fontSize: '2cqw',
-                        fontWeight: '600',
-                        letterSpacing: '0.2cqw',
-                        color: '#444'
+            <div style={{
+                containerType: 'inline-size',
+                height: '100%',
+                aspectRatio: '2/3', // Force portrait aspect ratio to match reference
+                backgroundColor: '#ffffff',
+                display: 'flex',
+                flexDirection: 'column',
+                padding: '4cqw',
+                boxSizing: 'border-box',
+                position: 'relative',
+                margin: '0 auto'
+            }}>
+                {/* Header */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '4cqw', zIndex: 2 }}>
+                    <div style={{ 
+                        backgroundColor: '#ebd0c0', // Beige color from reference
+                        padding: '1.5cqw 4cqw', 
+                        fontWeight: 'bold', 
+                        fontSize: '3.5cqw',
+                        letterSpacing: '0.1cqw',
+                        color: '#000'
                     }}>
-                        COLOR: {colorNames}
+                        {collectionName || 'COLLECTION'}
+                    </div>
+                    <div style={{ 
+                        textAlign: 'right', 
+                        fontSize: '5.5cqw', 
+                        fontFamily: '"Times New Roman", Times, serif', // Serif font from reference
+                        lineHeight: '1',
+                        letterSpacing: '0.2cqw',
+                        whiteSpace: 'pre-line',
+                        color: '#222'
+                    }}>
+                        {productType}
+                    </div>
+                </div>
+
+                {/* Body */}
+                <div style={{ display: 'flex', flex: 1, gap: '4cqw', minHeight: 0 }}>
+                    {/* Swatches Column */}
+                    <div style={{ 
+                        width: '30%', 
+                        display: 'flex', 
+                        flexDirection: 'column', 
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        padding: '2cqw 0'
+                    }}>
+                        {displayColors.map((color, idx) => {
+                            let swatchImg = color.image || color.img;
+                            if (!swatchImg && product.images && product.images.length > 0) {
+                                const cName = (color.name || color.value || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+                                if (cName) {
+                                    swatchImg = product.images.find(img => img.toLowerCase().replace(/[^a-z0-9]/g, '').includes(cName));
+                                }
+                            }
+                            
+                            return (
+                                <div key={idx} style={{
+                                    width: '20cqw',
+                                    height: '20cqw',
+                                    borderRadius: '50%',
+                                    backgroundImage: swatchImg ? `url(${swatchImg})` : 'none',
+                                    backgroundColor: color.hex || '#ccc',
+                                    backgroundSize: 'cover',
+                                    backgroundPosition: 'center',
+                                    boxShadow: '0 1cqw 2cqw rgba(0,0,0,0.1)'
+                                }} />
+                            );
+                        })}
+                    </div>
+
+                    {/* Main Image Column */}
+                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+                        <div style={{
+                            flex: 1,
+                            backgroundImage: `url(${mainImage})`,
+                            backgroundSize: 'cover',
+                            backgroundPosition: 'center'
+                        }} />
+                        <div style={{
+                            marginTop: '2cqw',
+                            textAlign: 'right',
+                            fontSize: '2.2cqw',
+                            fontWeight: '600',
+                            letterSpacing: '0.1cqw',
+                            color: '#333'
+                        }}>
+                            COLOR : {colorNames}
+                        </div>
                     </div>
                 </div>
             </div>

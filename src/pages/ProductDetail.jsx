@@ -284,13 +284,13 @@ const ProductDetail = () => {
     ];
 
     const images = product?.images && product.images.length > 0 
-        ? (isShade ? ['COVER_SLIDE', 'COVER_SLIDE_V1', 'COVER_SLIDE_V2', 'COVER_SLIDE_V3', ...product.images] : product.images)
-        : (isShade ? ['COVER_SLIDE', 'COVER_SLIDE_V1', 'COVER_SLIDE_V2', 'COVER_SLIDE_V3', "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&q=80&w=800"] : ["https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&q=80&w=800"]);
+        ? (isShade ? ['COVER_SLIDE', ...virtualMockups, ...product.images] : product.images)
+        : (isShade ? ['COVER_SLIDE', ...virtualMockups, "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&q=80&w=800"] : ["https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&q=80&w=800"]);
 
     // Update main image when variants change
     useEffect(() => {
         if (product && images && images.length > 0) {
-            setMainImageUrl(typeof images[currentImageIndex] === 'string' && images[currentImageIndex].startsWith('COVER_SLIDE') ? null : images[currentImageIndex]);
+            setMainImageUrl(images[currentImageIndex] === 'COVER_SLIDE' ? null : images[currentImageIndex]);
         }
     }, [currentImageIndex, product, images]);
 
@@ -586,15 +586,8 @@ const ProductDetail = () => {
                         alignItems: 'center',
                         justifyContent: 'center'
                     }}>
-                        {(mainImageUrl?.startsWith('COVER_SLIDE') || (!mainImageUrl && typeof images[currentImageIndex] === 'string' && images[currentImageIndex].startsWith('COVER_SLIDE'))) ? (
-                            <ProductCoverSlide 
-                                product={product} 
-                                overrideMainImage={
-                                    images[currentImageIndex] === 'COVER_SLIDE_V1' ? virtualMockups[0] : 
-                                    images[currentImageIndex] === 'COVER_SLIDE_V2' ? virtualMockups[1] : 
-                                    images[currentImageIndex] === 'COVER_SLIDE_V3' ? virtualMockups[2] : null
-                                }
-                            />
+                        {(mainImageUrl === 'COVER_SLIDE' || (!mainImageUrl && images[currentImageIndex] === 'COVER_SLIDE')) ? (
+                            <ProductCoverSlide product={product} />
                         ) : (
                             <img 
                                 src={mainImageUrl || images[currentImageIndex]} 
@@ -662,7 +655,7 @@ const ProductDetail = () => {
                                 key={idx}
                                 onClick={() => {
                                     setCurrentImageIndex(idx);
-                                    if (typeof img !== 'string' || !img.startsWith('COVER_SLIDE')) setMainImageUrl(img);
+                                    if (img !== 'COVER_SLIDE') setMainImageUrl(img);
                                 }}
                                 style={{
                                     width: '80px',
@@ -683,16 +676,11 @@ const ProductDetail = () => {
                                     color: '#666'
                                 }}
                             >
-                                {typeof img === 'string' && img.startsWith('COVER_SLIDE') ? (
-                                    <div style={{ width: '100%', height: '100%', overflow: 'hidden', position: 'relative' }}>
-                                        <ProductCoverSlide 
-                                            product={product} 
-                                            overrideMainImage={
-                                                img === 'COVER_SLIDE_V1' ? virtualMockups[0] : 
-                                                img === 'COVER_SLIDE_V2' ? virtualMockups[1] : 
-                                                img === 'COVER_SLIDE_V3' ? virtualMockups[2] : null
-                                            }
-                                        />
+                                {img === 'COVER_SLIDE' ? (
+                                    <div style={{ width: '100%', height: '100%', overflow: 'hidden', position: 'relative', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                                        <div style={{ height: '100%', aspectRatio: '2/3', pointerEvents: 'none' }}>
+                                            <ProductCoverSlide product={product} />
+                                        </div>
                                     </div>
                                 ) : (
                                     <img 
