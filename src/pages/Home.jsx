@@ -276,7 +276,7 @@ const Home = () => {
                                 id={product.id}
                                 title={product.title}
                                 price={product.basePrice !== undefined ? product.basePrice : (product.price || 9.99)}
-                                image={product.imageUrl || product.image}
+                                image={product.images && product.images.length > 0 ? product.images[0] : (product.imageUrl || product.image)}
                                 badge={product.badge}
                                 reviews={product.reviews || 0}
                                 colors={product.colors && Array.isArray(product.colors) ? product.colors.map(c => c ? (typeof c === 'string' ? c : c.hex) : '') : []}

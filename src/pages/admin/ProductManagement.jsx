@@ -350,8 +350,8 @@ const ProductManagement = () => {
                 ...newProduct,
                 basePrice: Number(newProduct.basePrice) || 0,
                 price: Number(newProduct.basePrice) || 0, // Legacy/Smart Tech compatibility
-                imageUrl: newProduct.imageUrl || '',
-                image: newProduct.imageUrl || '', // Legacy/Smart Tech compatibility
+                imageUrl: newProduct.images && newProduct.images.length > 0 ? newProduct.images[0] : '',
+                image: newProduct.images && newProduct.images.length > 0 ? newProduct.images[0] : '', // Legacy compatibility
                 sizeRatio: parseFloat(newProduct.sizeRatio) || 0,
                 minWidth: Number(newProduct.minWidth) || 0,
                 maxWidth: Number(newProduct.maxWidth) || 0,
@@ -851,7 +851,7 @@ const ProductManagement = () => {
                                             onClick={() => {
                                                 const newImages = [...newProduct.images];
                                                 newImages.splice(index, 1);
-                                                setNewProduct(prev => ({ ...prev, images: newImages }));
+                                                setNewProduct(prev => ({ ...prev, images: newImages, imageUrl: newImages.length > 0 ? newImages[0] : '' }));
                                             }}
                                             style={{
                                                 position: 'absolute', top: '5px', right: '5px', background: 'rgba(255,0,0,0.8)', color: 'white',
@@ -1188,8 +1188,8 @@ const ProductManagement = () => {
                                 return (
                                     <tr key={product.id} style={{ borderBottom: '1px solid #eee' }}>
                                         <td style={{ padding: '15px', width: '80px' }}>
-                                            {product.imageUrl || product.image ? (
-                                                <img src={product.imageUrl || product.image} alt={product.title} style={{ width: '60px', height: '60px', objectFit: 'cover', borderRadius: '4px' }} />
+                                            {(product.images && product.images.length > 0) || product.imageUrl || product.image ? (
+                                                <img src={(product.images && product.images.length > 0) ? product.images[0] : (product.imageUrl || product.image)} alt={product.title} style={{ width: '60px', height: '60px', objectFit: 'cover', borderRadius: '4px' }} />
                                             ) : (
                                                 <div style={{ width: '60px', height: '60px', background: '#eee', borderRadius: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#999' }}>
                                                     <ImageIcon size={24} />

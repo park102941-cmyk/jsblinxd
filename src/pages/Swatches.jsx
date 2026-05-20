@@ -165,7 +165,7 @@ const Swatches = () => {
                     const currentQty = quantities[product.id] || 1;
                     
                     // Match active color to product images if it doesn't have an explicit image
-                    let previewImage = activeColor?.image || product.imageUrl || product.image || 'https://via.placeholder.com/200';
+                    let previewImage = activeColor?.image || (product.images && product.images.length > 0 ? product.images[0] : (product.imageUrl || product.image)) || 'https://via.placeholder.com/200';
                     if (activeColor && !activeColor.image && product.images && product.images.length > 0) {
                         const cName = (activeColor.name || activeColor.value || '').toLowerCase().replace(/[^a-z0-9]/g, '');
                         if (cName) {

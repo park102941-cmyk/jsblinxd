@@ -124,7 +124,7 @@ const Products = () => {
                 id={product.id}
                 title={product.title || 'Untitled Product'}
                 price={product.basePrice !== undefined ? product.basePrice : (product.price || 0)}
-                image={product.imageUrl || product.image}
+                image={product.images && product.images.length > 0 ? product.images[0] : (product.imageUrl || product.image)}
                 badge={product.badge || (product.category === 'motor' ? 'Smart' : null)}
                 reviews={product.reviews || 0}
                 colors={product.showColor !== false ? extractColorImages(product.colors) : []}

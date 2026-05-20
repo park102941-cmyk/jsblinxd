@@ -120,7 +120,7 @@ const Search = () => {
                                         id={product.id}
                                         title={product.title}
                                         price={product.basePrice !== undefined ? product.basePrice : (product.price || 0)}
-                                        image={product.imageUrl || product.image}
+                                        image={product.images && product.images.length > 0 ? product.images[0] : (product.imageUrl || product.image)}
                                         badge={product.badge}
                                         reviews={product.reviews}
                                         questions={product.questions}
