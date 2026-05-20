@@ -1,21 +1,18 @@
 /**
  * JSBlind Order Engine (JSBlind Blinds Standard)
  * Converts user measurements and selections into manufacturing data and pricing.
+ * 
+ * Pricing Formula: Final Price = Base Price + (Area in sqft × sizeRatio) + motor/remote add-ons
  */
 
 export class JSBlindOrderEngine {
   constructor() {
     this.inchToCm = 2.54;
-    // Smartwings-style pricing constants
-    this.BASE_PRICE = 189.99;
-    this.BASE_WIDTH = 23;
-    this.BASE_HEIGHT = 29;
-    this.WIDTH_SURCHARGE_PER_INCH = 2.22; // 가로 초과 1인치당 $2.22
-    this.HEIGHT_SURCHARGE_PER_INCH = 1.71; // 세로 초과 1인치당 $1.71
+    this.DEFAULT_SIZE_RATIO = 7.00; // $/sqft default fallback
   }
 
   /**
-   * Calculates order details based on Smartwings-style logic.
+   * Calculates order details using sqft-based pricing.
    */
   calculateOrder({
     name = "",
@@ -24,10 +21,11 @@ export class JSBlindOrderEngine {
     heightInch,
     fabricCode = "",
     mountType = "inside",
-    motorType = "standard", // standard, zigbee, alexa, matter
+    motorType = "standard",
     solarPanel = false,
-    remoteType = "none", // none, 1-channel, 5-channel, 15-channel
-    basePrice = null
+    remoteType = "none",
+    basePrice = null,
+    sizeRatio = null
   }) {
     // 1. Basic CM conversion for manufacturing
     const widthCm = Number((widthInch * this.inchToCm).toFixed(4));
@@ -37,17 +35,17 @@ export class JSBlindOrderEngine {
     const finalWidthCm = mountType === "inside" ? Number((widthCm - 0.3).toFixed(4)) : widthCm;
     const finalHeightCm = Number((heightCm + 5.0).toFixed(4));
 
-    // 3. Smartwings-style Pricing Logic
-    const currentBasePrice = basePrice !== null ? Number(basePrice) : this.BASE_PRICE;
-    let totalPrice = currentBasePrice;
+    // 3. Area-based Pricing Logic
+    const currentBasePrice = basePrice !== null ? Number(basePrice) : 89;
+    const effectiveSizeRatio = sizeRatio !== null && sizeRatio > 0
+      ? Number(sizeRatio)
+      : this.DEFAULT_SIZE_RATIO;
 
-    // Size Surcharges
-    if (widthInch > this.BASE_WIDTH) {
-      totalPrice += (widthInch - this.BASE_WIDTH) * this.WIDTH_SURCHARGE_PER_INCH;
-    }
-    if (heightInch > this.BASE_HEIGHT) {
-      totalPrice += (heightInch - this.BASE_HEIGHT) * this.HEIGHT_SURCHARGE_PER_INCH;
-    }
+    // Area in square feet
+    const areaSqft = (widthInch * heightInch) / 144;
+    const sizeSurcharge = Number((areaSqft * effectiveSizeRatio).toFixed(2));
+
+    let totalPrice = currentBasePrice + sizeSurcharge;
 
     // Motor & Lift Style Surcharges
     const motorPrices = {
@@ -63,9 +61,9 @@ export class JSBlindOrderEngine {
 
     // Add-ons
     if (solarPanel) totalPrice += 49;
-    if (arguments[0].hub) totalPrice += 149; // Added Bond Bridge Hub support
+    if (arguments[0].hub) totalPrice += 149;
 
-    // Remote Surcharges (Updated +$20)
+    // Remote Surcharges
     const remotePrices = {
       none: 0,
       "1-channel": 45,
@@ -87,7 +85,9 @@ export class JSBlindOrderEngine {
       "Fabric Code": fabricCode,
       Mount: mountType === "inside" ? "Inside Mount" : "Outside Mount",
       "Base Price": currentBasePrice,
-      "Size Surcharge": totalPrice - currentBasePrice - motorSurcharge - remoteSurcharge - (solarPanel ? 49 : 0),
+      "Area sqft": Number(areaSqft.toFixed(2)),
+      "Size Ratio ($/sqft)": effectiveSizeRatio,
+      "Size Surcharge": sizeSurcharge,
       "Motor Surcharge": motorSurcharge,
       "Remote Surcharge": remoteSurcharge,
       "Total Price": Number(totalPrice.toFixed(2)),

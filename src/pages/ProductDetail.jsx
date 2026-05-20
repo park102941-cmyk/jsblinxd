@@ -343,7 +343,8 @@ const ProductDetail = () => {
             remoteType: remoteType,
             solarPanel: solarPanel,
             hub: bondBridge,
-            basePrice: product.basePrice || product.price
+            basePrice: product.basePrice || product.price,
+            sizeRatio: product.sizeRatio
         });
 
         let totalPrice = result?.["Total Price"] || 0;
