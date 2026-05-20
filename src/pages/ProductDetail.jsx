@@ -148,7 +148,7 @@ const ProductDetail = () => {
                         ? data.images 
                         : (data.imageUrl || data.image) 
                             ? [data.imageUrl || data.image] 
-                            : ["https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&q=80&w=800"];
+                            : [];
                     
                     if (!mainImageUrl && prodImages.length > 0) {
                         setMainImageUrl(prodImages[0]);
@@ -278,7 +278,7 @@ const ProductDetail = () => {
         ? product.images 
         : (product?.imageUrl || product?.image) 
             ? [product.imageUrl || product.image] 
-            : ["https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&q=80&w=800"];
+            : [];
 
     // Handle Image Switching logic
     useEffect(() => {
@@ -577,35 +577,47 @@ const ProductDetail = () => {
                         overflow: 'hidden',
                         marginBottom: '20px'
                     }}>
-                        <img
-                            src={mainImageUrl || images[currentImageIndex]}
-                            alt={product.title}
-                            onClick={() => setIsLightboxOpen(true)}
-                            style={{ 
-                                width: '100%', 
-                                height: '100%', 
-                                objectFit: 'cover', 
-                                transition: 'all 0.4s ease',
-                                cursor: 'zoom-in'
-                            }}
-                            onError={(e) => {
-                                e.target.onerror = null; 
-                                e.target.src = "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&q=80&w=800";
-                            }}
-                        />
-                        {/* Nav Arrows */}
-                        <button
-                            onClick={() => setCurrentImageIndex(prev => prev > 0 ? prev - 1 : images.length - 1)}
-                            style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', background: 'rgba(255,255,255,0.8)', border: 'none', borderRadius: '50%', padding: '8px', cursor: 'pointer' }}
-                        >
-                            <ChevronLeft size={24} />
-                        </button>
-                        <button
-                            onClick={() => setCurrentImageIndex(prev => prev < images.length - 1 ? prev + 1 : 0)}
-                            style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', background: 'rgba(255,255,255,0.8)', border: 'none', borderRadius: '50%', padding: '8px', cursor: 'pointer' }}
-                        >
-                            <ChevronRight size={24} />
-                        </button>
+                        {images && images.length > 0 ? (
+                            <>
+                                <img
+                                    src={mainImageUrl || images[currentImageIndex]}
+                                    alt={product.title}
+                                    onClick={() => setIsLightboxOpen(true)}
+                                    style={{ 
+                                        width: '100%', 
+                                        height: '100%', 
+                                        objectFit: 'cover', 
+                                        transition: 'all 0.4s ease',
+                                        cursor: 'zoom-in'
+                                    }}
+                                    onError={(e) => {
+                                        e.target.onerror = null; 
+                                        e.target.style.display = 'none';
+                                    }}
+                                />
+                                {/* Nav Arrows */}
+                                {images.length > 1 && (
+                                    <>
+                                        <button
+                                            onClick={() => setCurrentImageIndex(prev => prev > 0 ? prev - 1 : images.length - 1)}
+                                            style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', background: 'rgba(255,255,255,0.8)', border: 'none', borderRadius: '50%', padding: '8px', cursor: 'pointer' }}
+                                        >
+                                            <ChevronLeft size={24} />
+                                        </button>
+                                        <button
+                                            onClick={() => setCurrentImageIndex(prev => prev < images.length - 1 ? prev + 1 : 0)}
+                                            style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', background: 'rgba(255,255,255,0.8)', border: 'none', borderRadius: '50%', padding: '8px', cursor: 'pointer' }}
+                                        >
+                                            <ChevronRight size={24} />
+                                        </button>
+                                    </>
+                                )}
+                            </>
+                        ) : (
+                            <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#999', fontSize: '1.2rem' }}>
+                                No Image Available
+                            </div>
+                        )}
                     </div>
                     {/* Try in My Window button */}
                     {!isStandalone && (
@@ -651,8 +663,7 @@ const ProductDetail = () => {
                                     border: currentImageIndex === idx ? '2px solid #333' : '1px solid #ddd'
                                 }}
                                 onError={(e) => {
-                                    e.target.onerror = null; 
-                                    e.target.src = "https://images.unsplash.com/photo-1513694203530-ad3d99967451?auto=format&fit=crop&q=80&w=800";
+                                    e.target.style.display = 'none';
                                 }}
                             />
                         ))}
@@ -1439,8 +1450,7 @@ const ProductDetail = () => {
                             style={{ width: '100%', height: '100%', objectFit: 'contain' }}
                             onError={(e) => {
                                 e.target.onerror = null;
-                                // Fallback to a nice generic detail if image missing
-                                e.target.src = "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&q=80&w=800";
+                                e.target.style.display = 'none';
                             }}
                         />
                     </div>
