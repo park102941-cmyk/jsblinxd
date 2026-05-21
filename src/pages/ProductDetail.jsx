@@ -369,6 +369,9 @@ const ProductDetail = () => {
             const w = parseFloat(width || 0) + parseFloat(widthFraction);
             const h = parseFloat(height || 0) + parseFloat(heightFraction);
 
+            // Pre-calculate room label (needed both inside and outside the isStandalone check)
+            const finalRoomLabel = roomType ? `${roomType}${roomDetail ? ` - ${roomDetail}` : ''}` : roomDetail;
+
             if (!isStandalone) {
                 // Mandatory Field Checks
                 if (!selectedColor) {
@@ -397,7 +400,6 @@ const ProductDetail = () => {
                     return;
                 }
 
-                const finalRoomLabel = roomType ? `${roomType}${roomDetail ? ` - ${roomDetail}` : ''}` : roomDetail;
 
                 // Check for duplicate room name in current cart
                 const isDuplicate = cartItems.some(item => (item.product?.room || item.room) === finalRoomLabel);
@@ -432,7 +434,8 @@ const ProductDetail = () => {
                 remoteType: remoteType,
                 solarPanel: solarPanel,
                 cassetteColor: cassetteColor,
-                basePrice: product.basePrice || product.price
+                basePrice: product.basePrice || product.price,
+                sizeRatio: product.sizeRatio
             });
 
             // Resolve custom config details for cart display
@@ -1117,7 +1120,7 @@ const ProductDetail = () => {
 
                         {/* 8. Remote Control */}
                         <OptionSection
-                            title={`Remote Control: ${remoteType ? (remoteType === 'none' ? 'None' : (remoteType === '1-channel' ? '1-Ch' : (remoteType === '5-channel' ? '5-Ch' : '15-Ch'))) : 'Select'}`}
+                            title={`Remote Control: ${remoteType ? (remoteType === 'none' ? 'None' : (remoteType === '1-channel' ? '1-Ch' : '15-Ch')) : 'Select'}`}
                             isOpen={activeSection === 'remote'}
                             onToggle={() => setActiveSection(activeSection === 'remote' ? '' : 'remote')}
                             helpText={EXPLANATIONS.remote}
@@ -1128,7 +1131,6 @@ const ProductDetail = () => {
                                 {[
                                     { id: 'none', name: 'No Remote', price: 0 },
                                     { id: '1-channel', name: '1-Channel', price: 45 },
-                                    { id: '5-channel', name: '5-Channel', price: 55 },
                                     { id: '15-channel', name: '15-Channel', price: 65 }
                                 ].map(r => (
                                     <div

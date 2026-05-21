@@ -67,7 +67,6 @@ export class JSBlindOrderEngine {
     const remotePrices = {
       none: 0,
       "1-channel": 45,
-      "5-channel": 55,
       "15-channel": 65
     };
     const remoteSurcharge = remotePrices[remoteType] || 0;
