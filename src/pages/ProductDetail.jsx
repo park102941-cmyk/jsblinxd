@@ -1298,21 +1298,22 @@ const ProductDetail = () => {
             <div style={{ marginTop: '60px', borderTop: '1px solid #eee', paddingTop: '40px' }}>
                 <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 20px' }}>
                     {/* 1. Product Information */}
+                    {(product.description) && (
                     <OptionSection
                         title="Product Information"
                         isOpen={activeSection === 'info-desc'}
                         onToggle={() => setActiveSection(activeSection === 'info-desc' ? '' : 'info-desc')}
                         isRequired={false}
                     >
-                        <div style={{ fontSize: '0.9rem', color: '#444', lineHeight: '1.6' }}>
-                            <p>Our custom roller shades offer a perfect blend of modern aesthetics and functional excellence. Designed for versatility, these shades complement any interior décor while providing superior light control and privacy.</p>
-                            <ul style={{ paddingLeft: '20px', marginTop: '10px' }}>
-                                <li>Premium fabric selections with diverse textures and colors.</li>
-                                <li>Precision-engineered hardware for smooth, long-lasting operation.</li>
-                                <li>Modern, low-profile design that maximizes your window view.</li>
-                            </ul>
+                        <div style={{ fontSize: '0.9rem', color: '#444', lineHeight: '1.8' }}>
+                            {product.description.split('\n').map((line, i) =>
+                                line.trim() === '' 
+                                    ? <br key={i} />
+                                    : <p key={i} style={{ margin: '0 0 4px 0' }}>{line}</p>
+                            )}
                         </div>
                     </OptionSection>
+                    )}
 
                     {/* 2. Specifications */}
                     <OptionSection
@@ -1321,23 +1322,36 @@ const ProductDetail = () => {
                         onToggle={() => setActiveSection(activeSection === 'info-specs' ? '' : 'info-specs')}
                         isRequired={false}
                     >
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '30px', fontSize: '0.85rem', color: '#444', lineHeight: '1.5' }}>
-                            <div>
-                                <ul style={{ paddingLeft: '15px', listStyleType: 'circle' }}>
-                                    <li style={{ marginBottom: '8px' }}>All mounting brackets are finished in white and are visible from the top of the headrail.</li>
-                                    <li style={{ marginBottom: '8px' }}>Auto-Down and Premium Cordless headrails feature color-coordinated fabric inserts for a seamless, designer look.</li>
-                                    <li style={{ marginBottom: '8px' }}>This collection is <strong>Greenguard Gold Certified</strong>, ensuring low chemical emissions for a healthier home environment.</li>
-                                    <li style={{ marginBottom: '8px' }}>Protective bands should remain on the shade until fully installed to prevent edge fraying.</li>
-                                </ul>
-                            </div>
-                            <div>
-                                <ul style={{ paddingLeft: '15px', listStyleType: 'circle' }}>
-                                    <li style={{ marginBottom: '8px' }}>Shades come standard with a matching fabric-wrapped cassette system.</li>
-                                    <li style={{ marginBottom: '8px' }}>The Premium Cordless lift mechanism is located on the right side, which may result in a slightly larger light gap on that end.</li>
-                                    <li style={{ marginBottom: '8px' }}>For optimal performance and to keep the shade level, always use both hands when adjusting cordless products.</li>
-                                    <li style={{ marginBottom: '8px' }}>Motorized options use rechargeable lithium-ion batteries. They ship at ~30% charge for safety; please charge fully before initial use.</li>
-                                </ul>
-                            </div>
+                        <div style={{ fontSize: '0.85rem', color: '#444', lineHeight: '1.7' }}>
+                            {product.specs && Object.keys(product.specs).length > 0 ? (
+                                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                                    <tbody>
+                                        {Object.entries(product.specs).map(([key, value], i) => (
+                                            <tr key={i} style={{ borderBottom: '1px solid #f0f0f0' }}>
+                                                <td style={{ padding: '8px 12px', fontWeight: '600', color: '#555', width: '35%', textTransform: 'capitalize', background: i % 2 === 0 ? '#fafafa' : 'white' }}>
+                                                    {key.replace(/_/g, ' ')}
+                                                </td>
+                                                <td style={{ padding: '8px 12px', background: i % 2 === 0 ? '#fafafa' : 'white' }}>
+                                                    {value}
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            ) : (
+                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '30px' }}>
+                                    <ul style={{ paddingLeft: '15px', listStyleType: 'circle' }}>
+                                        <li style={{ marginBottom: '8px' }}>All mounting brackets are finished in white and visible from the top of the headrail.</li>
+                                        <li style={{ marginBottom: '8px' }}>Greenguard Gold Certified — low chemical emissions for a healthier home.</li>
+                                        <li style={{ marginBottom: '8px' }}>Protective bands should remain on the shade until fully installed.</li>
+                                    </ul>
+                                    <ul style={{ paddingLeft: '15px', listStyleType: 'circle' }}>
+                                        <li style={{ marginBottom: '8px' }}>Shades come standard with a matching fabric-wrapped cassette system.</li>
+                                        <li style={{ marginBottom: '8px' }}>Motorized options use rechargeable lithium-ion batteries. Charge fully before first use.</li>
+                                        <li style={{ marginBottom: '8px' }}>Always use both hands when adjusting cordless products to keep the shade level.</li>
+                                    </ul>
+                                </div>
+                            )}
                         </div>
                     </OptionSection>
 
