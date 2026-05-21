@@ -734,18 +734,19 @@ const ProductManagement = () => {
                             <label style={{ display: 'block', marginBottom: '8px', fontWeight: '500' }}>Category</label>
                             <select name="category" value={newProduct.category} onChange={handleInputChange} style={{ width: '100%', padding: '12px', border: '1px solid #ddd', borderRadius: '6px' }}>
                                 <option value="">Select Category</option>
-                                {categories.map(cat => (
-                                    <option key={cat.id} value={cat.id}>{cat.name}</option>
-                                ))}
-                                {/* Fallback options if no categories exist yet */}
-                                {categories.length === 0 && (
-                                    <>
-                                        <option value="zebra">Zebra Blinds</option>
-                                        <option value="roller">Roller Shades</option>
-                                        <option value="cellular">Cellular Shades</option>
-                                        <option value="motor">Motorized Blinds</option>
-                                    </>
-                                )}
+                                <optgroup label="── Blinds & Shades">
+                                    <option value="zebra">Zebra Shades</option>
+                                    <option value="roller">Roller Shades</option>
+                                </optgroup>
+                                <optgroup label="── Accessories">
+                                    <option value="motor">Motor / Smart Accessory</option>
+                                    <option value="remote">Remote Control</option>
+                                    <option value="hub">Smart Hub</option>
+                                </optgroup>
+                                <optgroup label="── Swatches">
+                                    <option value="swatch-zebra">Swatch – Zebra</option>
+                                    <option value="swatch-roller">Swatch – Roller</option>
+                                </optgroup>
                             </select>
                         </div>
 
@@ -1216,7 +1217,15 @@ const ProductManagement = () => {
                                                 fontSize: '0.8rem',
                                                 textTransform: 'capitalize'
                                             }}>
-                                                {categories.find(c => c.id === product.category)?.name || product.category}
+                                                {({
+                                                    zebra: 'Zebra Shades',
+                                                    roller: 'Roller Shades',
+                                                    motor: 'Motor / Smart Accessory',
+                                                    remote: 'Remote Control',
+                                                    hub: 'Smart Hub',
+                                                    'swatch-zebra': 'Swatch – Zebra',
+                                                    'swatch-roller': 'Swatch – Roller',
+                                                })[product.category] || product.category}
                                             </span>
                                         </td>
                                         <td style={{ padding: '15px', fontWeight: '500' }}>
