@@ -16,6 +16,7 @@ import remote1 from '../assets/products/remotes/remote_1.png';
 import remote2 from '../assets/products/remotes/remote_2.png';
 import remote3 from '../assets/products/remotes/remote_3.png';
 import remote4 from '../assets/products/remotes/remote_4.png';
+import virtualViewHero from '../assets/ai/virtual_view_hero.png';
 
 export const aiAssets = {
     rollerWhite,
@@ -32,7 +33,8 @@ export const aiAssets = {
     remote1,
     remote2,
     remote3,
-    remote4
+    remote4,
+    virtualViewHero
 };
 
 export default aiAssets;

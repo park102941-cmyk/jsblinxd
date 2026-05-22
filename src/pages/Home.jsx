@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { db } from '../lib/firebase';
 import { doc, getDoc, collection, getDocs } from 'firebase/firestore';
 import ProductCard from '../components/ProductCard';
@@ -13,6 +13,8 @@ const Home = () => {
     const { currentUser } = useAuth();
     const [bestSellers, setBestSellers] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [heroSlide, setHeroSlide] = useState(0);
+    const heroTimerRef = useRef(null);
 
     const [homeData, setHomeData] = useState({
         hero: {
@@ -106,6 +108,12 @@ const Home = () => {
         fetchData();
     }, []);
 
+    // Hero auto-play
+    useEffect(() => {
+        heroTimerRef.current = setInterval(() => setHeroSlide(s => (s + 1) % 2), 5000);
+        return () => clearInterval(heroTimerRef.current);
+    }, []);
+
     const renderIcon = (iconName) => {
         const icons = { Truck, ShieldCheck, Ruler, ThumbsUp, Rss, Smartphone };
         const Icon = icons[iconName];
@@ -114,57 +122,160 @@ const Home = () => {
 
     if (loading) return <LoadingSpinner fullScreen text="Loading..." />;
 
+    const heroSlides = [
+        {
+            bg: homeData.hero.imageUrl,
+            overlay: 'linear-gradient(rgba(0,0,0,0.25), rgba(0,0,0,0.15))',
+            tag: null,
+            title: homeData.hero.title,
+            subtitle: homeData.hero.subtitle,
+            cta1: { label: 'Shop Now', to: '/products' },
+            cta2: { label: 'Order Swatches', to: '/swatches' },
+        },
+        {
+            bg: aiAssets.virtualViewHero,
+            overlay: 'linear-gradient(135deg, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.3) 60%, rgba(0,0,0,0.1) 100%)',
+            tag: '✨ NEW FEATURE',
+            title: 'See It In\nYour Space',
+            subtitle: 'Visualize any blind, any fabric — right on your window. No guesswork, just confidence.',
+            cta1: { label: '🪟 Try Virtual View', to: '/products' },
+            cta2: { label: 'Learn More', to: '/swatches' },
+            accent: true,
+        }
+    ];
+
+    const goToSlide = (idx) => {
+        setHeroSlide(idx);
+        clearInterval(heroTimerRef.current);
+        heroTimerRef.current = setInterval(() => setHeroSlide(s => (s + 1) % heroSlides.length), 5000);
+    };
+
     return (
         <div className="home-container">
-            {/* Hero Section */}
-            <section 
-                className="hero-section"
-                style={{
-                    position: 'relative',
-                    height: '85vh',
-                    minHeight: '600px',
-                    backgroundColor: '#1d1d1f',
-                    backgroundImage: `url(${homeData.hero.imageUrl})`,
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: 'white'
-                }}
-            >
-                <div style={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    right: 0, bottom: 0,
-                    background: 'linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.1))'
-                }}></div>
-                
-                <div className="container animate-fade-in-up" style={{ position: 'relative', textAlign: 'center', maxWidth: '800px' }}>
-                    <h1 style={{ 
-                        fontSize: 'clamp(3rem, 8vw, 5rem)', 
-                        fontWeight: '800', 
-                        lineHeight: '1.1', 
-                        marginBottom: '20px',
-                        letterSpacing: '-2px',
-                        whiteSpace: 'pre-line' 
-                    }}>
-                        {homeData.hero.title}
-                    </h1>
-                    <p style={{ fontSize: '1.2rem', opacity: 0.9, marginBottom: '40px', fontWeight: '500' }}>
-                        {homeData.hero.subtitle}
-                    </p>
-                    <div style={{ display: 'flex', gap: '20px', justifyContent: 'center' }}>
-                        <Link to="/products" className="btn-primary hover-lift" style={{ padding: '15px 35px', borderRadius: '30px' }}>
-                            Shop Now
-                        </Link>
-                        <Link to="/swatches" className="btn-secondary hover-lift" style={{ padding: '15px 35px', borderRadius: '30px', backgroundColor: 'rgba(255,255,255,0.1)', backdropFilter: 'blur(10px)', color: 'white', border: '1px solid rgba(255,255,255,0.3)' }}>
-                            Order Swatches
-                        </Link>
+            {/* Hero Carousel */}
+            <section style={{ position: 'relative', height: '85vh', minHeight: '600px', overflow: 'hidden' }}>
+                {/* Slides */}
+                {heroSlides.map((slide, i) => (
+                    <div
+                        key={i}
+                        style={{
+                            position: 'absolute', inset: 0,
+                            backgroundImage: `url(${slide.bg})`,
+                            backgroundSize: 'cover',
+                            backgroundPosition: 'center',
+                            opacity: heroSlide === i ? 1 : 0,
+                            transition: 'opacity 0.9s cubic-bezier(0.4, 0, 0.2, 1)',
+                            zIndex: heroSlide === i ? 1 : 0,
+                        }}
+                    >
+                        <div style={{ position: 'absolute', inset: 0, background: slide.overlay }} />
+                        <div style={{
+                            position: 'relative', zIndex: 2, height: '100%',
+                            display: 'flex', alignItems: 'center', justifyContent: slide.accent ? 'flex-start' : 'center',
+                            padding: slide.accent ? '0 8%' : '0 20px',
+                            color: 'white', maxWidth: slide.accent ? 'none' : '100%'
+                        }}>
+                            <div
+                                className="animate-fade-in-up"
+                                style={{ maxWidth: slide.accent ? '560px' : '800px', textAlign: slide.accent ? 'left' : 'center' }}
+                            >
+                                {slide.tag && (
+                                    <div style={{
+                                        display: 'inline-flex', alignItems: 'center', gap: '6px',
+                                        background: 'rgba(255,255,255,0.15)', backdropFilter: 'blur(10px)',
+                                        border: '1px solid rgba(255,255,255,0.3)',
+                                        padding: '6px 16px', borderRadius: '30px',
+                                        fontSize: '0.75rem', fontWeight: '800', letterSpacing: '1.5px',
+                                        marginBottom: '24px', color: '#fff'
+                                    }}>
+                                        {slide.tag}
+                                    </div>
+                                )}
+                                <h1 style={{
+                                    fontSize: 'clamp(3rem, 7vw, 5.2rem)',
+                                    fontWeight: '800',
+                                    lineHeight: '1.05',
+                                    marginBottom: '20px',
+                                    letterSpacing: '-2px',
+                                    whiteSpace: 'pre-line',
+                                    textShadow: '0 2px 20px rgba(0,0,0,0.3)'
+                                }}>
+                                    {slide.title}
+                                </h1>
+                                <p style={{
+                                    fontSize: '1.15rem', opacity: 0.92, marginBottom: '40px',
+                                    fontWeight: '500', lineHeight: '1.6',
+                                    textShadow: '0 1px 8px rgba(0,0,0,0.4)'
+                                }}>
+                                    {slide.subtitle}
+                                </p>
+                                <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', justifyContent: slide.accent ? 'flex-start' : 'center' }}>
+                                    <Link to={slide.cta1.to} className="btn-primary hover-lift" style={{
+                                        padding: '15px 35px', borderRadius: '30px',
+                                        background: slide.accent ? '#fff' : undefined,
+                                        color: slide.accent ? '#1d1d1f' : undefined,
+                                        fontWeight: '800', fontSize: '1rem',
+                                        boxShadow: slide.accent ? '0 8px 32px rgba(0,0,0,0.2)' : undefined
+                                    }}>
+                                        {slide.cta1.label}
+                                    </Link>
+                                    <Link to={slide.cta2.to} className="hover-lift" style={{
+                                        padding: '15px 35px', borderRadius: '30px',
+                                        backgroundColor: 'rgba(255,255,255,0.12)',
+                                        backdropFilter: 'blur(10px)',
+                                        color: 'white',
+                                        border: '1px solid rgba(255,255,255,0.35)',
+                                        fontWeight: '600', fontSize: '0.95rem',
+                                        textDecoration: 'none', display: 'inline-flex', alignItems: 'center'
+                                    }}>
+                                        {slide.cta2.label}
+                                    </Link>
+                                </div>
+                            </div>
+                        </div>
                     </div>
+                ))}
+
+                {/* Dot Indicators */}
+                <div style={{
+                    position: 'absolute', bottom: '30px', left: '50%', transform: 'translateX(-50%)',
+                    display: 'flex', gap: '10px', zIndex: 10
+                }}>
+                    {heroSlides.map((_, i) => (
+                        <button
+                            key={i}
+                            onClick={() => goToSlide(i)}
+                            style={{
+                                width: heroSlide === i ? '32px' : '10px', height: '10px',
+                                borderRadius: '5px', border: 'none', cursor: 'pointer',
+                                background: heroSlide === i ? '#fff' : 'rgba(255,255,255,0.45)',
+                                transition: 'all 0.35s ease', padding: 0
+                            }}
+                        />
+                    ))}
                 </div>
+
+                {/* Prev / Next Arrows */}
+                {[{ dir: -1, side: 'left' }, { dir: 1, side: 'right' }].map(({ dir, side }) => (
+                    <button
+                        key={side}
+                        onClick={() => goToSlide((heroSlide + dir + heroSlides.length) % heroSlides.length)}
+                        style={{
+                            position: 'absolute', top: '50%', [side]: '24px',
+                            transform: 'translateY(-50%)',
+                            background: 'rgba(255,255,255,0.15)', backdropFilter: 'blur(8px)',
+                            border: '1px solid rgba(255,255,255,0.3)',
+                            color: '#fff', width: '44px', height: '44px', borderRadius: '50%',
+                            cursor: 'pointer', fontSize: '1.2rem', zIndex: 10,
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            transition: 'background 0.2s'
+                        }}
+                    >
+                        {dir === -1 ? '‹' : '›'}
+                    </button>
+                ))}
             </section>
+
 
             {/* Values Bar */}
             <div style={{ backgroundColor: '#f5f5f7', borderBottom: '1px solid #e5e5e5' }}>

@@ -1169,12 +1169,16 @@ const ProductDetail = () => {
                                     onClick={() => setSolarPanel(!solarPanel)}
                                     style={{ 
                                         display: 'flex', alignItems: 'center', justifyContent: 'space-between', 
-                                        padding: '15px', border: solarPanel ? '2px solid #333' : '1px solid #eee', 
+                                        padding: '12px 15px', border: solarPanel ? '2px solid #333' : '1px solid #eee', 
                                         borderRadius: '8px', cursor: 'pointer', background: solarPanel ? '#fcfcfc' : '#fff'
                                     }}
                                 >
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                                        <div style={{ background: '#fff9c4', color: '#fbc02d', padding: '8px', borderRadius: '50%' }}><Sun size={20} /></div>
+                                        <img 
+                                            src="https://m.media-amazon.com/images/I/51oGKyGOPWL._AC_SX679_.jpg"
+                                            alt="Solar Panel Charger"
+                                            style={{ width: '56px', height: '56px', objectFit: 'cover', borderRadius: '6px', border: '1px solid #eee' }}
+                                        />
                                         <div>
                                             <div style={{ fontWeight: '700', fontSize: '0.9rem' }}>Solar Panel Charger</div>
                                             <div style={{ fontSize: '0.75rem', color: '#666' }}>Eco-friendly continuous charging</div>
@@ -1185,16 +1189,20 @@ const ProductDetail = () => {
 
                                 <div 
                                     onClick={() => setBondBridge(!bondBridge)}
-                                    onMouseEnter={() => setHoveredOption({ name: 'Bond Bridge Smart Hub', image: '/images/bond_bridge.png', price: 149 })}
+                                    onMouseEnter={() => setHoveredOption({ name: 'Bond Bridge Smart Hub', image: 'https://res.cloudinary.com/dfrg9mnwj/image/upload/v1779401400/products/ouby07oeoodz77kn8dao.webp', price: 149 })}
                                     onMouseLeave={() => setHoveredOption(null)}
                                     style={{ 
                                         display: 'flex', alignItems: 'center', justifyContent: 'space-between', 
-                                        padding: '15px', border: bondBridge ? '2px solid #333' : '1px solid #eee', 
+                                        padding: '12px 15px', border: bondBridge ? '2px solid #333' : '1px solid #eee', 
                                         borderRadius: '8px', cursor: 'pointer', background: bondBridge ? '#fcfcfc' : '#fff'
                                     }}
                                 >
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                                        <div style={{ background: '#e0f2fe', color: '#0369a1', padding: '8px', borderRadius: '50%' }}><Cpu size={20} /></div>
+                                        <img 
+                                            src="https://res.cloudinary.com/dfrg9mnwj/image/upload/v1779401400/products/ouby07oeoodz77kn8dao.webp"
+                                            alt="Bond Bridge Smart Hub"
+                                            style={{ width: '56px', height: '56px', objectFit: 'cover', borderRadius: '6px', border: '1px solid #eee' }}
+                                        />
                                         <div>
                                             <div style={{ fontWeight: '700', fontSize: '0.9rem' }}>Bond Bridge Smart Hub</div>
                                             <div style={{ fontSize: '0.75rem', color: '#666' }}>Wi-Fi, Alexa & Google Home Control</div>
