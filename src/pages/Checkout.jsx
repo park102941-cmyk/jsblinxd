@@ -6,75 +6,7 @@ import { db } from '../lib/firebase';
 import { collection, addDoc } from 'firebase/firestore';
 import { GOOGLE_SCRIPT_URL } from '../lib/config';
 import { getUserPoints, awardPoints, redeemPoints, calcPointsEarned, calcPointsDiscount, DISCOUNT_PER_POINT } from '../lib/points';
-import { loadStripe } from '@stripe/stripe-js';
-import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 
-const stripePromise = loadStripe('pk_live_51SzUFNKI2rTF1dqWzB0b696qbTaQ5UYHdtfimDoUgjcK8D5Q0N1dDRBSFKZobFLE4BFnPW1cnfjTaOwQnVRg7ZTm00rVIZZEhx');
-
-const StripePaymentForm = ({ loading, setLoading, onSuccess }) => {
-    const stripe = useStripe();
-    const elements = useElements();
-    const [paymentError, setPaymentError] = useState('');
-
-    const handleStripePayment = async (e) => {
-        e.preventDefault();
-        setPaymentError('');
-        
-        // Form validation
-        const form = document.getElementById('checkout-form');
-        if (form && !form.checkValidity()) {
-            form.reportValidity();
-            return;
-        }
-
-        if (!stripe || !elements) return;
-
-        setLoading(true);
-        const cardElement = elements.getElement(CardElement);
-
-        const { error, token } = await stripe.createToken(cardElement);
-
-        if (error) {
-            setPaymentError(error.message);
-            setLoading(false);
-            return;
-        }
-
-        onSuccess(token.id);
-    };
-
-    return (
-        <div style={{ marginTop: '20px' }}>
-            <h4 style={{ marginBottom: '15px', fontSize: '1rem', color: '#333' }}>Credit Card Details</h4>
-            <div style={{ padding: '15px', border: '1px solid #ddd', borderRadius: '8px', backgroundColor: 'white', marginBottom: '10px' }}>
-                <CardElement options={{
-                    style: {
-                        base: {
-                            fontSize: '16px',
-                            color: '#424770',
-                            '::placeholder': { color: '#aab7c4' },
-                        },
-                        invalid: { color: '#9e2146' },
-                    },
-                }}/>
-            </div>
-            {paymentError && (
-                <div style={{ color: '#dc2626', fontSize: '0.85rem', marginBottom: '15px', padding: '10px', backgroundColor: '#fef2f2', borderRadius: '6px', border: '1px solid #fecaca' }}>
-                    {paymentError}
-                </div>
-            )}
-            <button
-                type="button"
-                onClick={handleStripePayment}
-                disabled={loading || !stripe}
-                className="btn btn-primary"
-                style={{ width: '100%', padding: '15px', fontSize: '1.1rem', fontWeight: 'bold' }}
-            >
-                {loading ? 'Processing Payment...' : 'Pay with Stripe & Place Order'}
-            </button>
-        </div>
-    );
-};
 const Checkout = () => {
     const { cartItems, calculateTotals, coupon, applyCoupon } = useCart();
     const { currentUser } = useAuth();
@@ -147,7 +79,15 @@ const Checkout = () => {
         }
     };
 
-    const handlePayment = async (stripeToken) => {
+    const handlePayment = async (e) => {
+        e.preventDefault();
+
+        // Form validation
+        const form = document.getElementById('checkout-form');
+        if (form && !form.checkValidity()) {
+            form.reportValidity();
+            return;
+        }
         if (cartItems.length === 0) {
             alert('Your cart is empty.');
             return;
@@ -173,7 +113,7 @@ const Checkout = () => {
                 pointsUsed: usePoints ? pointsToUse : 0,
                 pointsEarned: pointsToEarn,
                 status: 'pending',
-                stripeToken: stripeToken || null,
+                status: 'pending',
                 createdAt: new Date().toISOString()
             };
 
@@ -212,8 +152,33 @@ const Checkout = () => {
                 await awardPoints(currentUser.uid, finalTotal, orderId);
             }
 
-            alert(`Order Placed! 🎉\nOrder ID: ${orderId}\n\nPoints earned: +${pointsToEarn} pts`);
-            navigate(`/track-order?id=${orderId}&email=${encodeURIComponent(orderEmail)}`);
+            // 4. Create Stripe Checkout Session and Redirect
+            try {
+                const response = await fetch('/api/create-checkout-session', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        items: cartItems,
+                        orderId: orderId,
+                        finalTotal: finalTotal,
+                        customerEmail: orderEmail
+                    })
+                });
+                
+                const session = await response.json();
+                
+                if (session.error) {
+                    throw new Error(session.error);
+                }
+
+                // Redirect to Stripe Checkout
+                window.location.href = session.url;
+                return; // Stop execution to wait for redirect
+
+            } catch (stripeErr) {
+                console.error("Stripe Session Error:", stripeErr);
+                alert("Failed to initialize Stripe checkout. Please try again or contact support.");
+            }
 
         } catch (error) {
             console.error("Order failed", error);
@@ -455,13 +420,16 @@ const Checkout = () => {
                         )}
                     </div>
 
-                    <Elements stripe={stripePromise}>
-                        <StripePaymentForm 
-                            loading={loading} 
-                            setLoading={setLoading} 
-                            onSuccess={handlePayment} 
-                        />
-                    </Elements>
+                    <button
+                        type="submit"
+                        form="checkout-form"
+                        disabled={loading}
+                        className="btn btn-primary"
+                        onClick={handlePayment}
+                        style={{ width: '100%', marginTop: '30px', padding: '15px', fontSize: '1.1rem', fontWeight: 'bold' }}
+                    >
+                        {loading ? 'Redirecting to Stripe...' : 'Proceed to Secure Checkout'}
+                    </button>
                 </div>
             </div>
         </div>
