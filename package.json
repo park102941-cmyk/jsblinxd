@@ -11,6 +11,8 @@
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
+    "@stripe/react-stripe-js": "^6.4.0",
+    "@stripe/stripe-js": "^9.7.0",
     "firebase": "^10.14.1",
     "html2canvas": "^1.4.1",
     "jspdf": "^4.0.0",

@@ -6,7 +6,68 @@ import { db } from '../lib/firebase';
 import { collection, addDoc } from 'firebase/firestore';
 import { GOOGLE_SCRIPT_URL } from '../lib/config';
 import { getUserPoints, awardPoints, redeemPoints, calcPointsEarned, calcPointsDiscount, DISCOUNT_PER_POINT } from '../lib/points';
+import { loadStripe } from '@stripe/stripe-js';
+import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 
+const stripePromise = loadStripe('pk_live_51SzUFNKI2rTF1dqWzB0b696qbTaQ5UYHdtfimDoUgjcK8D5Q0N1dDRBSFKZobFLE4BFnPW1cnfjTaOwQnVRg7ZTm00rVIZZEhx');
+
+const StripePaymentForm = ({ loading, setLoading, onSuccess }) => {
+    const stripe = useStripe();
+    const elements = useElements();
+
+    const handleStripePayment = async (e) => {
+        e.preventDefault();
+        
+        // Form validation
+        const form = document.getElementById('checkout-form');
+        if (form && !form.checkValidity()) {
+            form.reportValidity();
+            return;
+        }
+
+        if (!stripe || !elements) return;
+
+        setLoading(true);
+        const cardElement = elements.getElement(CardElement);
+
+        const { error, token } = await stripe.createToken(cardElement);
+
+        if (error) {
+            alert(error.message);
+            setLoading(false);
+            return;
+        }
+
+        onSuccess(token.id);
+    };
+
+    return (
+        <div style={{ marginTop: '20px' }}>
+            <h4 style={{ marginBottom: '15px', fontSize: '1rem', color: '#333' }}>Credit Card Details</h4>
+            <div style={{ padding: '15px', border: '1px solid #ddd', borderRadius: '8px', backgroundColor: 'white', marginBottom: '20px' }}>
+                <CardElement options={{
+                    style: {
+                        base: {
+                            fontSize: '16px',
+                            color: '#424770',
+                            '::placeholder': { color: '#aab7c4' },
+                        },
+                        invalid: { color: '#9e2146' },
+                    },
+                }}/>
+            </div>
+            <button
+                type="button"
+                onClick={handleStripePayment}
+                disabled={loading || !stripe}
+                className="btn btn-primary"
+                style={{ width: '100%', padding: '15px', fontSize: '1.1rem', fontWeight: 'bold' }}
+            >
+                {loading ? 'Processing Payment...' : 'Pay with Stripe & Place Order'}
+            </button>
+        </div>
+    );
+};
 const Checkout = () => {
     const { cartItems, calculateTotals, coupon, applyCoupon } = useCart();
     const { currentUser } = useAuth();
@@ -79,8 +140,7 @@ const Checkout = () => {
         }
     };
 
-    const handlePayment = async (e) => {
-        e.preventDefault();
+    const handlePayment = async (stripeToken) => {
         if (cartItems.length === 0) {
             alert('Your cart is empty.');
             return;
@@ -106,6 +166,7 @@ const Checkout = () => {
                 pointsUsed: usePoints ? pointsToUse : 0,
                 pointsEarned: pointsToEarn,
                 status: 'pending',
+                stripeToken: stripeToken || null,
                 createdAt: new Date().toISOString()
             };
 
@@ -167,7 +228,7 @@ const Checkout = () => {
                 {/* Left: Shipping Info */}
                 <div>
                     <h2 style={{ fontSize: '1.3rem', marginBottom: '20px', borderBottom: '2px solid var(--secondary-color)', paddingBottom: '10px' }}>Shipping Information</h2>
-                    <form id="checkout-form" onSubmit={handlePayment} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                    <form id="checkout-form" style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
                         <div>
                             <label style={{ display: 'block', marginBottom: '5px' }}>Name</label>
                             <input
@@ -387,15 +448,13 @@ const Checkout = () => {
                         )}
                     </div>
 
-                    <button
-                        type="submit"
-                        form="checkout-form"
-                        disabled={loading}
-                        className="btn btn-primary"
-                        style={{ width: '100%', marginTop: '30px', padding: '15px' }}
-                    >
-                        {loading ? 'Processing...' : 'Place Order'}
-                    </button>
+                    <Elements stripe={stripePromise}>
+                        <StripePaymentForm 
+                            loading={loading} 
+                            setLoading={setLoading} 
+                            onSuccess={handlePayment} 
+                        />
+                    </Elements>
                 </div>
             </div>
         </div>
