@@ -293,10 +293,21 @@ const ProductDetail = () => {
         }
     }, [currentImageIndex, product, images]);
 
+    const getVirtualImage = (colorName, category) => {
+        if (!colorName || !category) return null;
+        const lowerName = colorName.toLowerCase();
+        const type = category.toLowerCase().includes('zebra') ? 'zebra' : 'roller';
+        let colorType = 'grey';
+        if (lowerName.includes('white') || lowerName.includes('ivory')) colorType = 'white';
+        else if (lowerName.includes('beige') || lowerName.includes('sand') || lowerName.includes('brown') || lowerName.includes('mocha') || lowerName.includes('oat') || lowerName.includes('wood') || lowerName.includes('mushroom')) colorType = 'beige';
+        else if (lowerName.includes('black') || lowerName.includes('charcoal') || lowerName.includes('ink')) colorType = 'charcoal';
+        return `/assets/virtual/${type}_${colorType}.png`;
+    };
+
     useEffect(() => {
-        const colorImg = selectedColor?.fullImage || selectedColor?.image;
+        const colorImg = selectedColor?.fullImage || selectedColor?.image || (product ? getVirtualImage(selectedColor?.name, product?.category) : null);
         if (colorImg) setMainImageUrl(colorImg);
-    }, [selectedColor]);
+    }, [selectedColor, product]);
 
     const [validationError, setValidationError] = useState('');
 
