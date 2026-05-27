@@ -54,11 +54,26 @@ const RemoteInfographic = () => {
         <div style={{ padding: '40px 0', maxWidth: '1000px', margin: '0 auto', fontFamily: 'Inter, sans-serif' }}>
             <div style={{ textAlign: 'center', marginBottom: '40px' }}>
                 <h2 style={{ fontSize: '2rem', fontWeight: '800', color: '#1d1d1f', marginBottom: '16px' }}>
-                    Smart Motor Remote Programming Guide
+                    Dooya Motor Remote Programming Guide
                 </h2>
                 <p style={{ fontSize: '1.1rem', color: '#666', maxWidth: '600px', margin: '0 auto' }}>
-                    Follow these simple steps to pair, adjust, and copy your Dooya-compatible blind motor remotes.
+                    Follow these step-by-step instructions specifically designed for the Dooya DM25TE/S series tubular motors.
                 </p>
+            </div>
+
+            {/* Remote Layout Image Reference */}
+            <div style={{ textAlign: 'center', marginBottom: '40px' }}>
+                <img 
+                    src="https://manuals.plus/wp-content/uploads/2025/02/DOOYA-DM25TE-S-1.5-Series-DC-Tubular-Motor-Button-Instructions-550x224.jpg"
+                    alt="Dooya Remote and Motor Buttons Diagram"
+                    style={{ 
+                        maxWidth: '100%', 
+                        height: 'auto', 
+                        borderRadius: '12px', 
+                        boxShadow: '0 4px 15px rgba(0,0,0,0.05)',
+                        border: '1px solid #e5e5e5'
+                    }}
+                />
             </div>
 
             {/* Note alert */}
@@ -69,11 +84,9 @@ const RemoteInfographic = () => {
             }}>
                 <AlertCircle size={20} color="#f59e0b" style={{ marginTop: '2px' }} />
                 <div>
-                    <strong style={{ display: 'block', color: '#b45309', marginBottom: '4px' }}>Important Timing Tips</strong>
+                    <strong style={{ display: 'block', color: '#b45309', marginBottom: '4px' }}>Important Tips</strong>
                     <span style={{ color: '#92400e', fontSize: '0.95rem', lineHeight: '1.5' }}>
-                        The <strong>P2 button</strong> is usually located on the back of the remote, inside the battery cover. 
-                        Press each button steadily with a <strong>1-second interval</strong> between presses. 
-                        If using a multi-channel remote, select the desired channel <em>before</em> programming.
+                        The <strong>P1 button</strong> is located on the motor head. The <strong>P2 button</strong> is usually inside the remote's battery cover. Pay close attention to timing: pressing buttons simultaneously vs. sequentially, and holding durations (2s vs 10s).
                     </span>
                 </div>
             </div>
@@ -87,10 +100,9 @@ const RemoteInfographic = () => {
                     icon={RadioReceiver}
                     color="#3b82f6"
                     steps={[
-                        <span>Power on the motor (it should jog and beep).</span>,
-                        <span>Press the <strong>P2</strong> button <strong>twice</strong> on the back of the remote.</span>,
-                        <span>Press the <strong>UP</strong> or <strong>DOWN</strong> button once.</span>,
-                        <span>The motor will jog and beep. <strong>Pairing is complete!</strong></span>
+                        <span>Press and hold <strong>P1</strong> on the motor for 2 seconds (Motor jogs 1x, beeps long).</span>,
+                        <span>Within 10 seconds, press and hold <strong>STOP</strong> on the remote for 2 seconds.</span>,
+                        <span>The motor will jog 2x and beep 3x. <strong>Pairing is complete!</strong></span>
                     ]}
                 />
 
@@ -100,10 +112,9 @@ const RemoteInfographic = () => {
                     icon={RefreshCw}
                     color="#8b5cf6"
                     steps={[
-                        <span>If the blind moves opposite to the button pressed, power cycle the motor.</span>,
-                        <span>Press the <strong>P2</strong> button <strong>twice</strong>.</span>,
-                        <span>Press the <strong>OPPOSITE</strong> direction button from initial pairing.</span>,
-                        <span>The motor will jog. <strong>Direction is reversed!</strong></span>
+                        <span><em>If limits are NOT set:</em> Press and hold <strong>UP and DOWN</strong> simultaneously for 2 seconds (Motor jogs 1x).</span>,
+                        <span><em>If limits ARE set:</em> Press and hold <strong>P1</strong> on the motor for 10 seconds.</span>,
+                        <span>The motor will jog 3x and beep 3x. <strong>Direction reversed!</strong></span>
                     ]}
                 />
 
@@ -113,21 +124,21 @@ const RemoteInfographic = () => {
                     icon={Settings}
                     color="#10b981"
                     steps={[
-                        <span>Enter setting mode: Press <strong>P2</strong> → <strong>UP</strong> → <strong>P2</strong> (motor jogs).</span>,
-                        <span><strong>Upper Limit:</strong> Move blind to top. Press and hold <strong>STOP</strong> for 3-5 seconds until beep.</span>,
-                        <span><strong>Lower Limit:</strong> Move blind to bottom. Press and hold <strong>STOP</strong> for 3-5 seconds until beep.</span>
+                        <span><strong>Upper Limit:</strong> Press UP to desired position. Press and hold <strong>UP + STOP</strong> simultaneously for 2s (Jog 2x, Beep 3x).</span>,
+                        <span><strong>Lower Limit:</strong> Press DOWN to desired position. Press and hold <strong>DOWN + STOP</strong> simultaneously for 2s (Jog 2x, Beep 3x).</span>,
+                        <span><em>To adjust later:</em> Hold UP+STOP or DOWN+STOP for 5s to unlock, move, then hold for 2s to lock again.</span>
                     ]}
                 />
 
                 {/* 4. Copy Remote */}
                 <StepCard 
-                    title="4. Copy to a New Remote"
+                    title="4. Add / Copy Remote"
                     icon={Copy}
                     color="#f43f5e"
                     steps={[
-                        <span>Take the <strong>original</strong> working remote and press <strong>P2 twice</strong>.</span>,
-                        <span>Take the <strong>new</strong> remote and press <strong>P2 once</strong>.</span>,
-                        <span>The motor will jog to confirm. <strong>Remote is copied!</strong></span>
+                        <span>Take the <strong>original</strong> working remote and press <strong>P2</strong> twice (Motor jogs 1x, beeps).</span>,
+                        <span>Take the <strong>new</strong> remote and press <strong>P2</strong> once.</span>,
+                        <span>The motor will jog 2x and beep 3x. <strong>Remote is copied!</strong></span>
                     ]}
                 />
             </div>
