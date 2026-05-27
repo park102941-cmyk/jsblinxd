@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Cpu, ArrowLeft, Zap, Battery, Wifi, Smartphone, Clock, Shield, CheckCircle, Home as HomeIcon } from 'lucide-react';
+import RemoteInfographic from '../../components/RemoteInfographic';
 
 const SmartMotors = () => {
     const motorTypes = [
@@ -350,6 +351,11 @@ const SmartMotors = () => {
                             </div>
                         ))}
                     </div>
+                </div>
+
+                {/* Remote Programming Infographic */}
+                <div style={{ marginBottom: '80px' }}>
+                    <RemoteInfographic />
                 </div>
 
                 {/* FAQ */}

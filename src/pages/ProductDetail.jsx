@@ -10,6 +10,7 @@ import { orderEngine } from '../lib/orderEngine';
 import OrderingGuide from '../components/OrderingGuide';
 import WindowVisualizer from '../components/WindowVisualizer';
 import LiftStyleIllustration from '../components/LiftStyleIllustration';
+import RemoteInfographic from '../components/RemoteInfographic';
 
 
 const ProductDetail = () => {
@@ -1725,6 +1726,12 @@ const ProductDetail = () => {
                     </div>
                 );
             })()}
+            {/* Remote Infographic - Only show if product title contains "Remote" or category is "remote" */}
+            {(product?.title?.toLowerCase().includes('remote') || product?.category?.toLowerCase().includes('remote')) && (
+                <div className="container" style={{ padding: '0 20px', marginBottom: '60px' }}>
+                    <RemoteInfographic />
+                </div>
+            )}
 
             {/* Full Screen Image Lightbox */}
             {isLightboxOpen && (
