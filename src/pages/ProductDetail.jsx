@@ -277,22 +277,6 @@ const ProductDetail = () => {
         }
     }, [product, location.state, fractions]);
 
-    const legacyImg = product?.imageUrl || product?.image;
-    const cleanLegacyImg = legacyImg && legacyImg.includes('unsplash.com') ? null : legacyImg;
-
-    const images = product?.images && product.images.length > 0 
-        ? product.images 
-        : cleanLegacyImg 
-            ? [cleanLegacyImg] 
-            : [];
-
-    // Handle Image Switching logic
-    useEffect(() => {
-        if (product && images && images.length > 0) {
-            setMainImageUrl(images[currentImageIndex]);
-        }
-    }, [currentImageIndex, product, images]);
-
     const getVirtualImage = (colorName, category) => {
         if (!colorName || !category) return null;
         const lowerName = colorName.toLowerCase();
@@ -303,6 +287,25 @@ const ProductDetail = () => {
         else if (lowerName.includes('black') || lowerName.includes('charcoal') || lowerName.includes('ink')) colorType = 'charcoal';
         return `/assets/virtual/${type}_${colorType}.png`;
     };
+
+    const images = React.useMemo(() => {
+        const baseImages = product?.images && product.images.length > 0 
+            ? [...product.images] 
+            : (product?.imageUrl ? [product.imageUrl] : []);
+        
+        const virtuals = product?.colors?.map(c => getVirtualImage(c.name, product?.category)).filter(Boolean) || [];
+        // Deduplicate
+        return Array.from(new Set([...baseImages, ...virtuals]));
+    }, [product]);
+
+    // Handle Image Switching logic
+    useEffect(() => {
+        if (product && images && images.length > 0) {
+            setMainImageUrl(images[currentImageIndex]);
+        }
+    }, [currentImageIndex, product, images]);
+
+
 
     useEffect(() => {
         const colorImg = selectedColor?.fullImage || selectedColor?.image || (product ? getVirtualImage(selectedColor?.name, product?.category) : null);
