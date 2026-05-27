@@ -3,7 +3,7 @@ import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { db } from '../lib/firebase';
-import { collection, addDoc } from 'firebase/firestore';
+import { collection, addDoc, doc, updateDoc } from 'firebase/firestore';
 import { GOOGLE_SCRIPT_URL } from '../lib/config';
 import { getUserPoints, awardPoints, redeemPoints, calcPointsEarned, calcPointsDiscount, DISCOUNT_PER_POINT } from '../lib/points';
 
@@ -38,6 +38,19 @@ const Checkout = () => {
     useEffect(() => {
         if (currentUser) {
             getUserPoints(currentUser.uid).then(setUserPoints);
+            
+            if (currentUser.shippingInfo) {
+                setShippingInfo(prev => ({
+                    ...prev,
+                    ...currentUser.shippingInfo
+                }));
+            } else {
+                setShippingInfo(prev => ({
+                    ...prev,
+                    name: currentUser.displayName || '',
+                    email: currentUser.email || ''
+                }));
+            }
         }
     }, [currentUser]);
 
@@ -119,6 +132,17 @@ const Checkout = () => {
 
             // 2. Save to Firestore (Database)
             await addDoc(collection(db, "orders"), orderData);
+
+            // Save address to user profile
+            if (currentUser && currentUser.uid !== 'guest') {
+                try {
+                    await updateDoc(doc(db, "users", currentUser.uid), {
+                        shippingInfo: shippingInfo
+                    });
+                } catch (userUpdateErr) {
+                    console.error("Failed to update user profile address", userUpdateErr);
+                }
+            }
 
             // 3. Send to Google Sheets (Inventory Management ONLY)
             try {
