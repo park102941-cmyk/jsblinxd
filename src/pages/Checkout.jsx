@@ -14,9 +14,11 @@ const stripePromise = loadStripe('pk_live_51SzUFNKI2rTF1dqWzB0b696qbTaQ5UYHdtfim
 const StripePaymentForm = ({ loading, setLoading, onSuccess }) => {
     const stripe = useStripe();
     const elements = useElements();
+    const [paymentError, setPaymentError] = useState('');
 
     const handleStripePayment = async (e) => {
         e.preventDefault();
+        setPaymentError('');
         
         // Form validation
         const form = document.getElementById('checkout-form');
@@ -33,7 +35,7 @@ const StripePaymentForm = ({ loading, setLoading, onSuccess }) => {
         const { error, token } = await stripe.createToken(cardElement);
 
         if (error) {
-            alert(error.message);
+            setPaymentError(error.message);
             setLoading(false);
             return;
         }
@@ -44,7 +46,7 @@ const StripePaymentForm = ({ loading, setLoading, onSuccess }) => {
     return (
         <div style={{ marginTop: '20px' }}>
             <h4 style={{ marginBottom: '15px', fontSize: '1rem', color: '#333' }}>Credit Card Details</h4>
-            <div style={{ padding: '15px', border: '1px solid #ddd', borderRadius: '8px', backgroundColor: 'white', marginBottom: '20px' }}>
+            <div style={{ padding: '15px', border: '1px solid #ddd', borderRadius: '8px', backgroundColor: 'white', marginBottom: '10px' }}>
                 <CardElement options={{
                     style: {
                         base: {
@@ -56,6 +58,11 @@ const StripePaymentForm = ({ loading, setLoading, onSuccess }) => {
                     },
                 }}/>
             </div>
+            {paymentError && (
+                <div style={{ color: '#dc2626', fontSize: '0.85rem', marginBottom: '15px', padding: '10px', backgroundColor: '#fef2f2', borderRadius: '6px', border: '1px solid #fecaca' }}>
+                    {paymentError}
+                </div>
+            )}
             <button
                 type="button"
                 onClick={handleStripePayment}
