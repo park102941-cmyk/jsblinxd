@@ -6,7 +6,7 @@ import { db } from '../lib/firebase';
 import { doc, getDoc, updateDoc, deleteDoc, arrayRemove, collection, query, where, getDocs } from 'firebase/firestore';
 import { updateProfile, deleteUser } from 'firebase/auth';
 import { getUserPoints } from '../lib/points';
-import jsPDF from 'jspdf';
+import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 
 const statusConfig = {
@@ -471,7 +471,7 @@ const MyAccount = () => {
                                                                 color: '#333', fontWeight: '600'
                                                             }}
                                                         >
-                                                            PDF
+                                                            Invoice
                                                         </button>
                                                     </td>
                                                 </tr>
